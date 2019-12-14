@@ -25,19 +25,19 @@ import (
 
 func main() {
 	myFlags := []cli.Flag{
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "debug, d",
 			Usage: "run the command in debug mode",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "network, n",
 			Usage: "show network details in overview",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "mounts, m",
 			Usage: "show network details in overview",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "sidecars, s",
 			Usage: "show network details in overview",
 		},
@@ -48,9 +48,7 @@ func main() {
 	app.Name = "iamCLI"
 	app.Usage = "written in go. Can be used as a sidekick to iamMenu and iamDoctr"
 	app.Version = "1.0.0"
-	app.Email = "gregor.pirolt@me.com"
 	app.Copyright = "copyright yo"
-	app.Author = "Gregor Pirolt"
 	app.Metadata = make(map[string]interface{})
 	app.Metadata["startTime"] = time.Now()
 	app.Before = func(c *cli.Context) error {
@@ -128,7 +126,7 @@ func main() {
 	catServiceSpecific := "2) - " + tm.Color("service specific", tm.RED)
 	catUtils := "3) - " + tm.Color("utilities", tm.CYAN)
 
-	app.Commands = []cli.Command{
+	app.Commands = []*cli.Command{
 		{
 			Name:     "up",
 			Category: catStackControlls,
@@ -178,7 +176,7 @@ func main() {
 			Usage:    "Configuration for current stack (type `config help` for possible subcommands)",
 			Aliases:  []string{"conf", "c", "."},
 			Flags:    myFlags,
-			Subcommands: []cli.Command{
+			Subcommands: []*cli.Command{
 				{
 					Name:    "yaml",
 					Usage:   "Show iam_config.yaml file",
@@ -346,7 +344,7 @@ func main() {
 				PrintShortcuts(c)
 				return nil
 			},
-			Subcommands: []cli.Command{
+			Subcommands: []*cli.Command{
 				{
 					Name:  "add",
 					Usage: "add new shortcut `ssc add shortcut service` ",
@@ -354,8 +352,8 @@ func main() {
 						if c.NArg() != 2 {
 							return cli.NewExitError("You should enter a service and a shortcut", 5)
 						}
-						shortcut := c.Args()[0]
-						service := c.Args()[1]
+						shortcut := c.Args().Get(0)
+						service := c.Args().Get(1)
 
 						shortcuts := c.App.Metadata["shortcuts"].(map[string]string)
 
@@ -382,7 +380,7 @@ func main() {
 							return cli.NewExitError("You should only one shortcut at a time", 5)
 							return nil
 						}
-						shortcut := c.Args()[0]
+						shortcut := c.Args().Get(0)
 
 						shortcuts := c.App.Metadata["shortcuts"].(map[string]string)
 
@@ -405,7 +403,7 @@ func main() {
 			Category: catUtils,
 			Usage:    "View and edit service attached volumes",
 			Aliases:  []string{"vol"},
-			Flags: append(myFlags, cli.BoolFlag{
+			Flags: append(myFlags, &cli.BoolFlag{
 				Name:  "print_volume",
 				Usage: "run the command without coloring output",
 			},
@@ -511,7 +509,7 @@ func TranslateShortcuts(c *cli.Context) []string {
 	shortcuts := c.App.Metadata["shortcuts"].(map[string]string)
 	services := make([]string, c.NArg())
 
-	for k, v := range c.Args() {
+	for k, v := range c.Args().Slice() {
 		services[k] = v
 		if service := shortcuts[v]; service != "" {
 			services[k] = service
