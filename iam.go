@@ -1,20 +1,17 @@
+// This package implements the cli for the iam-stack. The underlying framework is depnedent upon urfave/cli.
 package main
 
 import (
-	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
-	"os/exec"
 	"sort"
-	"strings"
 
-	"github.com/gregorpirolt/iamutils"
-
-	"github.com/gregorpirolt/iamcli/templates"
-	"gopkg.in/yaml.v3"
-
-	"github.com/gregorpirolt/iamcli/ui"
+	at "github.com/gregorpirolt/animaterm"
+	A "github.com/gregorpirolt/iamcli/actions"
+	T "github.com/gregorpirolt/iamcli/templates"
+	UI "github.com/gregorpirolt/iamcli/ui"
+	Impl "github.com/gregorpirolt/implementations"
+	I "github.com/gregorpirolt/interfaces"
 
 	"github.com/urfave/cli"
 
@@ -23,6 +20,9 @@ import (
 	tm "github.com/buger/goterm"
 )
 
+var iamUI = at.CreateUI()
+
+// Entrypoint for the iam cli
 func main() {
 	myFlags := []cli.Flag{
 		&cli.BoolFlag{
@@ -35,140 +35,135 @@ func main() {
 		},
 		&cli.BoolFlag{
 			Name:  "mounts, m",
-			Usage: "show network details in overview",
+			Usage: "show mounting details in overview",
 		},
 		&cli.BoolFlag{
-			Name:  "sidecars, s",
-			Usage: "show network details in overview",
+			Name:    "sidecars, s",
+			Aliases: []string{"sc"},
+			Usage:   "show sidecars in overview",
 		},
 	}
+	catStackControlls := "1) - " + tm.Color("stack controls", tm.BLUE)
+	catWorkloadSpecific := "2) - " + tm.Color("workload specific", tm.RED)
+	catUtils := "3) - " + tm.Color("utilities", tm.CYAN)
 
 	app := cli.NewApp()
 	app.Flags = myFlags
 	app.Name = "iamCLI"
 	app.Usage = "written in go. Can be used as a sidekick to iamMenu and iamDoctr"
-	app.Version = "1.0.0"
-	app.Copyright = "copyright yo"
+	app.Version = "0.5.0"
 	app.Metadata = make(map[string]interface{})
 	app.Metadata["startTime"] = time.Now()
+	app.CustomAppHelpTemplate = T.GetHelpTemplate()
 	app.Before = func(c *cli.Context) error {
-
-		configObject := iamutils.IamConfigYaml{}
-		configObject.InitFromFile("/.iam/iam_conf.yml")
-		c.App.Metadata["iamconfig"] = configObject
-
-		c.App.Metadata["services"] = iamutils.GenerateCLIServices(configObject)
-
-		homeDir, err := os.UserHomeDir()
+		userHome, err := os.UserHomeDir()
 		if err != nil {
-			return err
+			return nil
+		}
+		c.App.Metadata["configLocation"] = userHome + "/.iam/iam_conf.yml"
+		c.App.Metadata["iamconfig"] = Impl.CreateConfigObjectYaml(c.App.Metadata["configLocation"].(string))
+		c.App.Metadata["workloads"] = c.App.Metadata["iamconfig"].(I.IConfigObject).GetWorkloads()
+		c.App.Metadata["currentcontext"] = A.UtilGetCurrentKubeContext()
+		iamUI.ClearScreen()
+		iamUI.SetBoarder(5)
+		c.App.Metadata["animation"] = int64(0)
+		if c.App.Metadata["iamconfig"].(I.IConfigObject).
+			GetLastUsed().Add(time.Duration(5) * time.Second).
+			Before(time.Now()) {
+			c.App.Metadata["animation"] = int64(1)
 		}
 
-		shortcutsYAMLContent, err := ioutil.ReadFile(homeDir + "/.iam/iam_shortcuts.yml")
-		if err != nil {
-			log.Println(err.Error())
-			return err
-		}
-
-		shortcuts := map[string]string{}
-		err = yaml.Unmarshal(shortcutsYAMLContent, &shortcuts)
-		if err != nil {
-			return err
-		}
-
-		c.App.Metadata["shortcuts"] = shortcuts
-
-		out, err := exec.Command("kubectl", "config", "current-context").Output()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		c.App.Metadata["currentcontext"] = string(out)
-
-		// always print banner before running the app
-		ui.PrintBanner(c)
-
-		app.CustomAppHelpTemplate = templates.GetHelpTemplate()
+		c.App.Metadata["iamui"] = iamUI
+		UI.PrintBanner(c)
 		return nil
 	}
-	app.HideHelp = true
 	app.Action = func(c *cli.Context) error {
-		ui.PrintServiceOverview(c)
+		UI.PrintWorkloadOverview(c)
 		return nil
 	}
 	app.After = func(c *cli.Context) error {
-
-		conf := c.App.Metadata["iamconfig"].(iamutils.IamConfigYaml)
-		conf.Update()
-
-		// shortcutsYAMLContent, err := yaml.Marshal(c.App.Metadata["shortcuts"].(map[string]string))
-		// if err != nil {
-		// 	return err
-		// }
-
-		// homeDir, err := os.UserHomeDir()
-		// if err != nil {
-		// 	return err
-		// }
-
-		// err = ioutil.WriteFile(homeDir+"/.iam/iam_shortcuts.yml", shortcutsYAMLContent, 644)
-		// if err != nil {
-		// 	log.Println(err.Error())
-		// 	return err
-		// }
-
+		c.App.Metadata["iamconfig"].(I.IConfigObject).Update()
 		startTime := c.App.Metadata["startTime"].(time.Time)
-		ui.PrintExecutionTime(time.Since(startTime))
+		UI.PrintExecutionTime(time.Since(startTime))
 		return nil
 	}
 
-	catStackControlls := "1) - " + tm.Color("stack controls", tm.BLUE)
-	catServiceSpecific := "2) - " + tm.Color("service specific", tm.RED)
-	catUtils := "3) - " + tm.Color("utilities", tm.CYAN)
-
 	app.Commands = []*cli.Command{
+		{
+			Name:     "init",
+			Category: catUtils,
+			Usage:    "Initialze the " + app.Name,
+			Before:   UI.CheckNewSkill,
+			Action:   A.AInit,
+			Description: `
+			Welcome to the ` + app.Name + ` !!! 🍄 🍄 🍄
+
+			It looks like you just unlocked your first command. 🤗 🎉 🎉 🎉
+			Sadly you are not going to use this one as often as the other ones. 
+			But still it is an important one.
+
+			When ever you are ready, lets start setting up the ` + app.Name + ` by defining
+			the base path for your projects:
+			`,
+		},
 		{
 			Name:     "up",
 			Category: catStackControlls,
 			Usage:    "Start dev stack with current config",
 			Aliases:  []string{"u"},
 			Flags:    myFlags,
-			Action: func(c *cli.Context) error {
-				return nil
-			},
+			Before:   UI.CheckNewSkill,
+			Action:   A.AUp,
+			Description: `
+The 'up' command allows you to start a single workload in your stack or even the
+whole stack at once. All services that are currently active can be started with the command:
+iam up [workload name] (i.e iam up database)
+This does not nessesarily mean that the workload is actually started as a container
+but that 'a' workload is made available to your stack via it's DNS name.
+You can for example start a workload like a database and just wire up the connection to
+an external database hosted as a process on your local machine, on a nearby dev server, or even
+with tunneling or ingress routing on a remote kubernetes cluster. If you omitt the workload name
+the cli assumes you want to start all defined workloads. If some or all of them are already running,
+the command is ignored for them. If you need to restart a service have a look at iam restart.
+			`,
 		},
 		{
 			Name:     "down",
 			Category: catStackControlls,
-			Usage:    "Stop dev stack (or single service)",
+			Usage:    "Stop dev stack (or single workload)",
 			Aliases:  []string{"d"},
 			Flags:    myFlags,
-			Action: func(c *cli.Context) error {
-				return nil
-			},
+			Before:   UI.CheckNewSkill,
+			Action:   A.ADown,
+			Description: `
+			The 'down' command is good and professional.
+			`,
 		},
 		{
 			Name:     "restart",
 			Category: catStackControlls,
-			Usage:    "Restart dev stack (or single service)",
+			Usage:    "Restart dev stack (or single workload)",
 			Aliases:  []string{"r"},
 			Flags:    myFlags,
-			Action: func(c *cli.Context) error {
-				return nil
-			},
+			Before:   UI.CheckNewSkill,
+			Action:   A.ARestart,
+			Description: `
+			The 'restart' command is good and professional.
+			`,
 		},
 		{
-			Name:        "logs",
-			Category:    catStackControlls,
-			Usage:       "Show all logs for running stack (or single service)",
-			Aliases:     []string{"l"},
-			Flags:       myFlags,
-			UsageText:   "so this is the usage text",
-			Description: "and what is this then?",
-			ArgsUsage:   "Args usage",
-			Action: func(c *cli.Context) error {
-				return nil
-			},
+			Name:      "logs",
+			Category:  catStackControlls,
+			Usage:     "Show all logs for running stack (or single workload)",
+			Aliases:   []string{"l"},
+			Flags:     myFlags,
+			UsageText: "Show logs for a single Workload or all workloads combined",
+			ArgsUsage: "Args usage",
+			Before:    UI.CheckNewSkill,
+			Action:    A.ALogs,
+			Description: `
+			The 'logs' command is good and professional.
+			`,
 		},
 		{
 			Name:     "config",
@@ -181,365 +176,188 @@ func main() {
 					Name:    "yaml",
 					Usage:   "Show iam_config.yaml file",
 					Aliases: []string{"y"},
-					Action: func(c *cli.Context) error {
-						configObject := c.App.Metadata["iamconfig"].(iamutils.IamConfigYaml)
-						configObject.PrintSourceYaml()
-						return nil
-					},
+					Action:  A.SubAConfig["yaml"],
+					Before:  UI.CheckNewSkill,
+					Description: `
+					The 'config yaml' command is good and professional.
+					`,
 				},
-			},
-			Action: func(c *cli.Context) error {
-				// services  := c.App.Metadata["services"].(map[string]iamutils.CliService)
-
-				// composeChain := concatDockerComposeFiles(services)
-
-				// // ctx := context.Background()
-				// mycli, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
-				// if err != nil {
-				// 	return nil
-				// }
-
-				// mycli.Close()
-				// images, err := mycli.ImageList(context.Background(), types.ImageListOptions{})
-				// if err != nil {
-				// 	return nil
-				// }
-
-				// for _, image := range images {
-				// 	fmt.Println(image.ID)
-				// }
-
-				// os.Stdin, os.Stdout, os.Stderr
-				// cli2, err := command.NewDockerCli()
-				// if err != nil {
-				// 	return err
-				// }
-				// cli2.ClientInfo()
-				// // fmt.Println(flags.DefaultCaFile)
-				// cli2.Initialize(flags.NewClientOptions())
-				// cmd := stack.NewStackCommand(cli2)
-
-				// // the command package will pick up these, but you could override if you need to
-				// cmd.SetArgs(append([]string{"deploy", "mystack"}, composeChain...))
-
-				// cmd.Execute()
-				// // project, err := docker.NewProject(&ctx.Context{
-				// 	Context: project.Context{
-				// 		ComposeFiles: composeChain,
-				// 		ProjectName:  "my-compose",
-				// 	},
-				// }, nil)
-
-				// if err != nil {
-				// 	log.Fatal(err)
-				// }
-
-				// err = project.Up(context.Background(), options.Up{})
-
-				// if err != nil {
-				// 	log.Fatal(err)
-				// }
-
-				// fmt.Println(composeChain)
-
-				// cmd := exec.Command("docker-compose", "-v")
-				// // cmd := exec.Command("docker-compose", composeChain...)
-				// cmd.Stdout = os.Stdout
-				// cmd.Stderr = os.Stderr
-				// err := cmd.Run()
-				// if err != nil {
-				// 	log.Fatalf("cmd.Run() failed with %s\n", err)
-				// }
-
-				return nil
 			},
 		},
 		{
 			Name:     "enter",
-			Category: catServiceSpecific,
-			Usage:    "Enter a service",
+			Category: catWorkloadSpecific,
+			Usage:    "Enter a workload",
 			Aliases:  []string{"en"},
 			Flags:    myFlags,
-			Action: func(c *cli.Context) error {
-				str := ""
-				for {
-					// tm.Clear()
-					str = str + "="
-
-					// By moving cursor to top-left position we ensure that console output
-					// will be overwritten each time, instead of adding new.
-					tm.MoveCursor(1, 1)
-					tm.Println("Current Time:", time.Now().Format(time.RFC1123))
-
-					tm.Println(str + ">")
-					tm.Println("\nCancel with Ctrl + c")
-					tm.Flush() // Call it every time at the end of rendering
-					time.Sleep(time.Millisecond * 15)
-				}
-				return nil
-			},
+			Before:   UI.CheckNewSkill,
+			Action:   A.AEnter,
+			Description: `
+			The 'enter' command is good and professional.
+			`,
 		},
 		{
 			Name:     "execute",
-			Category: catServiceSpecific,
-			Usage:    "Execute a command in service and view output",
+			Category: catWorkloadSpecific,
+			Usage:    "Execute a command in workload and view output",
 			Aliases:  []string{"exec", "ex"},
 			Flags:    myFlags,
-			Action: func(c *cli.Context) error {
-				return nil
-			},
+			Before:   UI.CheckNewSkill,
+			Action:   A.AExecute,
+			Description: `
+			The 'execute' command is good and professional.
+			`,
 		},
 		{
-			Name:        "test",
-			Category:    catServiceSpecific,
-			Usage:       "Run unittest inside container",
-			Aliases:     []string{"t"},
-			Flags:       myFlags,
-			UsageText:   "TODO",
-			Description: "TODO",
-			ArgsUsage:   "TODO",
-			Action: func(c *cli.Context) error {
-				fmt.Println("")
-				fmt.Println("ACTION: (test)")
-				fmt.Println("TODO")
-				return nil
-			},
+			Name:      "test",
+			Category:  catWorkloadSpecific,
+			Usage:     "Run unittest inside container",
+			Aliases:   []string{"t"},
+			Flags:     myFlags,
+			UsageText: "TODO",
+			ArgsUsage: "TODO",
+			Before:    UI.CheckNewSkill,
+			Action:    A.ATest,
+			Description: `
+			The 'test' command is good and professional.
+			`,
 		},
 		{
-			Name:        "activate",
-			Category:    catServiceSpecific,
-			Usage:       "Activate a service",
-			Aliases:     []string{"act", "a"},
-			Flags:       myFlags,
-			UsageText:   "TODO",
-			Description: "TODO",
-			ArgsUsage:   "TODO",
+			Name:      "activate",
+			Category:  catWorkloadSpecific,
+			Usage:     "Activate a workload",
+			Aliases:   []string{"act", "a"},
+			Flags:     myFlags,
+			UsageText: "TODO",
+			ArgsUsage: "TODO",
+			Before:    UI.CheckNewSkill,
+			Action:    A.AActivate,
 			After: func(c *cli.Context) error {
-				ui.PrintServiceOverview(c)
+				UI.PrintWorkloadOverview(c)
 				return nil
 			},
-			Action: func(c *cli.Context) error {
-				services := TranslateShortcuts(c)
-				configObject := c.App.Metadata["iamconfig"].(iamutils.IamConfigYaml)
-
-				for _, serviceToActivate := range services {
-					for _, s := range configObject.IamServiceSettings {
-						if serviceToActivate == s.Name {
-							s.ToggleActive()
-							configObject.IamServiceSettings[s.Name] = s
-							c.App.Metadata["services"] = iamutils.GenerateCLIServices(configObject)
-						}
-					}
-				}
-				return nil
-			},
+			Description: `
+			The 'activate' command is good and professional.
+			`,
 		},
 		{
 			Name:     "shortcuts",
 			Category: catUtils,
-			Usage:    "Show and edit shortcut names for services",
-			Aliases:  []string{"sc"},
+			Usage:    "Show and edit shortcut names for workloads",
+			Aliases:  []string{"sc", "shortcut"},
 			Flags:    myFlags,
-			After: func(c *cli.Context) error {
-				PrintShortcuts(c)
-				return nil
-			},
 			Subcommands: []*cli.Command{
 				{
-					Name:  "add",
-					Usage: "add new shortcut `ssc add shortcut service` ",
-					Action: func(c *cli.Context) error {
-						if c.NArg() != 2 {
-							return cli.NewExitError("You should enter a service and a shortcut", 5)
-						}
-						shortcut := c.Args().Get(0)
-						service := c.Args().Get(1)
-
-						shortcuts := c.App.Metadata["shortcuts"].(map[string]string)
-
-						if val := shortcuts[shortcut]; val == "" {
-							for _, s := range c.App.Metadata["services"].([]iamutils.DockerComposePod) {
-								fmt.Println(s)
-								// if s.GetName() == service {
-								// 	shortcuts[shortcut] = service
-								// 	fmt.Println("Added new shortcut: " + tm.Color(shortcut, tm.RED) + " -> " + tm.Color(shortcuts[shortcut], tm.CYAN))
-
-								// 	return nil
-								// }
-							}
-							return cli.NewExitError("The service "+tm.Color(service, tm.CYAN)+" is not part of your stack. You can list all services with the command `iam config`", 6)
-						}
-						return cli.NewExitError(tm.Color(shortcut, tm.RED)+" already exists and points to "+tm.Color(shortcuts[shortcut], tm.CYAN), 7)
-					},
+					Name:    "list",
+					Aliases: []string{"l", "ls"},
+					Usage:   "list all shortcuts",
+					Action:  A.SubAShortcut["list"],
+					Before:  UI.CheckNewSkill,
+					Description: `
+					The 'shortcuts list' command is good and professional.
+					`,
 				},
 				{
-					Name:  "remove",
-					Usage: "remove a shortcut `ssc remove shortcut` ",
-					Action: func(c *cli.Context) error {
-						if c.NArg() > 1 {
-							return cli.NewExitError("You should only one shortcut at a time", 5)
-							return nil
-						}
-						shortcut := c.Args().Get(0)
-
-						shortcuts := c.App.Metadata["shortcuts"].(map[string]string)
-
-						if val := shortcuts[shortcut]; val == "" {
-							return cli.NewExitError("There is no shortcut "+tm.Color(shortcut, tm.RED), 8)
-						}
-						fmt.Println("Removed shortcut: " + tm.Color(shortcut, tm.RED) + " -> " + tm.Color(shortcuts[shortcut], tm.CYAN))
-						delete(shortcuts, shortcut)
-
-						return nil
-					},
+					Name:    "add",
+					Aliases: []string{"a"},
+					Usage:   "add new shortcut `sc add shortcut workload` ",
+					Action:  A.SubAShortcut["add"],
+					Before:  UI.CheckNewSkill,
+					Description: `
+					The 'shortcuts add' command is good and professional.
+					`,
+				},
+				{
+					Name:    "remove",
+					Aliases: []string{"r"},
+					Usage:   "remove a shortcut `ssc remove shortcut` ",
+					Action:  A.SubAShortcut["remove"],
+					Before:  UI.CheckNewSkill,
+					Description: `
+					The 'shortcuts remove' command is good and professional.
+					`,
 				},
 			},
-			Action: func(c *cli.Context) error {
+			After: func(c *cli.Context) error {
+				A.PrintShortcuts(c)
 				return nil
 			},
 		},
 		{
 			Name:     "volume",
 			Category: catUtils,
-			Usage:    "View and edit service attached volumes",
+			Usage:    "View and edit workload attached volumes",
 			Aliases:  []string{"vol"},
-			Flags: append(myFlags, &cli.BoolFlag{
-				Name:  "print_volume",
-				Usage: "run the command without coloring output",
-			},
+			Flags: append(
+				myFlags,
+				&cli.BoolFlag{
+					Name:  "print_volume",
+					Usage: "run the command without coloring output",
+				},
 			),
-			UsageText:   "TODO",
-			Description: "TODO",
-			ArgsUsage:   "TODO",
-			Action: func(c *cli.Context) error {
-				c.Set("print_volume", "true")
-				ui.PrintServiceOverview(c)
-				fmt.Println("")
-				fmt.Println("ACTION: (volume)")
-				fmt.Println("TODO")
-				return nil
-			},
+			UsageText: "TODO",
+			ArgsUsage: "TODO",
+			Before:    UI.CheckNewSkill,
+			Action:    A.AVolume,
+			Description: `
+			The 'volume' command is good and professional.
+			`,
 		},
 		{
-			Name:        "certificates",
-			Category:    catUtils,
-			Usage:       "View and fetch certificates from cluster",
-			Aliases:     []string{"cert"},
-			UsageText:   "TODO",
-			Description: "TODO",
-			ArgsUsage:   "TODO",
-			Action: func(c *cli.Context) error {
-				c.Set("print_volume", "true")
-				ui.PrintServiceOverview(c)
-				fmt.Println("")
-				fmt.Println("ACTION: (volume)")
-				fmt.Println("TODO")
-				return nil
-			},
+			Name:      "certificates",
+			Category:  catUtils,
+			Usage:     "View and fetch certificates from cluster",
+			Aliases:   []string{"cert"},
+			UsageText: "TODO",
+			ArgsUsage: "TODO",
+			Before:    UI.CheckNewSkill,
+			Action:    A.ACertificates,
+			Description: `
+			The 'certificates' command is good and professional.
+			`,
 		},
 		{
 			Name:     "dns",
 			Category: catUtils,
 			Usage:    "View and edit DNS routing",
-			Action: func(c *cli.Context) error {
-				return nil
-			},
-		},
-		{
-			Name:     "settings",
-			Category: catUtils,
-			Usage:    "View and edit global settings",
-			Action: func(c *cli.Context) error {
-				return nil
-			},
+			Before:   UI.CheckNewSkill,
+			Action:   A.ADNS,
+			Description: `
+			The 'dns' command is good and professional.
+			`,
 		},
 		{
 			Name:     "context",
 			Category: catUtils,
 			Usage:    "View and edit kubernetes context",
 			Aliases:  []string{"cont", "kubec"},
-			Action: func(c *cli.Context) error {
-				out, err := exec.Command("kubectl", "config", "get-contexts").Output()
-				if err != nil {
-					log.Fatal(err)
-				}
-				fmt.Println(string(out))
-				if c.NArg() > 0 {
-					for _, word := range strings.Fields(string(out)) {
-						if strings.Contains(word, c.Args().First()) {
-							fmt.Println("Setting current context to '" + word + "'")
-							out, err := exec.Command("kubectl", "config", "use-context", word).Output()
-							if err != nil {
-								log.Fatal(err)
-							}
-							fmt.Println(string(out))
-							return nil
-						}
-					}
-				}
-				return nil
-			},
+			Before:   UI.CheckNewSkill,
+			Action:   A.AContext,
+			After:    A.AfterContext,
+			Description: `
+			The 'context' command is good and professional.
+			`,
 		},
 		{
 			Name:     "helm",
 			Category: catUtils,
 			Usage:    "View and edit helm deployments",
 			Aliases:  []string{"he"},
-			Action: func(c *cli.Context) error {
-				out, err := exec.Command("helm", "ls", "--all-namespaces").Output()
-				if err != nil {
-					log.Fatal(err)
-				}
-				fmt.Println(string(out))
-				return nil
-			},
+			Before:   UI.CheckNewSkill,
+			Action:   A.AHelm,
+			Description: `
+			The 'helm' command is good and professional.
+			`,
 		},
 	}
 
 	sort.Sort(cli.FlagsByName(app.Flags))
+	// c.App.Metadata["iamui"].(at.IUserInterface).ClearScreen()
+	// c.App.Metadata["iamui"].(at.IUserInterface).SetBoarder(0)
+	// go c.App.Metadata["iamui"].(at.IUserInterface).Draw(at.ReducedHeight()/3, at.Width())
 
 	err := app.Run(os.Args)
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-// TranslateShortcuts ...
-func TranslateShortcuts(c *cli.Context) []string {
-	shortcuts := c.App.Metadata["shortcuts"].(map[string]string)
-	services := make([]string, c.NArg())
-
-	for k, v := range c.Args().Slice() {
-		services[k] = v
-		if service := shortcuts[v]; service != "" {
-			services[k] = service
-		}
-	}
-	return services
-}
-
-// PrintShortcuts ...
-func PrintShortcuts(c *cli.Context) {
-	shortcuts := c.App.Metadata["shortcuts"].(map[string]string)
-	fmt.Println("\nShortcuts: ")
-	sorted := []string{}
-	for scs, service := range shortcuts {
-		sorted = append(sorted, fmt.Sprintf("\t%-15v->%-15v", scs, service))
-	}
-	sort.Strings(sorted)
-	for _, s := range sorted {
-		fmt.Println(s)
-	}
-}
-
-func concatDockerComposeFiles(s map[string]iamutils.CliService) []string {
-	composeChain := []string{}
-	for _, service := range s {
-		_, _, active := service.GetActive()
-		if active {
-			composeChain = append(composeChain, "-c")
-			composeChain = append(composeChain, service.Pod.Path)
-		}
-	}
-	return composeChain
 }

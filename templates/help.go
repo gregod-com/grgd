@@ -1,7 +1,8 @@
+// Provides basic bulding blocks for advanced console UI
 package templates
 
-
-// GetHelpTemplate ...
+// GetHelpTemplate so if i start typing something here
+// bla ...
 func GetHelpTemplate() string {
 	return `
  USAGE:
@@ -10,7 +11,7 @@ func GetHelpTemplate() string {
  COMMANDS:{{range .VisibleCategories}}{{if .Name}}
 
 	{{.Name}}:{{end}}{{range .VisibleCommands}}
-	  {{join .Names ", "}}{{"\t\t\t-> "}}{{.Usage}}{{end}}{{end}}{{end}}{{if .VisibleFlags}}
+	  {{join .Names ", "}}{{"\t-> "}}{{.Usage}}{{end}}{{end}}{{end}}{{if .VisibleFlags}}
 
  GLOBAL OPTIONS:
 	{{range $index, $option := .VisibleFlags}}{{if $index}}

@@ -1,2 +1,2 @@
-# iamcli
-go package for iamcli
+# grc
+go package for grc - gregodcli
