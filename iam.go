@@ -6,12 +6,12 @@ import (
 	"os"
 	"sort"
 
-	at "github.com/gregorpirolt/animaterm"
-	A "github.com/gregorpirolt/iamcli/actions"
-	T "github.com/gregorpirolt/iamcli/templates"
-	UI "github.com/gregorpirolt/iamcli/ui"
-	Impl "github.com/gregorpirolt/implementations"
-	I "github.com/gregorpirolt/interfaces"
+	at "github.com/gregod-com/animaterm"
+	A "github.com/gregod-com/grgd/actions"
+	T "github.com/gregod-com/grgd/templates"
+	UI "github.com/gregod-com/grgd/ui"
+	Impl "github.com/gregod-com/implementations"
+	I "github.com/gregod-com/interfaces"
 
 	"github.com/urfave/cli"
 
@@ -49,8 +49,8 @@ func main() {
 
 	app := cli.NewApp()
 	app.Flags = myFlags
-	app.Name = "iamCLI"
-	app.Usage = "written in go. Can be used as a sidekick to iamMenu and iamDoctr"
+	app.Name = "grgd"
+	app.Usage = "written in go. Can be used as a sidekick to gregod-menu and gregod-doctor"
 	app.Version = "0.5.0"
 	app.Metadata = make(map[string]interface{})
 	app.Metadata["startTime"] = time.Now()

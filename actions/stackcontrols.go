@@ -3,7 +3,7 @@ package actions
 import (
 	"fmt"
 
-	I "github.com/gregorpirolt/interfaces"
+	I "github.com/gregod-com/interfaces"
 	"github.com/urfave/cli"
 )
 
@@ -96,7 +96,7 @@ func AConfig(c *cli.Context) error {
 }
 
 // SubAConfig ...
-var SubAConfig = map[string]func(*cli.Context) error {
+var SubAConfig = map[string]func(*cli.Context) error{
 	"yaml": func(c *cli.Context) error {
 		fmt.Println("This is the config yaml subcommand")
 		configObject := c.App.Metadata["iamconfig"].(I.IConfigObject)

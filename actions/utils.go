@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	tm "github.com/buger/goterm"
-	UI "github.com/gregorpirolt/iamcli/ui"
-	I "github.com/gregorpirolt/interfaces"
+	UI "github.com/gregod-com/grgd/ui"
+	I "github.com/gregod-com/interfaces"
 	"github.com/urfave/cli"
 )
 
@@ -18,7 +18,7 @@ func AInit(c *cli.Context) error {
 }
 
 // SubAShortcut ...
-var SubAShortcut = map[string]func(*cli.Context) error {
+var SubAShortcut = map[string]func(*cli.Context) error{
 	"add": func(c *cli.Context) error {
 		if c.NArg() != 2 {
 			return cli.NewExitError("You should enter a workload and a shortcut", 5)
@@ -152,16 +152,16 @@ func PrintShortcuts(c *cli.Context) {
 	fmt.Println("\nShortcuts: ")
 	overviewmap := map[string][]string{}
 	for shortcut, workload := range c.App.Metadata["iamconfig"].(I.IConfigObject).GetWorkloadShortcuts() {
-		overviewmap[workload] = append(overviewmap[workload],shortcut)
+		overviewmap[workload] = append(overviewmap[workload], shortcut)
 	}
 	sorted := []string{}
 
-	for wl,shortcuts := range overviewmap {
+	for wl, shortcuts := range overviewmap {
 		workloadline := ""
 		workloadline += fmt.Sprintf("  %-*v=>", 20, wl)
 		sort.Strings(shortcuts)
-		for _,s := range shortcuts {
-			workloadline += fmt.Sprintf(" '%v',",s)
+		for _, s := range shortcuts {
+			workloadline += fmt.Sprintf(" '%v',", s)
 		}
 		workloadline += fmt.Sprintln()
 		sorted = append(sorted, workloadline)

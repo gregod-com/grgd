@@ -2,7 +2,8 @@ package actions
 
 import (
 	"fmt"
-	I "github.com/gregorpirolt/interfaces"
+
+	I "github.com/gregod-com/interfaces"
 	"github.com/urfave/cli"
 )
 

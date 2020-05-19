@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	at "github.com/gregorpirolt/animaterm"
-	I "github.com/gregorpirolt/interfaces"
+	at "github.com/gregod-com/animaterm"
+	I "github.com/gregod-com/interfaces"
 
 	"github.com/urfave/cli"
 
