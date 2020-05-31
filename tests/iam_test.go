@@ -1,20 +1,19 @@
 package test
 
 import (
-	"testing"
-	"github.com/stretchr/testify/assert"
-	"os"
-	"log"
 	"bytes"
+	"log"
+	"os"
+	"testing"
 )
 
 // capture output of a function and return the string
 func captureOutput(f func()) string {
-    var buf bytes.Buffer
-    log.SetOutput(&buf)
-    f()
-    log.SetOutput(os.Stderr)
-    return buf.String()
+	var buf bytes.Buffer
+	log.SetOutput(&buf)
+	f()
+	log.SetOutput(os.Stderr)
+	return buf.String()
 }
 
 func TestHelloWorld(t *testing.T) {
@@ -30,7 +29,7 @@ func TestPrintBanner(t *testing.T) {
 
 func TestMainFunction(t *testing.T) {
 	// GIVEN
-	output := captureOutput(func() {PrintBanner()})
+	output := captureOutput(func() { PrintBanner() })
 
 	// WHEN
 	want := "iamCLI"

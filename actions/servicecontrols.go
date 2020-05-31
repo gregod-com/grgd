@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	I "github.com/gregod-com/interfaces"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func AEnter(c *cli.Context) error {

@@ -1,2 +1,2 @@
-# grc
-go package for grc - gregodcli
+# grgd
+go package for grgd - gregodcli

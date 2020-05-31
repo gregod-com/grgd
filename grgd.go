@@ -2,25 +2,29 @@
 package main
 
 import (
+	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
+	"plugin"
 	"sort"
+	"time"
 
-	at "github.com/gregod-com/animaterm"
+	PlugInterface "github.com/gregod-com/grgd/plugins"
+	I "github.com/gregod-com/interfaces"
+	"github.com/urfave/cli/v2"
+
 	A "github.com/gregod-com/grgd/actions"
+	PlugIndex "github.com/gregod-com/grgd/pluginindex"
 	T "github.com/gregod-com/grgd/templates"
 	UI "github.com/gregod-com/grgd/ui"
 	Impl "github.com/gregod-com/implementations"
-	I "github.com/gregod-com/interfaces"
-
-	"github.com/urfave/cli"
-
-	"time"
 
 	tm "github.com/buger/goterm"
 )
 
-var iamUI = at.CreateUI()
+// var iamUI = at.CreateUI()
 
 // Entrypoint for the iam cli
 func main() {
@@ -38,9 +42,8 @@ func main() {
 			Usage: "show mounting details in overview",
 		},
 		&cli.BoolFlag{
-			Name:    "sidecars, s",
-			Aliases: []string{"sc"},
-			Usage:   "show sidecars in overview",
+			Name:  "sidecars, s, sc",
+			Usage: "show sidecars in overview",
 		},
 	}
 	catStackControlls := "1) - " + tm.Color("stack controls", tm.BLUE)
@@ -51,11 +54,18 @@ func main() {
 	app.Flags = myFlags
 	app.Name = "grgd"
 	app.Usage = "written in go. Can be used as a sidekick to gregod-menu and gregod-doctor"
-	app.Version = "0.5.0"
+	app.Version = "0.6.0"
 	app.Metadata = make(map[string]interface{})
 	app.Metadata["startTime"] = time.Now()
 	app.CustomAppHelpTemplate = T.GetHelpTemplate()
 	app.Before = func(c *cli.Context) error {
+		c.App.Metadata["repoIndex"] = "https://s3.gregod.com/public/plugins/index.yaml"
+		c.App.Metadata["updatecheckinterval"] = time.Second * 1
+		SystemCheck(*c)
+
+		LoadPlugins(*c)
+
+		os.Exit(0)
 		userHome, err := os.UserHomeDir()
 		if err != nil {
 			return nil
@@ -64,42 +74,42 @@ func main() {
 		c.App.Metadata["iamconfig"] = Impl.CreateConfigObjectYaml(c.App.Metadata["configLocation"].(string))
 		c.App.Metadata["workloads"] = c.App.Metadata["iamconfig"].(I.IConfigObject).GetWorkloads()
 		c.App.Metadata["currentcontext"] = A.UtilGetCurrentKubeContext()
-		iamUI.ClearScreen()
-		iamUI.SetBoarder(5)
+		// iamUI.ClearScreen()
+		// iamUI.SetBoarder(5)
 		c.App.Metadata["animation"] = int64(0)
 		if c.App.Metadata["iamconfig"].(I.IConfigObject).
-			GetLastUsed().Add(time.Duration(5) * time.Second).
+			GetLastUsed().Add(time.Duration(50) * time.Second).
 			Before(time.Now()) {
 			c.App.Metadata["animation"] = int64(1)
 		}
 
-		c.App.Metadata["iamui"] = iamUI
-		UI.PrintBanner(c)
+		// c.App.Metadata["iamui"] = iamUI
+		// UI.PrintBanner(c)
 		return nil
 	}
 	app.Action = func(c *cli.Context) error {
-		UI.PrintWorkloadOverview(c)
+		// UI.PrintWorkloadOverview(c)32
 		return nil
 	}
 	app.After = func(c *cli.Context) error {
 		c.App.Metadata["iamconfig"].(I.IConfigObject).Update()
 		startTime := c.App.Metadata["startTime"].(time.Time)
-		UI.PrintExecutionTime(time.Since(startTime))
+		fmt.Println(startTime)
+		// UI.PrintExecutionTime(time.Since(startTime))
 		return nil
 	}
-
 	app.Commands = []*cli.Command{
 		{
 			Name:     "init",
 			Category: catUtils,
 			Usage:    "Initialze the " + app.Name,
-			Before:   UI.CheckNewSkill,
-			Action:   A.AInit,
+			// Before:   UI.CheckNewSkill,
+			Action: A.AInit,
 			Description: `
 			Welcome to the ` + app.Name + ` !!! 🍄 🍄 🍄
 
 			It looks like you just unlocked your first command. 🤗 🎉 🎉 🎉
-			Sadly you are not going to use this one as often as the other ones. 
+			Sadly you are not going to use this one as often as the other ones.
 			But still it is an important one.
 
 			When ever you are ready, lets start setting up the ` + app.Name + ` by defining
@@ -112,8 +122,8 @@ func main() {
 			Usage:    "Start dev stack with current config",
 			Aliases:  []string{"u"},
 			Flags:    myFlags,
-			Before:   UI.CheckNewSkill,
-			Action:   A.AUp,
+			// Before:   UI.CheckNewSkill,
+			Action: A.AUp,
 			Description: `
 The 'up' command allows you to start a single workload in your stack or even the
 whole stack at once. All services that are currently active can be started with the command:
@@ -133,8 +143,8 @@ the command is ignored for them. If you need to restart a service have a look at
 			Usage:    "Stop dev stack (or single workload)",
 			Aliases:  []string{"d"},
 			Flags:    myFlags,
-			Before:   UI.CheckNewSkill,
-			Action:   A.ADown,
+			// Before:   UI.CheckNewSkill,
+			Action: A.ADown,
 			Description: `
 			The 'down' command is good and professional.
 			`,
@@ -145,8 +155,8 @@ the command is ignored for them. If you need to restart a service have a look at
 			Usage:    "Restart dev stack (or single workload)",
 			Aliases:  []string{"r"},
 			Flags:    myFlags,
-			Before:   UI.CheckNewSkill,
-			Action:   A.ARestart,
+			// Before:   UI.CheckNewSkill,
+			Action: A.ARestart,
 			Description: `
 			The 'restart' command is good and professional.
 			`,
@@ -159,8 +169,8 @@ the command is ignored for them. If you need to restart a service have a look at
 			Flags:     myFlags,
 			UsageText: "Show logs for a single Workload or all workloads combined",
 			ArgsUsage: "Args usage",
-			Before:    UI.CheckNewSkill,
-			Action:    A.ALogs,
+			// Before:    UI.CheckNewSkill,
+			Action: A.ALogs,
 			Description: `
 			The 'logs' command is good and professional.
 			`,
@@ -190,8 +200,8 @@ the command is ignored for them. If you need to restart a service have a look at
 			Usage:    "Enter a workload",
 			Aliases:  []string{"en"},
 			Flags:    myFlags,
-			Before:   UI.CheckNewSkill,
-			Action:   A.AEnter,
+			// Before:   UI.CheckNewSkill,
+			Action: A.AEnter,
 			Description: `
 			The 'enter' command is good and professional.
 			`,
@@ -202,8 +212,8 @@ the command is ignored for them. If you need to restart a service have a look at
 			Usage:    "Execute a command in workload and view output",
 			Aliases:  []string{"exec", "ex"},
 			Flags:    myFlags,
-			Before:   UI.CheckNewSkill,
-			Action:   A.AExecute,
+			// Before:   UI.CheckNewSkill,
+			Action: A.AExecute,
 			Description: `
 			The 'execute' command is good and professional.
 			`,
@@ -216,8 +226,8 @@ the command is ignored for them. If you need to restart a service have a look at
 			Flags:     myFlags,
 			UsageText: "TODO",
 			ArgsUsage: "TODO",
-			Before:    UI.CheckNewSkill,
-			Action:    A.ATest,
+			// Before:    UI.CheckNewSkill,
+			Action: A.ATest,
 			Description: `
 			The 'test' command is good and professional.
 			`,
@@ -230,8 +240,8 @@ the command is ignored for them. If you need to restart a service have a look at
 			Flags:     myFlags,
 			UsageText: "TODO",
 			ArgsUsage: "TODO",
-			Before:    UI.CheckNewSkill,
-			Action:    A.AActivate,
+			// Before:    UI.CheckNewSkill,
+			Action: A.AActivate,
 			After: func(c *cli.Context) error {
 				UI.PrintWorkloadOverview(c)
 				return nil
@@ -252,7 +262,7 @@ the command is ignored for them. If you need to restart a service have a look at
 					Aliases: []string{"l", "ls"},
 					Usage:   "list all shortcuts",
 					Action:  A.SubAShortcut["list"],
-					Before:  UI.CheckNewSkill,
+					// Before:  UI.CheckNewSkill,
 					Description: `
 					The 'shortcuts list' command is good and professional.
 					`,
@@ -262,7 +272,7 @@ the command is ignored for them. If you need to restart a service have a look at
 					Aliases: []string{"a"},
 					Usage:   "add new shortcut `sc add shortcut workload` ",
 					Action:  A.SubAShortcut["add"],
-					Before:  UI.CheckNewSkill,
+					// Before:  UI.CheckNewSkill,
 					Description: `
 					The 'shortcuts add' command is good and professional.
 					`,
@@ -272,7 +282,7 @@ the command is ignored for them. If you need to restart a service have a look at
 					Aliases: []string{"r"},
 					Usage:   "remove a shortcut `ssc remove shortcut` ",
 					Action:  A.SubAShortcut["remove"],
-					Before:  UI.CheckNewSkill,
+					// Before:  UI.CheckNewSkill,
 					Description: `
 					The 'shortcuts remove' command is good and professional.
 					`,
@@ -297,8 +307,8 @@ the command is ignored for them. If you need to restart a service have a look at
 			),
 			UsageText: "TODO",
 			ArgsUsage: "TODO",
-			Before:    UI.CheckNewSkill,
-			Action:    A.AVolume,
+			// Before:    UI.CheckNewSkill,
+			Action: A.AVolume,
 			Description: `
 			The 'volume' command is good and professional.
 			`,
@@ -310,8 +320,8 @@ the command is ignored for them. If you need to restart a service have a look at
 			Aliases:   []string{"cert"},
 			UsageText: "TODO",
 			ArgsUsage: "TODO",
-			Before:    UI.CheckNewSkill,
-			Action:    A.ACertificates,
+			// Before:    UI.CheckNewSkill,
+			Action: A.ACertificates,
 			Description: `
 			The 'certificates' command is good and professional.
 			`,
@@ -320,8 +330,8 @@ the command is ignored for them. If you need to restart a service have a look at
 			Name:     "dns",
 			Category: catUtils,
 			Usage:    "View and edit DNS routing",
-			Before:   UI.CheckNewSkill,
-			Action:   A.ADNS,
+			// Before:   UI.CheckNewSkill,
+			Action: A.ADNS,
 			Description: `
 			The 'dns' command is good and professional.
 			`,
@@ -331,9 +341,9 @@ the command is ignored for them. If you need to restart a service have a look at
 			Category: catUtils,
 			Usage:    "View and edit kubernetes context",
 			Aliases:  []string{"cont", "kubec"},
-			Before:   UI.CheckNewSkill,
-			Action:   A.AContext,
-			After:    A.AfterContext,
+			// Before:   UI.CheckNewSkill,
+			Action: A.AContext,
+			After:  A.AfterContext,
 			Description: `
 			The 'context' command is good and professional.
 			`,
@@ -343,8 +353,8 @@ the command is ignored for them. If you need to restart a service have a look at
 			Category: catUtils,
 			Usage:    "View and edit helm deployments",
 			Aliases:  []string{"he"},
-			Before:   UI.CheckNewSkill,
-			Action:   A.AHelm,
+			// Before:   UI.CheckNewSkill,
+			Action: A.AHelm,
 			Description: `
 			The 'helm' command is good and professional.
 			`,
@@ -360,4 +370,136 @@ the command is ignored for them. If you need to restart a service have a look at
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+// SystemCheck ...
+func SystemCheck(ctx cli.Context) error {
+	homedir, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	path := homedir + "/.grgd"
+	if _, notexistserr := os.Stat(path); os.IsNotExist(notexistserr) {
+		os.Mkdir(path, os.FileMode(uint32(0760)))
+	}
+	ctx.App.Metadata["grgdhome"] = path
+
+	pluginPath := homedir + "/.grgd/plugins"
+	if _, notexistserr := os.Stat(pluginPath); os.IsNotExist(notexistserr) {
+		os.Mkdir(pluginPath, os.FileMode(uint32(0760)))
+	}
+	ctx.App.Metadata["grgdplugins"] = pluginPath
+	updateCheckInterval := ctx.App.Metadata["updatecheckinterval"].(time.Duration)
+	pl := PlugIndex.CreatePluginIndex(pluginPath + "/index.yaml")
+	if time.Now().After(pl.GetLastChecked().Add(updateCheckInterval)) {
+		err := CheckUpdate(ctx)
+		if err != nil {
+			log.Println("Looks like there was an error fetching updates... skipping this update-cycle")
+			pl.Update()
+		}
+	}
+
+	return err
+}
+
+// CheckUpdate ...
+func CheckUpdate(ctx cli.Context) error {
+	// reader := bufio.NewReader(os.Stdin)
+	repoIndex := ctx.App.Metadata["repoIndex"].(string)
+	// currentIndex := ctx.App.Metadata["grgdplugins"].(string) + "/index.yaml"
+	remoteIndex := ctx.App.Metadata["grgdplugins"].(string) + "/index-remote.yaml"
+	err := DownloadFile(remoteIndex, repoIndex)
+	if err != nil {
+		return err
+	}
+	// pluginsCurrent := PlugIndex.CreatePluginIndex(currentIndex)
+	// pluginsRemote := PlugIndex.CreatePluginIndex(remoteIndex)
+
+	// fmt.Println("Downloaded: " + repoIndex)
+	// for _, plremote := range pluginsRemote.GetPluginList().([]PlugIndex.PluginMetadata) {
+	// 	for _, pllocal := range pluginsCurrent.GetPluginList().([]PlugIndex.PluginMetadata) {
+	// 		if plremote.Name == pllocal.Name {
+	// 			vlocal := semver.New(pllocal.Version)
+	// 			vremote := semver.New(plremote.Version)
+	// 			if vlocal.LessThan(*vremote) {
+	// 				fmt.Printf("Update plugin    %-15s to v%v (current %v)? [y/n]", plremote.Name, vremote, vlocal)
+	// 				yes, _ := reader.ReadString('\n')
+	// 				if yes == "y\n" {
+	// 					fmt.Println(plremote.Sha)
+	// 					DownloadFile("filepath", plremote.URL)
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+
+	// 	// fmt.Println(p.Name)
+	// 	// fmt.Println(p.Version)
+	// 	// fmt.Println(p.Size)
+	// 	// fmt.Println(p.Sha)
+	// 	// fmt.Println(p.URL)
+	// }
+	// pl.Update()
+	return nil
+}
+
+// DownloadFile updates and plugins from s3
+func DownloadFile(filepath string, url string) error {
+
+	// Get the data
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	// Create the file
+	out, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	// Write the body to file
+	_, err = io.Copy(out, resp.Body)
+	return err
+}
+
+// LoadPlugins ...
+func LoadPlugins(ctx cli.Context) error {
+
+	var grgdplugin PlugInterface.GrgdPlugin
+
+	pluginPath := ctx.App.Metadata["grgdplugins"].(string) + "/test/test.so"
+
+	pluginImpl, err := plugin.Open(pluginPath)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	symPlugin, err := pluginImpl.Lookup("Plugin")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	grgdplugin, ok := symPlugin.(PlugInterface.GrgdPlugin)
+	if !ok {
+		fmt.Println("unexpected type from module symbol")
+		os.Exit(1)
+	}
+
+	for k, method := range grgdplugin.Methods(ctx) {
+		fmt.Println(k)
+		method(ctx)
+	}
+
+	m := grgdplugin.Methods(nil)["Name"]
+	fmt.Println(m(nil))
+
+	// os.Exit(1)
+
+	return nil
+
 }

@@ -10,7 +10,7 @@ import (
 	tm "github.com/buger/goterm"
 	UI "github.com/gregod-com/grgd/ui"
 	I "github.com/gregod-com/interfaces"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func AInit(c *cli.Context) error {
@@ -129,12 +129,13 @@ func TranslateShortcuts(c *cli.Context) []string {
 	shortcuts := c.App.Metadata["iamconfig"].(I.IConfigObject).GetWorkloadShortcuts()
 	workloads := make([]string, c.NArg())
 
-	for k, v := range c.Args().Slice() {
-		workloads[k] = v
-		if workload := shortcuts[v]; workload != "" {
-			workloads[k] = workload
-		}
-	}
+	// for k, v := range c.Args().Slice() {
+	// 	workloads[k] = v
+	// 	if workload := shortcuts[v]; workload != "" {
+	// 		workloads[k] = workload
+	// 	}
+	// }
+	log.Println(shortcuts)
 	return workloads
 }
 

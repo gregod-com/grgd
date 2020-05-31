@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	I "github.com/gregod-com/interfaces"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
-// Up start the stack
+// AUp start the stack
 func AUp(c *cli.Context) error {
 	go fmt.Println("this is the up command")
 	return nil

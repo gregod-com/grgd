@@ -14,7 +14,7 @@ import (
 	at "github.com/gregod-com/animaterm"
 	I "github.com/gregod-com/interfaces"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 
 	figure "github.com/common-nighthawk/go-figure"
 )
@@ -116,6 +116,7 @@ func PrintBanner(c *cli.Context) {
 
 // PrintWorkloadOverview ...
 func PrintWorkloadOverview(c *cli.Context) {
+
 	config := c.App.Metadata["iamconfig"].(I.IConfigObject)
 	userInterface := c.App.Metadata["iamui"].(at.IUserInterface)
 	workloadMap := c.App.Metadata["workloads"].(map[string]I.IWorkload)
@@ -123,8 +124,13 @@ func PrintWorkloadOverview(c *cli.Context) {
 	workloadsInactive := []string{}
 
 	k := 0
+	// for _, s := range sortMapAlphabetically(workloadMap) {
+	// 	log.Println(s.GetPod().GetMainContainer())
+	// }
+
 	for _, s := range sortMapAlphabetically(workloadMap) {
 		if _, _, a := s.GetActive(); a {
+
 			activeWorkloads = append(activeWorkloads, []string{})
 			activeWorkloads[k] = append(activeWorkloads[k], s.GetName())
 			activeWorkloads[k] = append(activeWorkloads[k], "down")
