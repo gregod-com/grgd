@@ -12,9 +12,9 @@ import (
 
 // PluginIndex ...
 type PluginIndex struct {
-	path               string           `yaml:"a,omitempty"`
-	PluginMetadataList []PluginMetadata `yaml:"plugins"`
-	Lastchecked        time.Time        `yaml:"lastchecked"`
+	path               string              `yaml:"a,omitempty"`
+	pluginMetadataList []I.IPluginMetadata `yaml:"plugins"`
+	Lastchecked        time.Time           `yaml:"lastchecked"`
 }
 
 // PluginMetadata ...
@@ -22,7 +22,6 @@ type PluginMetadata struct {
 	Name    string
 	Version string
 	Size    uint64
-	Sha     string
 	URL     string
 }
 
@@ -34,7 +33,7 @@ func CreatePluginIndex(path string) I.IPluginIndex {
 }
 
 func (yamlObj *PluginIndex) initFromFile() error {
-	err := yaml.Unmarshal(yamlObj.GetSourceAsBytes(), yamlObj)
+	err := yaml.Unmarshal(yamlObj.getSourceAsBytes(), yamlObj)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,11 +63,10 @@ func (yamlObj *PluginIndex) PrintConfig() error {
 
 // GetSourceAsString ...
 func (yamlObj *PluginIndex) GetSourceAsString() string {
-	return string(yamlObj.GetSourceAsBytes())
+	return string(yamlObj.getSourceAsBytes())
 }
 
-// GetSourceAsBytes ...
-func (yamlObj *PluginIndex) GetSourceAsBytes() []byte {
+func (yamlObj *PluginIndex) getSourceAsBytes() []byte {
 	iamconf, err := ioutil.ReadFile(yamlObj.path)
 	if err != nil {
 		// yamlObj.Update()
@@ -89,6 +87,6 @@ func (yamlObj *PluginIndex) GetLastChecked() time.Time {
 }
 
 // GetPluginList ...
-func (yamlObj *PluginIndex) GetPluginList() interface{} {
-	return yamlObj.PluginMetadataList
+func (yamlObj *PluginIndex) GetPluginList() []I.IPluginMetadata {
+	return yamlObj.pluginMetadataList
 }

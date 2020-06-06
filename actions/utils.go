@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	tm "github.com/buger/goterm"
-	UI "github.com/gregod-com/grgd/ui"
+	// UI "github.com/gregod-com/grgd/ui"
 	I "github.com/gregod-com/interfaces"
 	"github.com/urfave/cli/v2"
 )
@@ -61,7 +61,7 @@ var SubAShortcut = map[string]func(*cli.Context) error{
 
 func AVolume(c *cli.Context) error {
 	c.Set("print_volume", "true")
-	UI.PrintWorkloadOverview(c)
+	// UI.PrintWorkloadOverview(c)
 	fmt.Println("")
 	fmt.Println("ACTION: (volume)")
 	fmt.Println("TODO")
@@ -70,7 +70,7 @@ func AVolume(c *cli.Context) error {
 
 func ACertificates(c *cli.Context) error {
 	c.Set("print_volume", "true")
-	UI.PrintWorkloadOverview(c)
+	// UI.PrintWorkloadOverview(c)
 	fmt.Println("")
 	fmt.Println("ACTION: (volume)")
 	fmt.Println("TODO")

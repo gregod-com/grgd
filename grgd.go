@@ -4,27 +4,31 @@ package main
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"plugin"
 	"sort"
 	"time"
+	"reflect"
 
-	PlugInterface "github.com/gregod-com/grgd/plugins"
 	I "github.com/gregod-com/interfaces"
-	"github.com/urfave/cli/v2"
 
 	A "github.com/gregod-com/grgd/actions"
 	PlugIndex "github.com/gregod-com/grgd/pluginindex"
 	T "github.com/gregod-com/grgd/templates"
-	UI "github.com/gregod-com/grgd/ui"
 	Impl "github.com/gregod-com/implementations"
 
-	tm "github.com/buger/goterm"
+	"github.com/urfave/cli/v2"
 )
 
-// var iamUI = at.CreateUI()
+const PLUGINSKEY = "grgdplugins"
+const STARTTIMEKEY = "startTime"
+const CONFIGPATH = "configLocation"
+const CONFIG = "iamconfig"
+
+var UI I.IUI
 
 // Entrypoint for the iam cli
 func main() {
@@ -46,9 +50,9 @@ func main() {
 			Usage: "show sidecars in overview",
 		},
 	}
-	catStackControlls := "1) - " + tm.Color("stack controls", tm.BLUE)
-	catWorkloadSpecific := "2) - " + tm.Color("workload specific", tm.RED)
-	catUtils := "3) - " + tm.Color("utilities", tm.CYAN)
+	catStackControlls := "1) - stack controls"
+	catWorkloadSpecific := "2) - workload specific"
+	catUtils := "3) - utilities"
 
 	app := cli.NewApp()
 	app.Flags = myFlags
@@ -56,45 +60,39 @@ func main() {
 	app.Usage = "written in go. Can be used as a sidekick to gregod-menu and gregod-doctor"
 	app.Version = "0.6.0"
 	app.Metadata = make(map[string]interface{})
-	app.Metadata["startTime"] = time.Now()
+	app.Metadata[STARTTIMEKEY] = time.Now()
 	app.CustomAppHelpTemplate = T.GetHelpTemplate()
 	app.Before = func(c *cli.Context) error {
-		c.App.Metadata["repoIndex"] = "https://s3.gregod.com/public/plugins/index.yaml"
-		c.App.Metadata["updatecheckinterval"] = time.Second * 1
-		SystemCheck(*c)
-
-		LoadPlugins(*c)
-
-		os.Exit(0)
 		userHome, err := os.UserHomeDir()
 		if err != nil {
 			return nil
 		}
-		c.App.Metadata["configLocation"] = userHome + "/.iam/iam_conf.yml"
-		c.App.Metadata["iamconfig"] = Impl.CreateConfigObjectYaml(c.App.Metadata["configLocation"].(string))
-		c.App.Metadata["workloads"] = c.App.Metadata["iamconfig"].(I.IConfigObject).GetWorkloads()
-		c.App.Metadata["currentcontext"] = A.UtilGetCurrentKubeContext()
-		// iamUI.ClearScreen()
-		// iamUI.SetBoarder(5)
-		c.App.Metadata["animation"] = int64(0)
-		if c.App.Metadata["iamconfig"].(I.IConfigObject).
-			GetLastUsed().Add(time.Duration(50) * time.Second).
-			Before(time.Now()) {
-			c.App.Metadata["animation"] = int64(1)
-		}
 
-		// c.App.Metadata["iamui"] = iamUI
-		// UI.PrintBanner(c)
+		c.App.Metadata["repoIndex"] = "https://s3.gregod.com/public/plugins/index.yaml"
+		c.App.Metadata["updatecheckinterval"] = time.Millisecond * 200
+		c.App.Metadata[CONFIGPATH] = userHome + "/.iam/iam_conf.yml"
+		c.App.Metadata["currentcontext"] = A.UtilGetCurrentKubeContext()
+		c.App.Metadata[CONFIG] = Impl.CreateConfigObjectYaml(c.App.Metadata[CONFIGPATH].(string))
+		c.App.Metadata["animation"] = int64(300)
+
+		SystemCheck(c)
+		LoadPlugins(c)
+
+		UI.ClearScreen(c)
+
+		UI.PrintBanner(c)
+		// UI.PrintPercentOfScreen(c, "h", 20)
+		UI.PrintWorkloadOverview(c)
 		return nil
 	}
 	app.Action = func(c *cli.Context) error {
-		// UI.PrintWorkloadOverview(c)32
+		// UI.PrintWorkloadOverview(c)
 		return nil
 	}
 	app.After = func(c *cli.Context) error {
-		c.App.Metadata["iamconfig"].(I.IConfigObject).Update()
-		startTime := c.App.Metadata["startTime"].(time.Time)
-		fmt.Println(startTime)
+		c.App.Metadata[CONFIG].(I.IConfigObject).Update()
+		// startTime := c.App.Metadata[STARTTIMEKEY].(time.Time)
+		// fmt.Println(startTime)
 		// UI.PrintExecutionTime(time.Since(startTime))
 		return nil
 	}
@@ -187,7 +185,7 @@ the command is ignored for them. If you need to restart a service have a look at
 					Usage:   "Show iam_config.yaml file",
 					Aliases: []string{"y"},
 					Action:  A.SubAConfig["yaml"],
-					Before:  UI.CheckNewSkill,
+					// Before:  UI.CheckNewSkill,
 					Description: `
 					The 'config yaml' command is good and professional.
 					`,
@@ -243,7 +241,7 @@ the command is ignored for them. If you need to restart a service have a look at
 			// Before:    UI.CheckNewSkill,
 			Action: A.AActivate,
 			After: func(c *cli.Context) error {
-				UI.PrintWorkloadOverview(c)
+				// UI.PrintWorkloadOverview(c)
 				return nil
 			},
 			Description: `
@@ -373,7 +371,7 @@ the command is ignored for them. If you need to restart a service have a look at
 }
 
 // SystemCheck ...
-func SystemCheck(ctx cli.Context) error {
+func SystemCheck(ctx *cli.Context) error {
 	homedir, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal(err)
@@ -389,7 +387,7 @@ func SystemCheck(ctx cli.Context) error {
 	if _, notexistserr := os.Stat(pluginPath); os.IsNotExist(notexistserr) {
 		os.Mkdir(pluginPath, os.FileMode(uint32(0760)))
 	}
-	ctx.App.Metadata["grgdplugins"] = pluginPath
+	ctx.App.Metadata[PLUGINSKEY] = pluginPath
 	updateCheckInterval := ctx.App.Metadata["updatecheckinterval"].(time.Duration)
 	pl := PlugIndex.CreatePluginIndex(pluginPath + "/index.yaml")
 	if time.Now().After(pl.GetLastChecked().Add(updateCheckInterval)) {
@@ -404,11 +402,11 @@ func SystemCheck(ctx cli.Context) error {
 }
 
 // CheckUpdate ...
-func CheckUpdate(ctx cli.Context) error {
+func CheckUpdate(ctx *cli.Context) error {
 	// reader := bufio.NewReader(os.Stdin)
 	repoIndex := ctx.App.Metadata["repoIndex"].(string)
-	// currentIndex := ctx.App.Metadata["grgdplugins"].(string) + "/index.yaml"
-	remoteIndex := ctx.App.Metadata["grgdplugins"].(string) + "/index-remote.yaml"
+	// currentIndex := ctx.App.Metadata[PLUGINSKEY].(string) + "/index.yaml"
+	remoteIndex := ctx.App.Metadata[PLUGINSKEY].(string) + "/index-remote.yaml"
 	err := DownloadFile(remoteIndex, repoIndex)
 	if err != nil {
 		return err
@@ -466,40 +464,70 @@ func DownloadFile(filepath string, url string) error {
 }
 
 // LoadPlugins ...
-func LoadPlugins(ctx cli.Context) error {
+func LoadPlugins(ctx *cli.Context) error {
 
-	var grgdplugin PlugInterface.GrgdPlugin
+	// TODO: the categories should be fetched from config
+	var categories = []string{"test", "ui", "executor", "dns"}
 
-	pluginPath := ctx.App.Metadata["grgdplugins"].(string) + "/test/test.so"
-
-	pluginImpl, err := plugin.Open(pluginPath)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	symPlugin, err := pluginImpl.Lookup("Plugin")
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	grgdplugin, ok := symPlugin.(PlugInterface.GrgdPlugin)
+	pluginFolder, ok := ctx.App.Metadata[PLUGINSKEY].(string)
 	if !ok {
-		fmt.Println("unexpected type from module symbol")
-		os.Exit(1)
+		log.Fatal(ok)
 	}
 
-	for k, method := range grgdplugin.Methods(ctx) {
-		fmt.Println(k)
-		method(ctx)
+	// iterate over cartegories in plugin folder
+	for _, c := range categories {
+		fileinfo, err := ioutil.ReadDir(pluginFolder + "/" + c)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		// iterate over plugin implementations
+		for _, f := range fileinfo {
+			pluginPath := pluginFolder + "/" + c + "/" + f.Name()
+			if ctx.Bool("debug") {
+				log.Printf("Loading plugin at %s\n", pluginPath)
+			}
+
+			// open .so file and error if something goes wrong
+			pluginImpl, err := plugin.Open(pluginPath)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+
+			// check if there is a var of func called `Plugin` in .so file
+			symPlugin, err := pluginImpl.Lookup("Plugin")
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(2)
+			}
+
+			// check if the var/func is implemneting the grgd plugin interface
+			grgdplugin, ok := symPlugin.(I.IGrgdPlugin)
+			if !ok {
+				fmt.Println(reflect.TypeOf(symPlugin))
+				cli.Exit("unexpected type from module symbol", 3)
+			}
+
+			// check if the init method returns a valid plugin metatda interface
+			metadata, ok := grgdplugin.Init(pluginPath).(I.IPluginMetadata)
+			if !ok {
+				fmt.Println("Looks like the metadata is shiat")
+				os.Exit(4)
+			}
+
+			ctx.App.Metadata[metadata.Name()] = grgdplugin
+
+			uiplugin, ok := symPlugin.(I.IUI)
+			if ok {
+				if ctx.Bool("debug") {
+					log.Printf("Assigned %s as default UI\n", metadata.Name())
+				}
+				UI = uiplugin
+			}
+
+		}
+
 	}
-
-	m := grgdplugin.Methods(nil)["Name"]
-	fmt.Println(m(nil))
-
-	// os.Exit(1)
-
 	return nil
-
 }
