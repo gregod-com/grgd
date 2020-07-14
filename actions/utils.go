@@ -5,7 +5,6 @@ import (
 	"log"
 	"os/exec"
 	"sort"
-	"strings"
 
 	tm "github.com/buger/goterm"
 	// UI "github.com/gregod-com/grgd/ui"
@@ -82,27 +81,6 @@ func ADNS(c *cli.Context) error {
 }
 
 func ASettings(c *cli.Context) error {
-	return nil
-}
-
-func AContext(c *cli.Context) error {
-	out, err := exec.Command("kubectl", "config", "get-contexts").Output()
-	if err != nil {
-		log.Fatal(err)
-	}
-	if c.NArg() > 0 {
-		for _, word := range strings.Fields(string(out)) {
-			if strings.Contains(word, c.Args().First()) {
-				// fmt.Println("Setting current context to '" + word + "'")
-				out, err := exec.Command("kubectl", "config", "use-context", word).Output()
-				if err != nil {
-					log.Fatal(err)
-				}
-				fmt.Println(string(out))
-				break
-			}
-		}
-	}
 	return nil
 }
 

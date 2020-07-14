@@ -7,27 +7,6 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// AUp start the stack
-func AUp(c *cli.Context) error {
-	go fmt.Println("this is the up command")
-	return nil
-}
-
-func ADown(c *cli.Context) error {
-	go fmt.Println("this is the down command")
-	return nil
-}
-
-func ARestart(c *cli.Context) error {
-	go fmt.Println("this is the restart command")
-	return nil
-}
-
-func ALogs(c *cli.Context) error {
-	go fmt.Println("this is the logs command")
-	return nil
-}
-
 func AConfig(c *cli.Context) error {
 	go fmt.Println("this is the config command")
 	// services  := c.App.Metadata["services"].(map[string]iamutils.CliService)

@@ -7,22 +7,14 @@ import (
 	"time"
 
 	I "github.com/gregod-com/interfaces"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 // PluginIndex ...
 type PluginIndex struct {
-	path               string              `yaml:"a,omitempty"`
-	pluginMetadataList []I.IPluginMetadata `yaml:"plugins"`
-	Lastchecked        time.Time           `yaml:"lastchecked"`
-}
-
-// PluginMetadata ...
-type PluginMetadata struct {
-	Name    string
-	Version string
-	Size    uint64
-	URL     string
+	path               string               `yaml:"a,omitempty"`
+	PluginMetadataList []PluginMetadataImpl `yaml:"plugins5"`
+	Lastchecked        time.Time            `yaml:"lastchecked"`
 }
 
 // CreatePluginIndex ...
@@ -47,6 +39,10 @@ func (yamlObj *PluginIndex) Update() error {
 	if err != nil {
 		return err
 	}
+
+	log.Println(yamlObj.PluginMetadataList)
+
+	log.Println(string(newyaml))
 
 	err = ioutil.WriteFile(yamlObj.path, newyaml, 0644)
 	if err != nil {
@@ -88,5 +84,15 @@ func (yamlObj *PluginIndex) GetLastChecked() time.Time {
 
 // GetPluginList ...
 func (yamlObj *PluginIndex) GetPluginList() []I.IPluginMetadata {
-	return yamlObj.pluginMetadataList
+	returnArray := []I.IPluginMetadata{}
+	for _, v := range yamlObj.PluginMetadataList {
+		returnArray = append(returnArray, v)
+	}
+	return returnArray
+}
+
+// AddPlugin ...
+func (yamlObj *PluginIndex) AddPlugin(newplug I.IPluginMetadata) error {
+	yamlObj.PluginMetadataList = append(yamlObj.PluginMetadataList, newplug)
+	return nil
 }
