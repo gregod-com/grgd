@@ -8,14 +8,15 @@ import (
 	"os"
 	"plugin"
 
+	plugContracts "github.com/gregod-com/grgdplugincontracts"
+
 	idx "github.com/gregod-com/grgd/pluginindex"
-	I "github.com/gregod-com/interfaces"
 )
 
 // LoadPlugins ...
-func LoadPlugins(pluginFolder string) (map[string]I.IGrgdPlugin, I.IUIPlugin) {
-	var loadedUIPlugin I.IUIPlugin
-	loadedCMDPlugins := map[string]I.IGrgdPlugin{}
+func LoadPlugins(pluginFolder string) (map[string]plugContracts.IGrgdPlugin, plugContracts.IUIPlugin) {
+	var loadedUIPlugin plugContracts.IUIPlugin
+	loadedCMDPlugins := map[string]plugContracts.IGrgdPlugin{}
 	pluginBinariesFolder := pluginFolder + "binaries/"
 
 	index := idx.CreatePluginIndex(pluginFolder + "index.yaml")
@@ -43,13 +44,13 @@ func LoadPlugins(pluginFolder string) (map[string]I.IGrgdPlugin, I.IUIPlugin) {
 		}
 
 		// check if the var/func is implementing the grgd plugin interface
-		grgdplugin, ok := symPlugin.(I.IGrgdPlugin)
+		grgdplugin, ok := symPlugin.(plugContracts.IGrgdPlugin)
 		if !ok {
 			log.Println("Unexpected type from module symbol in Plugin at " + pluginPath)
 			continue
 		}
 
-		metadata, ok := grgdplugin.Init(nil).(I.IPluginMetadata)
+		metadata, ok := grgdplugin.Init(nil).(plugContracts.IPluginMetadata)
 		if !ok {
 			log.Printf("Unexpected implementation of interface IPluginMetadata in plugin %T: %T => %v", grgdplugin, grgdplugin.GetMetaData(nil), grgdplugin.Init(nil))
 			continue
@@ -60,7 +61,7 @@ func LoadPlugins(pluginFolder string) (map[string]I.IGrgdPlugin, I.IUIPlugin) {
 			loadedCMDPlugins[metadata.GetName()] = grgdplugin
 			index.Update()
 		case "ui":
-			loadedUIPlugin, ok = grgdplugin.(I.IUIPlugin)
+			loadedUIPlugin, ok = grgdplugin.(plugContracts.IUIPlugin)
 			if !ok {
 				fmt.Println("Plugin does not implement IUIPlugin")
 			}

@@ -8,6 +8,7 @@ import (
 	"sort"
 	"time"
 
+	plugContracts "github.com/gregod-com/grgdplugincontracts"
 	I "github.com/gregod-com/interfaces"
 
 	A "github.com/gregod-com/grgd/actions"
@@ -17,9 +18,16 @@ import (
 	cli "github.com/urfave/cli/v2"
 )
 
+// PLUGINSKEY ...
 const PLUGINSKEY = "grgdplugins"
+
+// STARTTIMEKEY ...
 const STARTTIMEKEY = "startTime"
+
+// CONFIGPATH ...
 const CONFIGPATH = "configLocation"
+
+// CONFIG ...
 const CONFIG = "iamconfig"
 
 func main() {
@@ -29,7 +37,7 @@ func main() {
 	CMDPlugins, UIPlugin := LoadPlugins(homedir + "/.grgd/plugins/")
 
 	for _, plug := range CMDPlugins {
-		cmdplug, ok := plug.(I.ICMDPlugin)
+		cmdplug, ok := plug.(plugContracts.ICMDPlugin)
 		if !ok {
 			fmt.Println("Wrong impl")
 		}

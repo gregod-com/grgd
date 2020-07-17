@@ -5,11 +5,12 @@ import (
 	"strconv"
 
 	idx "github.com/gregod-com/grgd/pluginindex"
-	I "github.com/gregod-com/interfaces"
+	plugContracts "github.com/gregod-com/grgdplugincontracts"
 	cli "github.com/urfave/cli/v2"
 )
 
-func CreatePluginIndexFromCLIContext(c *cli.Context) I.IPluginIndex {
+// CreatePluginIndexFromCLIContext ...
+func CreatePluginIndexFromCLIContext(c *cli.Context) plugContracts.IPluginIndex {
 	pluginIndexPath, ok := c.App.Metadata["pluginIndex"].(string)
 	if !ok {
 		log.Fatal("Undefined Pluginindex")
@@ -20,7 +21,7 @@ func CreatePluginIndexFromCLIContext(c *cli.Context) I.IPluginIndex {
 // APluginList ...
 func APluginList(c *cli.Context) error {
 	index := CreatePluginIndexFromCLIContext(c)
-	UI := c.App.Metadata["UIPlugin"].(I.IUIPlugin)
+	UI := c.App.Metadata["UIPlugin"].(plugContracts.IUIPlugin)
 
 	head := []string{"Name", "Version", "Size", "URL", "Category", "Active"}
 	rows := [][]string{}

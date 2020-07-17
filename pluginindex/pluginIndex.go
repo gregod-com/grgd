@@ -11,7 +11,7 @@ import (
 
 	"github.com/gregod-com/implementations"
 
-	I "github.com/gregod-com/interfaces"
+	plugContracts "github.com/gregod-com/grgdplugincontracts"
 	"golang.org/x/mod/semver"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -19,13 +19,13 @@ import (
 // PluginIndex ...
 type PluginIndex struct {
 	path                   string                                        `yaml:"-"`
-	PluginMetadataList     map[string]I.IPluginMetadata                  `yaml:"-"`
+	PluginMetadataList     map[string]plugContracts.IPluginMetadata      `yaml:"-"`
 	PluginMetadataListYAML map[string]implementations.PluginMetadataImpl `yaml:"plugins"`
 	Lastchecked            time.Time                                     `yaml:"lastchecked"`
 }
 
 // CreatePluginIndex ...
-func CreatePluginIndex(path string) I.IPluginIndex {
+func CreatePluginIndex(path string) plugContracts.IPluginIndex {
 	var obj = &PluginIndex{path: path}
 	obj.initFromFile()
 	return obj
@@ -36,7 +36,7 @@ func (yamlObj *PluginIndex) initFromFile() error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	yamlObj.PluginMetadataList = make(map[string]I.IPluginMetadata, len(yamlObj.PluginMetadataListYAML))
+	yamlObj.PluginMetadataList = make(map[string]plugContracts.IPluginMetadata, len(yamlObj.PluginMetadataListYAML))
 	for k := range yamlObj.PluginMetadataListYAML {
 		yamlObj.PluginMetadataList[k] = ConvertInterfaceToImpl(yamlObj.PluginMetadataListYAML[k])
 	}
@@ -95,12 +95,12 @@ func (yamlObj *PluginIndex) GetLastChecked() time.Time {
 }
 
 // GetPluginList ...
-func (yamlObj *PluginIndex) GetPluginList() map[string]I.IPluginMetadata {
+func (yamlObj *PluginIndex) GetPluginList() map[string]plugContracts.IPluginMetadata {
 	return yamlObj.PluginMetadataList
 }
 
 // AddPlugin ...
-func (yamlObj *PluginIndex) AddPlugin(newplugImpl I.IPluginMetadata) string {
+func (yamlObj *PluginIndex) AddPlugin(newplugImpl plugContracts.IPluginMetadata) string {
 
 	identifier := newplugImpl.GetCategory() + "-" + newplugImpl.GetName()
 
@@ -148,7 +148,7 @@ func ynQuestion() bool {
 }
 
 // PluginMetaConverter ...
-func PluginMetaConverter(pmeta I.IPluginMetadata) implementations.PluginMetadataImpl {
+func PluginMetaConverter(pmeta plugContracts.IPluginMetadata) implementations.PluginMetadataImpl {
 	return implementations.PluginMetadataImpl{
 		Name:     pmeta.GetName(),
 		Version:  pmeta.GetVersion(),
@@ -160,7 +160,7 @@ func PluginMetaConverter(pmeta I.IPluginMetadata) implementations.PluginMetadata
 }
 
 // PluginMetaConverter ...
-func ConvertInterfaceToImpl(pmeta implementations.PluginMetadataImpl) I.IPluginMetadata {
+func ConvertInterfaceToImpl(pmeta implementations.PluginMetadataImpl) plugContracts.IPluginMetadata {
 	return &implementations.PluginMetadataImpl{
 		Name:     pmeta.GetName(),
 		Version:  pmeta.GetVersion(),

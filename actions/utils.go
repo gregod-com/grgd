@@ -7,7 +7,6 @@ import (
 	"sort"
 
 	tm "github.com/buger/goterm"
-	// UI "github.com/gregod-com/grgd/ui"
 	I "github.com/gregod-com/interfaces"
 	"github.com/urfave/cli/v2"
 )
@@ -51,8 +50,8 @@ var SubAShortcut = map[string]func(*cli.Context) error{
 			default:
 				return cli.NewExitError("Unexpected error occured", 0)
 			}
-			fmt.Println("Removed shortcut: " + tm.Color(shortcut, tm.RED))
 		}
+		fmt.Println("Removed shortcut: " + tm.Color(shortcut, tm.RED))
 		return nil
 
 	},
@@ -64,19 +63,6 @@ func AVolume(c *cli.Context) error {
 	fmt.Println("")
 	fmt.Println("ACTION: (volume)")
 	fmt.Println("TODO")
-	return nil
-}
-
-func ACertificates(c *cli.Context) error {
-	c.Set("print_volume", "true")
-	// UI.PrintWorkloadOverview(c)
-	fmt.Println("")
-	fmt.Println("ACTION: (volume)")
-	fmt.Println("TODO")
-	return nil
-}
-
-func ADNS(c *cli.Context) error {
 	return nil
 }
 
