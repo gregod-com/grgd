@@ -14,7 +14,6 @@ import (
 	T "github.com/gregod-com/grgd/templates"
 	Impl "github.com/gregod-com/implementations"
 
-	"github.com/gregod-com/grgdplugins/shared"
 	cli "github.com/urfave/cli/v2"
 )
 
@@ -23,27 +22,19 @@ const STARTTIMEKEY = "startTime"
 const CONFIGPATH = "configLocation"
 const CONFIG = "iamconfig"
 
-var UIPlugin I.IUIPlugin
-var CMDPlugins []I.ICMDPlugin
-
-// var AllPlugins []I.IPluginMetadata
-
-var homedir string
-
 func main() {
 	app := cli.NewApp()
 
-	homedir = shared.HomeDir()
-	AllPlugins := LoadPlugins(homedir + "/.grgd/plugins/")
+	homedir := HomeDir()
+	CMDPlugins, UIPlugin := LoadPlugins(homedir + "/.grgd/plugins/")
 
-	for k := range AllPlugins {
-		fmt.Println(k)
-	}
 	for _, plug := range CMDPlugins {
-		app.Commands = append(app.Commands, plug.GetCommands(nil)...)
+		cmdplug, ok := plug.(I.ICMDPlugin)
+		if !ok {
+			fmt.Println("Wrong impl")
+		}
+		app.Commands = append(app.Commands, cmdplug.GetCommands(nil)...)
 	}
-
-	os.Exit(0)
 
 	myFlags := []cli.Flag{
 		&cli.BoolFlag{
@@ -155,12 +146,12 @@ func main() {
 
 	app.Before = func(c *cli.Context) error {
 		c.App.Metadata[CONFIGPATH] = homedir + "/.grgd/config.yml"
+		c.App.Metadata[CONFIG] = Impl.CreateConfigObjectYaml(c.App.Metadata[CONFIGPATH].(string))
+		c.App.Metadata["pluginIndex"] = homedir + "/.grgd/plugins/index.yaml"
 		c.App.Metadata["repoIndex"] = "https://s3.gregod.com/public/plugins/index.yaml"
 		c.App.Metadata["AWS-REGION"] = "eu-central-1"
 		c.App.Metadata["updatecheckinterval"] = time.Millisecond * 50
 		c.App.Metadata["currentcontext"] = A.UtilGetCurrentKubeContext()
-		c.App.Metadata[CONFIG] = Impl.CreateConfigObjectYaml(c.App.Metadata[CONFIGPATH].(string))
-		c.App.Metadata["AllPlugins"] = AllPlugins
 		c.App.Metadata["UIPlugin"] = UIPlugin
 
 		SystemCheck(c)
@@ -187,4 +178,13 @@ func main() {
 	if apperr != nil {
 		log.Fatal(apperr)
 	}
+}
+
+// HomeDir ...
+func HomeDir() string {
+	dir, errHomeDir := os.UserHomeDir()
+	if errHomeDir != nil {
+		log.Fatal(errHomeDir)
+	}
+	return dir
 }

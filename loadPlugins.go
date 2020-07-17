@@ -13,8 +13,9 @@ import (
 )
 
 // LoadPlugins ...
-func LoadPlugins(pluginFolder string) map[string]I.IGrgdPlugin {
-	loadedPlugins := map[string]I.IGrgdPlugin{}
+func LoadPlugins(pluginFolder string) (map[string]I.IGrgdPlugin, I.IUIPlugin) {
+	var loadedUIPlugin I.IUIPlugin
+	loadedCMDPlugins := map[string]I.IGrgdPlugin{}
 	pluginBinariesFolder := pluginFolder + "binaries/"
 
 	index := idx.CreatePluginIndex(pluginFolder + "index.yaml")
@@ -31,7 +32,8 @@ func LoadPlugins(pluginFolder string) map[string]I.IGrgdPlugin {
 		// open .so file and error if something goes wrong
 		pluginImpl, err := plugin.Open(pluginPath)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
+			continue
 		}
 
 		// check if there is a var or func called `Plugin` in .so file
@@ -43,23 +45,40 @@ func LoadPlugins(pluginFolder string) map[string]I.IGrgdPlugin {
 		// check if the var/func is implementing the grgd plugin interface
 		grgdplugin, ok := symPlugin.(I.IGrgdPlugin)
 		if !ok {
-			log.Fatal("Unexpected type from module symbol in Plugin at " + pluginPath)
+			log.Println("Unexpected type from module symbol in Plugin at " + pluginPath)
+			continue
 		}
 
-		// check if the init method returns a valid plugin metatda interface
-		metadata, ok := grgdplugin.Init(pluginPath).(I.IPluginMetadata)
+		metadata, ok := grgdplugin.Init(nil).(I.IPluginMetadata)
 		if !ok {
-			log.Fatal("Unexpected implementation of interface IPluginMetadata")
+			log.Printf("Unexpected implementation of interface IPluginMetadata in plugin %T: %T => %v", grgdplugin, grgdplugin.GetMetaData(nil), grgdplugin.Init(nil))
+			continue
 		}
 
-		index.AddPlugin(metadata)
-		fmt.Println(index.GetPluginList())
+		switch x := index.AddPlugin(metadata); x {
+		case "commands":
+			loadedCMDPlugins[metadata.GetName()] = grgdplugin
+			index.Update()
+		case "ui":
+			loadedUIPlugin, ok = grgdplugin.(I.IUIPlugin)
+			if !ok {
+				fmt.Println("Plugin does not implement IUIPlugin")
+			}
+		case "remove":
+			err := os.Remove(pluginPath)
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Printf("Plugin %v successfully deleted", metadata.GetName())
+		case "disabled":
+			// fmt.Println("Ignoring Plugin")
+		default:
+			fmt.Printf("Unknown category %v\n", x)
+		}
+
 		if err := index.Update(); err != nil {
 			log.Fatal(err.Error())
 		}
-		os.Exit(0)
-		loadedPlugins[metadata.GetName()] = grgdplugin
-
 	}
-	return loadedPlugins
+	return loadedCMDPlugins, loadedUIPlugin
 }

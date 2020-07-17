@@ -7,19 +7,20 @@ import (
 	"time"
 
 	PlugIndex "github.com/gregod-com/grgd/pluginindex"
+	"github.com/gregod-com/grgdplugins/shared"
 
 	cli "github.com/urfave/cli/v2"
 )
 
 // SystemCheck ...
 func SystemCheck(ctx *cli.Context) error {
-	path := homedir + "/.grgd"
+	path := shared.HomeDir() + "/.grgd"
 	if _, notexistserr := os.Stat(path); os.IsNotExist(notexistserr) {
 		os.Mkdir(path, os.FileMode(uint32(0760)))
 	}
 	ctx.App.Metadata["grgdhome"] = path
 
-	pluginPath := homedir + "/.grgd/plugins"
+	pluginPath := shared.HomeDir() + "/.grgd/plugins"
 	if _, notexistserr := os.Stat(pluginPath); os.IsNotExist(notexistserr) {
 		os.Mkdir(pluginPath, os.FileMode(uint32(0760)))
 	}
