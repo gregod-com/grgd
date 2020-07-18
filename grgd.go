@@ -13,7 +13,6 @@ import (
 
 	A "github.com/gregod-com/grgd/actions"
 	T "github.com/gregod-com/grgd/templates"
-	Impl "github.com/gregod-com/implementations"
 
 	cli "github.com/urfave/cli/v2"
 )
@@ -154,7 +153,7 @@ func main() {
 
 	app.Before = func(c *cli.Context) error {
 		c.App.Metadata[CONFIGPATH] = homedir + "/.grgd/config.yml"
-		c.App.Metadata[CONFIG] = Impl.CreateConfigObjectYaml(c.App.Metadata[CONFIGPATH].(string))
+		c.App.Metadata[CONFIG] = CreateConfigObjectYaml(c.App.Metadata[CONFIGPATH].(string))
 		c.App.Metadata["pluginIndex"] = homedir + "/.grgd/plugins/index.yaml"
 		c.App.Metadata["repoIndex"] = "https://s3.gregod.com/public/plugins/index.yaml"
 		c.App.Metadata["AWS-REGION"] = "eu-central-1"
