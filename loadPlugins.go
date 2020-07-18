@@ -81,5 +81,10 @@ func LoadPlugins(pluginFolder string) (map[string]plugContracts.IGrgdPlugin, plu
 			log.Fatal(err.Error())
 		}
 	}
+
+	if loadedUIPlugin == nil {
+		fmt.Println("No UI, using fallback UI")
+		loadedUIPlugin = &fallbackui{}
+	}
 	return loadedCMDPlugins, loadedUIPlugin
 }
