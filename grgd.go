@@ -66,7 +66,7 @@ func main() {
 	app.Flags = myFlags
 	app.Name = "grgd"
 	app.Usage = "written in go. Can be used as a sidekick to gregod-menu and gregod-doctor"
-	app.Version = "0.6.0"
+	app.Version = "0.7.0"
 	app.Metadata = make(map[string]interface{})
 	app.Metadata[STARTTIMEKEY] = time.Now()
 	app.CustomAppHelpTemplate = T.GetHelpTemplate()

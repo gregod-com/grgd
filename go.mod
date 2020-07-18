@@ -2,16 +2,13 @@ module github.com/gregod-com/grgd
 
 go 1.14
 
-replace (
-	github.com/gregod-com/grgdplugins/shared => ../grgdplugins/shared
-	github.com/gregod-com/implementations => ../implementations
-	github.com/gregod-com/interfaces => ../interfaces
-)
+replace github.com/gregod-com/implementations => ../implementations
 
 require (
 	github.com/buger/goterm v0.0.0-20200322175922-2f3e71b85129
-	github.com/gregod-com/grgdplugincontracts v0.0.3
-	github.com/gregod-com/implementations v0.0.2
+	github.com/common-nighthawk/go-figure v0.0.0-20200609044655-c4b36f998cf2
+	github.com/gregod-com/grgdplugincontracts v0.0.4
+	github.com/gregod-com/implementations v0.0.3
 	github.com/gregod-com/interfaces v0.0.22
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/urfave/cli/v2 v2.2.0
