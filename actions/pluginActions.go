@@ -1,56 +1,51 @@
 package actions
 
 import (
-	"log"
 	"sort"
 	"strconv"
 	"strings"
 
 	idx "github.com/gregod-com/grgd/pluginindex"
+	"github.com/gregod-com/grgdplugincontracts"
 	plugContracts "github.com/gregod-com/grgdplugincontracts"
 	cli "github.com/urfave/cli/v2"
 )
 
-// CreatePluginIndexFromCLIContext ...
-func CreatePluginIndexFromCLIContext(c *cli.Context) plugContracts.IPluginIndex {
-	pluginIndexPath, ok := c.App.Metadata["pluginIndex"].(string)
-	if !ok {
-		log.Fatal("Undefined Pluginindex")
-	}
-	return idx.CreatePluginIndex(pluginIndexPath)
-}
-
 // APluginList ...
 func APluginList(c *cli.Context) error {
-	index := CreatePluginIndexFromCLIContext(c)
+
+	index := idx.CreatePluginIndexFromCLIContext(c)
 	UI := c.App.Metadata["UIPlugin"].(plugContracts.IUIPlugin)
-	head := []string{"Name", "Version", "URL", "Category", "Active"}
+	head := []string{"Name", "Version", "Category", "Active", "Loaded", "URL"}
 
-	rows := sortKeys(index.GetPluginListActive())
+	rows := sortPluginMetadataSlice(index.GetPluginListActive())
 
-	if len(rows) > 0 {
-		UI.Println(c, "Active Plugins")
-		UI.PrintTable(c, head, rows)
-	}
+	UI.Println(c, "Active Plugins")
+	UI.PrintTable(c, head, rows)
 
-	rows = sortKeys(index.GetPluginListInactive())
+	rows = sortPluginMetadataSlice(index.GetPluginListInactive())
 
-	if len(rows) > 0 {
-		UI.Println(c, "")
-		UI.Println(c, "InActive Plugins")
-		UI.PrintTable(c, head, rows)
-	}
+	UI.Println(c, "")
+	UI.Println(c, "InActive Plugins")
+	UI.PrintTable(c, head, rows)
+
+	rows = sortPluginMetadataSlice(index.GetPluginListOffline())
+
+	UI.Println(c, "")
+	UI.Println(c, "Offline Plugins")
+	UI.PrintTable(c, head, rows)
 	return nil
 }
 
 // APluginActivate ...
 func APluginActivate(c *cli.Context) error {
 	UI := c.App.Metadata["UIPlugin"].(plugContracts.IUIPlugin)
-	index := CreatePluginIndexFromCLIContext(c)
+	index := idx.CreatePluginIndexFromCLIContext(c)
 	plugname := c.Args().First()
 	key := []string{}
 
-	for k := range index.GetPluginList() {
+	for _, v := range index.GetPluginList() {
+		k := v.GetIdentifier()
 		if strings.Contains(strings.ToLower(k), strings.ToLower(plugname)) {
 			key = append(key, k)
 		}
@@ -60,8 +55,8 @@ func APluginActivate(c *cli.Context) error {
 	case 0:
 		UI.Println(c, "No matching plugin names")
 	case 1:
-		index.GetPluginList()[key[0]].ToggleActive()
-		index.Update()
+		UI.Println(c, "Found Match")
+		index.ToggleActive(key[0])
 		APluginList(c)
 	default:
 		UI.Println(c, "Multiple plugins found:")
@@ -72,21 +67,26 @@ func APluginActivate(c *cli.Context) error {
 	return nil
 }
 
-func sortKeys(m map[string]plugContracts.IPluginMetadata) [][]string {
+func sortPluginMetadataSlice(m []grgdplugincontracts.IPluginMetadata) [][]string {
 	rows := [][]string{}
-	keys := []string{}
-	for k := range m {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
 
-	for _, key := range keys {
+	sort.Slice(m, func(i, j int) bool {
+		switch strings.Compare(m[i].GetName(), m[j].GetName()) {
+		case -1:
+			return true
+		default:
+			return false
+		}
+	})
+
+	for _, key := range m {
 		row := []string{}
-		row = append(row, m[key].GetName())
-		row = append(row, m[key].GetVersion())
-		row = append(row, m[key].GetURL())
-		row = append(row, m[key].GetCategory())
-		row = append(row, strconv.FormatBool(m[key].GetActive()))
+		row = append(row, key.GetName())
+		row = append(row, key.GetVersion())
+		row = append(row, key.GetCategory())
+		row = append(row, strconv.FormatBool(key.GetActive()))
+		row = append(row, strconv.FormatBool(key.GetLoaded()))
+		row = append(row, key.GetURL())
 		rows = append(rows, row)
 	}
 
