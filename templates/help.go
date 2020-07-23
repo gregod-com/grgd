@@ -28,7 +28,7 @@ func GetHelpTemplate() string {
 			{{- printf "%-20v" $names }} {{"->  "}}{{.Usage}}
 		{{- end}}
 		{{end}}
-	{{end}}
+	{{- end}}
 	{{if .VisibleFlags}}
 	GLOBAL OPTIONS:
 	{{- range $index, $option := .VisibleFlags}}
@@ -36,6 +36,5 @@ func GetHelpTemplate() string {
 		{{- end}}
 		{{- printf "%-20v" $option }}
 	{{- end}}
-{{end}}
-`
+{{end}}`
 }

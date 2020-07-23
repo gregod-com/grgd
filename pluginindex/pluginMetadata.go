@@ -2,17 +2,23 @@ package pluginindex
 
 // PluginMetadataImpl ...
 type PluginMetadataImpl struct {
-	Name     string
-	Version  string
-	URL      string
-	Category string
-	Active   bool
-	Path     string
+	Name     string `yaml:"name"`
+	Version  string `yaml:"version"`
+	URL      string `yaml:"url"`
+	Category string `yaml:"category"`
+	Active   bool   `yaml:"active"`
+	Loaded   bool   `yaml:"loaded"`
+	Path     string `yaml:"path"`
 }
 
 // GetFullname ...
 func (plmeta PluginMetadataImpl) GetFullname() string {
 	return plmeta.Category + "-" + plmeta.Name + "-" + plmeta.Version
+}
+
+// GetIdentifier ...
+func (plmeta PluginMetadataImpl) GetIdentifier() string {
+	return plmeta.Category + "-" + plmeta.Name
 }
 
 // GetName ...
@@ -45,14 +51,25 @@ func (plmeta PluginMetadataImpl) GetPath() string {
 	return plmeta.Path
 }
 
+// GetLoaded ...
+func (plmeta PluginMetadataImpl) GetLoaded() bool {
+	return plmeta.Loaded
+}
+
+// SetLoaded ...
+func (plmeta *PluginMetadataImpl) SetLoaded(l bool) {
+	plmeta.Loaded = l
+}
+
 // SetActive ...
 func (plmeta *PluginMetadataImpl) SetActive(a bool) {
 	plmeta.Active = a
 }
 
 // ToggleActive ...
-func (plmeta *PluginMetadataImpl) ToggleActive() {
+func (plmeta *PluginMetadataImpl) ToggleActive() bool {
 	plmeta.Active = !plmeta.Active
+	return plmeta.Active
 }
 
 // SetPath ...

@@ -2,15 +2,18 @@
 package main
 
 import (
+	"github.com/gregod-com/grgdplugincontracts"
 	cli "github.com/urfave/cli/v2"
 )
 
 // CheckUpdate ...
-func CheckUpdate(ctx *cli.Context) error {
+func CheckUpdate(c *cli.Context) error {
 	// reader := bufio.NewReader(os.Stdin)
-	repoIndex := ctx.App.Metadata["repoIndex"].(string)
-	// currentIndex := ctx.App.Metadata[PLUGINSKEY].(string) + "/index.yaml"
-	remoteIndex := ctx.App.Metadata[PLUGINSKEY].(string) + "/index-remote.yaml"
+	repoIndex := c.App.Metadata["repoIndex"].(string)
+	// currentIndex := c.App.Metadata[PLUGINSKEY].(string) + "/index.yaml"
+	remoteIndex := c.App.Metadata[PLUGINSKEY].(string) + "/index-remote.yaml"
+	UI := c.App.Metadata["UIPlugin"].(grgdplugincontracts.IUIPlugin)
+
 	err := DownloadFile(remoteIndex, repoIndex)
 	if err != nil {
 		return err
@@ -18,29 +21,21 @@ func CheckUpdate(ctx *cli.Context) error {
 	// pluginsCurrent := PlugIndex.CreatePluginIndex(currentIndex)
 	// pluginsRemote := PlugIndex.CreatePluginIndex(remoteIndex)
 
-	// fmt.Println("Downloaded: " + repoIndex)
+	UI.Println(c, "Downloaded: "+repoIndex)
 	// for _, plremote := range pluginsRemote.GetPluginList().([]PlugIndex.PluginMetadata) {
 	// 	for _, pllocal := range pluginsCurrent.GetPluginList().([]PlugIndex.PluginMetadata) {
 	// 		if plremote.Name == pllocal.Name {
 	// 			vlocal := semver.New(pllocal.Version)
 	// 			vremote := semver.New(plremote.Version)
+
 	// 			if vlocal.LessThan(*vremote) {
-	// 				fmt.Printf("Update plugin    %-15s to v%v (current %v)? [y/n]", plremote.Name, vremote, vlocal)
-	// 				yes, _ := reader.ReadString('\n')
-	// 				if yes == "y\n" {
-	// 					fmt.Println(plremote.Sha)
+	// 				question := fmt.Sprintf("Update plugin    %-15s to v%v (current %v)? [y/n]", plremote.Name, vremote, vlocal)
+	// 				if UI.YesNoQuestion(c, question) {
 	// 					DownloadFile("filepath", plremote.URL)
 	// 				}
 	// 			}
 	// 		}
 	// 	}
-
-	// 	// fmt.Println(p.Name)
-	// 	// fmt.Println(p.Version)
-	// 	// fmt.Println(p.Size)
-	// 	// fmt.Println(p.Sha)
-	// 	// fmt.Println(p.URL)
 	// }
-	// pl.Update()
 	return nil
 }

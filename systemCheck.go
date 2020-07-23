@@ -30,7 +30,7 @@ func SystemCheck(ctx *cli.Context) error {
 		err := CheckUpdate(ctx)
 		if err != nil {
 			log.Println("Looks like there was an error fetching updates... skipping this update-cycle")
-			pl.Update()
+			// pl.Update()
 		}
 	}
 

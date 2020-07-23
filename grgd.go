@@ -2,13 +2,11 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"sort"
 	"time"
 
-	plugContracts "github.com/gregod-com/grgdplugincontracts"
 	I "github.com/gregod-com/interfaces"
 
 	A "github.com/gregod-com/grgd/actions"
@@ -27,7 +25,7 @@ const STARTTIMEKEY = "startTime"
 const CONFIGPATH = "configLocation"
 
 // CONFIG ...
-const CONFIG = "iamconfig"
+const CONFIG = "config"
 
 func main() {
 	app := cli.NewApp()
@@ -36,29 +34,24 @@ func main() {
 	CMDPlugins, UIPlugin := LoadPlugins(homedir + "/.grgd/plugins/")
 
 	for _, plug := range CMDPlugins {
-		cmdplug, ok := plug.(plugContracts.ICMDPlugin)
-		if !ok {
-			fmt.Println("Wrong impl")
-		}
-		app.Commands = append(app.Commands, cmdplug.GetCommands(nil)...)
+		app.Commands = append(app.Commands, plug.GetCommands(nil)...)
 	}
 
 	myFlags := []cli.Flag{
 		&cli.BoolFlag{
-			Name:  "debug, d",
-			Usage: "run the command in debug mode",
+			Name:    "debug",
+			Aliases: []string{"d"},
+			Usage:   "run the command in debug mode",
 		},
 		&cli.BoolFlag{
-			Name:  "network, n",
-			Usage: "show network details in overview",
+			Name:    "verbose",
+			Aliases: []string{"vvv"},
+			Usage:   "run the command in verbose mode",
 		},
 		&cli.BoolFlag{
-			Name:  "mounts, m",
-			Usage: "show mounting details in overview",
-		},
-		&cli.BoolFlag{
-			Name:  "sidecars, s, sc",
-			Usage: "show sidecars in overview",
+			Name:    "silent",
+			Aliases: []string{"s"},
+			Usage:   "mute all outputs",
 		},
 	}
 
@@ -69,10 +62,12 @@ func main() {
 	app.Metadata = make(map[string]interface{})
 	app.Metadata[STARTTIMEKEY] = time.Now()
 	app.CustomAppHelpTemplate = T.GetHelpTemplate()
+	app.HideHelpCommand = true
 	app.Commands = append(app.Commands, []*cli.Command{
 		{
 			Name:        "init",
 			Usage:       "Initialze the " + app.Name,
+			Flags:       myFlags,
 			Action:      A.AInit,
 			Description: T.Description(app, "init"),
 		},
@@ -100,18 +95,25 @@ func main() {
 			},
 		},
 		{
-			Name:        "config",
-			Usage:       "Configuration for current stack",
-			Aliases:     []string{"conf", "c"},
-			Flags:       myFlags,
-			Description: T.Description(app, "config"),
+			Name:            "config",
+			Usage:           "view and edit current configuration",
+			Aliases:         []string{"conf", "c"},
+			Flags:           app.Flags,
+			HideHelpCommand: true,
+			// Action:      A.AConfig,
+			// Description: A.AConfigDescription,
 			Subcommands: []*cli.Command{
 				{
-					Name:        "yaml",
-					Usage:       "Show iam_config.yaml file",
-					Aliases:     []string{"y"},
-					Action:      A.SubAConfig["yaml"],
-					Description: T.Description(app, "config-yaml"),
+					Name:    "yaml",
+					Usage:   "print config file in yaml format",
+					Aliases: []string{"y"},
+					Action:  A.SubAConfigYAML,
+				},
+				{
+					Name:    "edit",
+					Usage:   "edit the config file",
+					Aliases: []string{"e"},
+					Action:  A.SubAConfigEdit,
 				},
 			},
 		},
@@ -124,28 +126,28 @@ func main() {
 			Subcommands: []*cli.Command{
 				{
 					Name:        "list",
-					Aliases:     []string{"l", "ls"},
+					Aliases:     []string{"ls"},
 					Usage:       "list all shortcuts",
-					Action:      A.SubAShortcut["list"],
-					Description: T.Description(app, "shortcuts-list"),
+					Action:      A.SubAShortcutList,
+					Description: A.SubAShortcutListDescription,
 				},
 				{
 					Name:        "add",
 					Aliases:     []string{"a"},
 					Usage:       "add new shortcut `sc add shortcut workload` ",
-					Action:      A.SubAShortcut["add"],
-					Description: T.Description(app, "shortcuts-add"),
+					Action:      A.SubAShortcutAdd,
+					Description: A.SubAShortcutAddDescription,
 				},
 				{
 					Name:        "remove",
 					Aliases:     []string{"r"},
 					Usage:       "remove a shortcut `sc remove shortcut` ",
-					Action:      A.SubAShortcut["remove"],
-					Description: T.Description(app, "shortcuts-remove"),
+					Action:      A.SubAShortcutRemove,
+					Description: A.SubAShortcutRemoveDescription,
 				},
 			},
 			After: func(c *cli.Context) error {
-				A.PrintShortcuts(c)
+				A.SubAShortcutList(c)
 				return nil
 			},
 		},
@@ -158,10 +160,12 @@ func main() {
 		c.App.Metadata["repoIndex"] = "https://s3.gregod.com/public/plugins/index.yaml"
 		c.App.Metadata["AWS-REGION"] = "eu-central-1"
 		c.App.Metadata["updatecheckinterval"] = time.Millisecond * 50
-		c.App.Metadata["currentcontext"] = A.UtilGetCurrentKubeContext()
+		// c.App.Metadata["currentcontext"] = A.UtilGetCurrentKubeContext()
+
 		c.App.Metadata["UIPlugin"] = UIPlugin
 
 		SystemCheck(c)
+		CheckUpdate(c)
 
 		UIPlugin.ClearScreen(c)
 		UIPlugin.PrintBanner(c)
@@ -174,7 +178,6 @@ func main() {
 	app.After = func(c *cli.Context) error {
 		c.App.Metadata[CONFIG].(I.IConfigObject).Update()
 		// startTime := c.App.Metadata[STARTTIMEKEY].(time.Time)
-		// fmt.Println(startTime)
 		// UIPlugin.PrintExecutionTime(time.Since(startTime))
 		return nil
 	}

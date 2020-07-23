@@ -76,7 +76,7 @@ func (p fallbackui) PrintBanner(i interface{}) interface{} {
 // PrintWorkloadOverview ...
 func (p fallbackui) PrintWorkloadOverview(i interface{}) {
 	// c := ExtractCliContext(i)
-	// config := c.App.Metadata["iamconfig"].(I.IConfigObject)
+	// config := c.App.Metadata["config"].(I.IConfigObject)
 }
 
 // PrintTable ...
