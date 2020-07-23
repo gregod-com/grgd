@@ -109,7 +109,7 @@ func (yamlObj *PluginIndex) GetSourceAsString() string {
 func (yamlObj *PluginIndex) getSourceAsBytes() []byte {
 	config, err := ioutil.ReadFile(yamlObj.path)
 	if err != nil {
-		// yamlObj.Update()
+		yamlObj.Update()
 		log.Println("A new config file has been created at " + yamlObj.path)
 		log.Fatal("Run the 'init' command next to configure your stack.")
 	}

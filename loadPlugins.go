@@ -9,19 +9,22 @@ import (
 	"strings"
 
 	"github.com/gregod-com/grgdplugincontracts"
-	plugContracts "github.com/gregod-com/grgdplugincontracts"
 
 	idx "github.com/gregod-com/grgd/pluginindex"
 )
 
 // LoadPlugins ...
-func LoadPlugins(pluginFolder string) ([]plugContracts.ICMDPlugin, plugContracts.IUIPlugin) {
-	var loadedUIPlugin plugContracts.IUIPlugin
-	var loadedCMDPlugins []plugContracts.ICMDPlugin
-	var allActiveMetaData []plugContracts.IPluginMetadata
-	var allAvailablePlugins []plugContracts.IPluginMetadata
+func LoadPlugins(pluginFolder string) ([]grgdplugincontracts.ICMDPlugin, grgdplugincontracts.IUIPlugin) {
+	var loadedUIPlugin grgdplugincontracts.IUIPlugin
+	var loadedCMDPlugins []grgdplugincontracts.ICMDPlugin
+	var allActiveMetaData []grgdplugincontracts.IPluginMetadata
+	var allAvailablePlugins []grgdplugincontracts.IPluginMetadata
 
 	pluginBinariesFolder := pluginFolder + "binaries/"
+
+	if _, err := os.Stat(pluginBinariesFolder); os.IsNotExist(err) {
+		os.Mkdir(pluginBinariesFolder, 0755)
+	}
 
 	index := idx.CreatePluginIndex(pluginFolder + "index.yaml")
 
@@ -53,7 +56,7 @@ func LoadPlugins(pluginFolder string) ([]plugContracts.ICMDPlugin, plugContracts
 		}
 
 		// check if the var/func is implementing the grgd plugin interface
-		grgdplugin, ok := symPlugin.(plugContracts.IGrgdPlugin)
+		grgdplugin, ok := symPlugin.(grgdplugincontracts.IGrgdPlugin)
 		if !ok {
 			log.Println("Unexpected type from module symbol in plugin at " + pluginPath)
 			continue
@@ -72,7 +75,7 @@ func LoadPlugins(pluginFolder string) ([]plugContracts.ICMDPlugin, plugContracts
 			allActiveMetaData = append(allActiveMetaData, metadata)
 		case "ui":
 			log.Println("Found ui " + metadata.GetIdentifier())
-			loadedUIPlugin, ok = grgdplugin.(plugContracts.IUIPlugin)
+			loadedUIPlugin, ok = grgdplugin.(grgdplugincontracts.IUIPlugin)
 			if !ok {
 				log.Println("Plugin does not implement IUIPlugin")
 				continue
