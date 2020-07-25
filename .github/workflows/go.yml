@@ -39,5 +39,5 @@ jobs:
     - name: Upload binary
       uses: actions/upload-artifact@v2
       with:
-        name: homework
-        path: grgd.go
+        name: grgd-v0.2.0
+        path: grgd
