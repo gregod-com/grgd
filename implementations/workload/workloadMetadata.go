@@ -1,4 +1,4 @@
-package main
+package workload
 
 import (
 	I "github.com/gregod-com/interfaces"

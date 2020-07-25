@@ -1,5 +1,5 @@
-// This package implements the cli for the iam-stack. The underlying framework is depnedent upon urfave/cli.
-package main
+// Package helpers implements the cli for the iam-stack. The underlying framework is depnedent upon urfave/cli.
+package helpers
 
 import (
 	"io/ioutil"
@@ -9,12 +9,10 @@ import (
 	"strings"
 
 	"github.com/gregod-com/grgdplugincontracts"
-
-	idx "github.com/gregod-com/grgd/pluginindex"
 )
 
 // LoadPlugins ...
-func LoadPlugins(pluginFolder string) ([]grgdplugincontracts.ICMDPlugin, grgdplugincontracts.IUIPlugin) {
+func LoadPlugins(pluginFolder string, index grgdplugincontracts.IPluginIndex) ([]grgdplugincontracts.ICMDPlugin, grgdplugincontracts.IUIPlugin) {
 	var loadedUIPlugin grgdplugincontracts.IUIPlugin
 	var loadedCMDPlugins []grgdplugincontracts.ICMDPlugin
 	var allActiveMetaData []grgdplugincontracts.IPluginMetadata
@@ -25,8 +23,6 @@ func LoadPlugins(pluginFolder string) ([]grgdplugincontracts.ICMDPlugin, grgdplu
 	if _, err := os.Stat(pluginBinariesFolder); os.IsNotExist(err) {
 		os.Mkdir(pluginBinariesFolder, 0755)
 	}
-
-	index := idx.CreatePluginIndex(pluginFolder + "index.yaml")
 
 	fileinfo, err := ioutil.ReadDir(pluginBinariesFolder)
 	if err != nil {
@@ -99,7 +95,7 @@ func LoadPlugins(pluginFolder string) ([]grgdplugincontracts.ICMDPlugin, grgdplu
 
 	if loadedUIPlugin == nil {
 		log.Println("No UI, using fallback UI")
-		loadedUIPlugin = &fallbackui{}
+		loadedUIPlugin = &FallbackUI{}
 	}
 	return loadedCMDPlugins, loadedUIPlugin
 }

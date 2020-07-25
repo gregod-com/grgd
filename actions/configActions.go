@@ -1,8 +1,9 @@
 package actions
 
 import (
+	"github.com/gregod-com/grgd/helpers"
 	"github.com/gregod-com/grgdplugincontracts"
-	I "github.com/gregod-com/interfaces"
+	"github.com/gregod-com/interfaces"
 	"github.com/urfave/cli/v2"
 )
 
@@ -11,7 +12,9 @@ const AConfigDescription = `This is the description as a var in single quotes mu
 
 // AConfig ...
 func AConfig(c *cli.Context) error {
-	UI := c.App.Metadata["UIPlugin"].(grgdplugincontracts.IUIPlugin)
+	var UI grgdplugincontracts.IUIPlugin
+	helpers.ExtractMetadataFatal(c.App.Metadata, "UIPlugin", &UI)
+
 	UI.Println(c, "this is the config command")
 	return nil
 }
@@ -21,15 +24,20 @@ const SubAConfigYAMLDescription = `This is the description as a var in single qu
 
 // SubAConfigYAML ...
 func SubAConfigYAML(c *cli.Context) error {
-	UI := c.App.Metadata["UIPlugin"].(grgdplugincontracts.IUIPlugin)
-	configObject := c.App.Metadata["config"].(I.IConfigObject)
+	var UI grgdplugincontracts.IUIPlugin
+	var configObject interfaces.IConfigObject
+	helpers.ExtractMetadataFatal(c.App.Metadata, "UIPlugin", &UI)
+	helpers.ExtractMetadataFatal(c.App.Metadata, "config", &configObject)
+
 	UI.Println(c, configObject.GetSourceAsString())
 	return nil
 }
 
 // SubAConfigEdit ...
 func SubAConfigEdit(c *cli.Context) error {
-	UI := c.App.Metadata["UIPlugin"].(grgdplugincontracts.IUIPlugin)
+	var UI grgdplugincontracts.IUIPlugin
+	helpers.ExtractMetadataFatal(c.App.Metadata, "UIPlugin", &UI)
+
 	UI.Println(c, "This is the config edit subcommand")
 	return nil
 }

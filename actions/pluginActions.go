@@ -5,17 +5,18 @@ import (
 	"strconv"
 	"strings"
 
-	idx "github.com/gregod-com/grgd/pluginindex"
+	"github.com/gregod-com/grgd/helpers"
+	"github.com/gregod-com/grgd/implementations/pluginindex"
 	"github.com/gregod-com/grgdplugincontracts"
-	plugContracts "github.com/gregod-com/grgdplugincontracts"
 	cli "github.com/urfave/cli/v2"
 )
 
 // APluginList ...
 func APluginList(c *cli.Context) error {
+	var UI grgdplugincontracts.IUIPlugin
+	helpers.ExtractMetadataFatal(c.App.Metadata, "UIPlugin", &UI)
 
-	index := idx.CreatePluginIndexFromCLIContext(c)
-	UI := c.App.Metadata["UIPlugin"].(plugContracts.IUIPlugin)
+	index := pluginindex.CreatePluginIndexFromCLIContext(c)
 	head := []string{"Name", "Version", "Category", "Active", "Loaded", "URL"}
 
 	rows := sortPluginMetadataSlice(index.GetPluginListActive())
@@ -39,8 +40,9 @@ func APluginList(c *cli.Context) error {
 
 // APluginActivate ...
 func APluginActivate(c *cli.Context) error {
-	UI := c.App.Metadata["UIPlugin"].(plugContracts.IUIPlugin)
-	index := idx.CreatePluginIndexFromCLIContext(c)
+	var UI grgdplugincontracts.IUIPlugin
+	helpers.ExtractMetadataFatal(c.App.Metadata, "UIPlugin", &UI)
+	index := pluginindex.CreatePluginIndexFromCLIContext(c)
 	plugname := c.Args().First()
 	key := []string{}
 

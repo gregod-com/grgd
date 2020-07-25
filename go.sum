@@ -7,6 +7,8 @@ github.com/gregod-com/grgdplugincontracts v0.1.0 h1:kjV+qiSbw4mTMRmFpUXRWsUGlz3u
 github.com/gregod-com/grgdplugincontracts v0.1.0/go.mod h1:rT1mDgssTQ2x5t9o54UHYPenIuBGypdU7UejNE7EwWw=
 github.com/gregod-com/interfaces v0.1.0 h1:wblEttt3jsSOO0hkXG9aUoj+dw9Ozpe+uGmQtpDpx9o=
 github.com/gregod-com/interfaces v0.1.0/go.mod h1:xhxbf3os/SUPGVDDUSl5TD7W+ADXbVOiYD7Ggmf1P7o=
+github.com/kisielk/godepgraph v0.0.0-20190626013829-57a7e4a651a9 h1:ZkWH0x1yafBo+Y2WdGGdszlJrMreMXWl7/dqpEkwsIk=
+github.com/kisielk/godepgraph v0.0.0-20190626013829-57a7e4a651a9/go.mod h1:Gb5YEgxqiSSVrXKWQxDcKoCM94NO5QAwOwTaVmIUAMI=
 github.com/kr/pretty v0.1.0 h1:L/CwN0zerZDmRFUapSPitk6f+Q3+0za1rQkzVuMiMFI=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=

@@ -1,18 +1,26 @@
 // This package implements the cli for the iam-stack. The underlying framework is depnedent upon urfave/cli.
-package main
+package helpers
 
 import (
 	"github.com/gregod-com/grgdplugincontracts"
-	cli "github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v2"
 )
 
 // CheckUpdate ...
 func CheckUpdate(c *cli.Context) error {
 	// reader := bufio.NewReader(os.Stdin)
-	repoIndex := c.App.Metadata["repoIndex"].(string)
+	var UI grgdplugincontracts.IUIPlugin
+	var repoIndex, remoteIndex string
+	ExtractMetadataFatal(c.App.Metadata, "pluginIndex", &repoIndex)
+	ExtractMetadataFatal(c.App.Metadata, "remoteIndex", &remoteIndex)
+	ExtractMetadataFatal(c.App.Metadata, "UIPlugin", &UI)
+
+	// repoIndex, ok := c.App.Metadata["repoIndex"].(string)
+	// if !ok {
+	// 	return errors.New("Metadata map is missing key `repoIndex`")
+	// }
 	// currentIndex := c.App.Metadata[PLUGINSKEY].(string) + "/index.yaml"
-	remoteIndex := c.App.Metadata[PLUGINSKEY].(string) + "/index-remote.yaml"
-	UI := c.App.Metadata["UIPlugin"].(grgdplugincontracts.IUIPlugin)
+	// remoteIndex := c.App.Metadata["grgdplugins"].(string) + "/index-remote.yaml"
 
 	err := DownloadFile(remoteIndex, repoIndex)
 	if err != nil {

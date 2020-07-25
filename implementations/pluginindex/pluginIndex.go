@@ -9,10 +9,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gregod-com/grgd/helpers"
 	"github.com/gregod-com/grgdplugincontracts"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/mod/semver"
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 )
 
 // PluginIndex ...
@@ -23,10 +24,9 @@ type PluginIndex struct {
 
 // CreatePluginIndexFromCLIContext ...
 func CreatePluginIndexFromCLIContext(c *cli.Context) grgdplugincontracts.IPluginIndex {
-	pluginIndexPath, ok := c.App.Metadata["pluginIndex"].(string)
-	if !ok {
-		log.Fatal("Undefined Pluginindex")
-	}
+	var pluginIndexPath string
+	helpers.ExtractMetadataFatal(c.App.Metadata, "pluginIndex", &pluginIndexPath)
+
 	return CreatePluginIndex(pluginIndexPath)
 }
 

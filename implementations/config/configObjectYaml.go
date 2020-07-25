@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"errors"
@@ -8,9 +8,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gregod-com/grgd/implementations/workload"
 	I "github.com/gregod-com/interfaces"
 
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 )
 
 // CreateConfigObjectYaml ...
@@ -25,7 +26,7 @@ type ConfigObjectYaml struct {
 	path              string
 	ProjectDirectory  string `yaml:"projectDir"`
 	Registries        map[string]string
-	WorkloadsMetadata map[string]*WorkloadMetadata `yaml:"services"`
+	WorkloadsMetadata map[string]*workload.WorkloadMetadata `yaml:"services"`
 	ServicesToIgnore  []string
 	Shortcuts         map[string]string
 	CommandsUsed      map[string]bool `yaml:"commands"`

@@ -2,11 +2,11 @@ package actions
 
 import (
 	"fmt"
-	"log"
 	"sort"
 
+	"github.com/gregod-com/grgd/helpers"
 	"github.com/gregod-com/grgdplugincontracts"
-	I "github.com/gregod-com/interfaces"
+	"github.com/gregod-com/interfaces"
 	"github.com/urfave/cli/v2"
 )
 
@@ -15,20 +15,23 @@ const SubAShortcutAddDescription = `This is the description for shortcut add`
 
 // SubAShortcutAdd ...
 func SubAShortcutAdd(c *cli.Context) error {
-	UI := c.App.Metadata["UIPlugin"].(grgdplugincontracts.IUIPlugin)
+	var UI grgdplugincontracts.IUIPlugin
+	var config interfaces.IConfigObject
+	helpers.ExtractMetadataFatal(c.App.Metadata, "UIPlugin", &UI)
+	helpers.ExtractMetadataFatal(c.App.Metadata, "config", &config)
 
 	if c.NArg() != 2 {
 		return cli.NewExitError("You should enter a workload and a shortcut", 5)
 	}
 	shortcut, workload := c.Args().Get(0), c.Args().Get(1)
 
-	err := c.App.Metadata["config"].(I.IConfigObject).AddWorkloadShortcut(shortcut, workload)
+	err := config.AddWorkloadShortcut(shortcut, workload)
 	if err != nil {
 		switch err.Error() {
 		case "WorkloadNotFound":
 			return cli.NewExitError("The workload "+workload+" is not part of your stack.", 6)
 		case "ShortcutExists":
-			return cli.NewExitError("Shortcut '"+shortcut+"' already exists and points to "+c.App.Metadata["config"].(I.IConfigObject).GetWorkloadByShortcut(shortcut), 7)
+			return cli.NewExitError("Shortcut '"+shortcut+"' already exists and points to "+config.GetWorkloadByShortcut(shortcut), 7)
 		default:
 			return cli.NewExitError("Unexpected error occured", 0)
 		}
@@ -37,17 +40,21 @@ func SubAShortcutAdd(c *cli.Context) error {
 	return nil
 }
 
-// SubAShortcutAddDescription ...
+// SubAShortcutRemoveDescription ...
 const SubAShortcutRemoveDescription = `This is the description for shortcut remove`
 
 // SubAShortcutRemove ...
 func SubAShortcutRemove(c *cli.Context) error {
-	UI := c.App.Metadata["UIPlugin"].(grgdplugincontracts.IUIPlugin)
+	var UI grgdplugincontracts.IUIPlugin
+	var config interfaces.IConfigObject
+	helpers.ExtractMetadataFatal(c.App.Metadata, "UIPlugin", &UI)
+	helpers.ExtractMetadataFatal(c.App.Metadata, "config", &config)
+
 	if c.NArg() > 1 {
 		return cli.NewExitError("You should only one shortcut at a time", 5)
 	}
 	shortcut := c.Args().Get(0)
-	err := c.App.Metadata["config"].(I.IConfigObject).RemoveWorkloadShortcut(shortcut)
+	err := config.RemoveWorkloadShortcut(shortcut)
 	if err != nil {
 		switch err.Error() {
 		case "ShortcutNotFound":
@@ -66,11 +73,14 @@ const SubAShortcutListDescription = `This is the description for shortcut add`
 
 // SubAShortcutList ...
 func SubAShortcutList(c *cli.Context) error {
-	UI := c.App.Metadata["UIPlugin"].(grgdplugincontracts.IUIPlugin)
+	var UI grgdplugincontracts.IUIPlugin
+	var config interfaces.IConfigObject
+	helpers.ExtractMetadataFatal(c.App.Metadata, "UIPlugin", &UI)
+	helpers.ExtractMetadataFatal(c.App.Metadata, "config", &config)
 
 	UI.Println(c, "\nShortcuts: ")
 	overviewmap := map[string][]string{}
-	for shortcut, workload := range c.App.Metadata["config"].(I.IConfigObject).GetWorkloadShortcuts() {
+	for shortcut, workload := range config.GetWorkloadShortcuts() {
 		overviewmap[workload] = append(overviewmap[workload], shortcut)
 	}
 	sorted := []string{}
@@ -95,7 +105,12 @@ func SubAShortcutList(c *cli.Context) error {
 
 // TranslateShortcuts ...
 func TranslateShortcuts(c *cli.Context) []string {
-	shortcuts := c.App.Metadata["config"].(I.IConfigObject).GetWorkloadShortcuts()
+	var UI grgdplugincontracts.IUIPlugin
+	var config interfaces.IConfigObject
+	helpers.ExtractMetadataFatal(c.App.Metadata, "UIPlugin", &UI)
+	helpers.ExtractMetadataFatal(c.App.Metadata, "config", &config)
+
+	shortcuts := config.GetWorkloadShortcuts()
 	workloads := make([]string, c.NArg())
 
 	// for k, v := range c.Args().Slice() {
@@ -104,6 +119,6 @@ func TranslateShortcuts(c *cli.Context) []string {
 	// 		workloads[k] = workload
 	// 	}
 	// }
-	log.Println(shortcuts)
+	UI.Println(c, shortcuts)
 	return workloads
 }

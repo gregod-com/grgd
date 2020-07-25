@@ -1,4 +1,4 @@
-package main
+package helpers
 
 import (
 	"bufio"
@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 
 	"github.com/common-nighthawk/go-figure"
@@ -34,24 +35,34 @@ func ExtractCliContext(i interface{}) *cli.Context {
 	return c
 }
 
-type fallbackui struct {
+// FallbackUI ...
+type FallbackUI struct {
 }
 
 // ClearScreen ...
-func (p fallbackui) ClearScreen(i interface{}) interface{} {
+func (p FallbackUI) ClearScreen(i interface{}) interface{} {
 	c := ExtractCliContext(i)
 	//  do not clear screen if in debug mode
 	if c.Bool("debug") {
 		return nil
 	}
 
-	out := ExecCommand("clear", "cmd", "/c", "cls")
-	fmt.Println(out)
+	switch runtime.GOOS {
+	case "linux", "darwin":
+		out := ExecCommand("clear")
+		fmt.Println(out)
+	case "windows":
+		out := ExecCommand("cmd", "/c", "cls")
+		fmt.Println(out)
+	default:
+		fmt.Printf("ClearScreen not implemented for %v\n", runtime.GOOS)
+	}
+
 	return nil
 }
 
 // PrintPercentOfScreen ...
-func (p fallbackui) PrintPercentOfScreen(i interface{}, str string, percent int) interface{} {
+func (p FallbackUI) PrintPercentOfScreen(i interface{}, str string, percent int) interface{} {
 
 	// percent int, c string
 	// TODO find way to easyly get terminal width
@@ -64,7 +75,7 @@ func (p fallbackui) PrintPercentOfScreen(i interface{}, str string, percent int)
 }
 
 // PrintBanner ...
-func (p fallbackui) PrintBanner(i interface{}) interface{} {
+func (p FallbackUI) PrintBanner(i interface{}) interface{} {
 	c := ExtractCliContext(i)
 
 	iamASCII := figure.NewFigure(c.App.Name, "standard", true)
@@ -74,13 +85,13 @@ func (p fallbackui) PrintBanner(i interface{}) interface{} {
 }
 
 // PrintWorkloadOverview ...
-func (p fallbackui) PrintWorkloadOverview(i interface{}) {
+func (p FallbackUI) PrintWorkloadOverview(i interface{}) {
 	// c := ExtractCliContext(i)
 	// config := c.App.Metadata["config"].(I.IConfigObject)
 }
 
 // PrintTable ...
-func (p fallbackui) PrintTable(i interface{}, heads []string, rows [][]string) interface{} {
+func (p FallbackUI) PrintTable(i interface{}, heads []string, rows [][]string) interface{} {
 
 	for _, v := range heads {
 		fmt.Printf("| %-20v", v)
@@ -101,14 +112,14 @@ func (p fallbackui) PrintTable(i interface{}, heads []string, rows [][]string) i
 }
 
 // Println ...
-func (p fallbackui) Println(i interface{}, str interface{}) interface{} {
+func (p FallbackUI) Println(i interface{}, str interface{}) interface{} {
 	// c := ExtractCliContext(i)
 	fmt.Println(str)
 	return nil
 }
 
 // YesNoQuestion ...
-func (p fallbackui) YesNoQuestion(i interface{}, question string) bool {
+func (p FallbackUI) YesNoQuestion(i interface{}, question string) bool {
 	reader := bufio.NewReader(os.Stdin)
 	answer, err := reader.ReadString('\n')
 	if err != nil {
