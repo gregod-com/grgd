@@ -1,4 +1,4 @@
-package helpers
+package view
 
 import (
 	"bufio"
@@ -30,6 +30,9 @@ func ExecCommand(binary string, commandAndParams ...string) string {
 func ExtractCliContext(i interface{}) *cli.Context {
 	c, ok := i.(*cli.Context)
 	if !ok {
+		if i == nil {
+			return &cli.Context{}
+		}
 		log.Fatal("unexpected implementation of cli.Context")
 	}
 	return c
@@ -41,12 +44,6 @@ type FallbackUI struct {
 
 // ClearScreen ...
 func (p FallbackUI) ClearScreen(i interface{}) interface{} {
-	c := ExtractCliContext(i)
-	//  do not clear screen if in debug mode
-	if c.Bool("debug") {
-		return nil
-	}
-
 	switch runtime.GOOS {
 	case "linux", "darwin":
 		out := ExecCommand("clear")
@@ -118,18 +115,43 @@ func (p FallbackUI) Println(i interface{}, str interface{}) interface{} {
 	return nil
 }
 
+// Printf ...
+func (p FallbackUI) Printf(str string, a ...interface{}) interface{} {
+	// c := ExtractCliContext(i)
+	fmt.Printf(str, a...)
+	return nil
+}
+
 // YesNoQuestion ...
 func (p FallbackUI) YesNoQuestion(i interface{}, question string) bool {
+	fmt.Print(question + " [y/n] ")
+	answer := readLine()
+	if strings.Contains(answer, "y") {
+		return true
+	}
+	return false
+}
+
+// Question ...
+func (p FallbackUI) Question(question string, i ...interface{}) error {
+	fmt.Print(question)
+	if len(i) > 0 {
+		answer, ok := i[0].(*string)
+		if input := readLine(); ok && input != "" {
+			*answer = input
+		}
+	}
+	return nil
+}
+
+func readLine() string {
 	reader := bufio.NewReader(os.Stdin)
 	answer, err := reader.ReadString('\n')
 	if err != nil {
 		log.Fatal(err)
 	}
 	answer = strings.Replace(answer, "\n", "", -1)
-	if strings.Contains(answer, "y") {
-		return true
-	}
-	return false
+	return answer
 }
 
 // // PrintActiveWorkload ...
