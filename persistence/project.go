@@ -1,47 +1,24 @@
 package persistence
 
 import (
-	"encoding/json"
-	"fmt"
+	log "github.com/sirupsen/logrus"
 
-	"github.com/TylerBrock/colorjson"
-	"github.com/gregod-com/grgd/helpers"
 	"gorm.io/gorm"
 )
 
 // GRGDProject ...
 type GRGDProject struct {
-	gorm.Model  `json:"-"`
+	gorm.Model
 	Name        string
 	Path        string
 	ProfileID   uint
 	Initialized bool
-	Services    []Service
+	Services    []*Service `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Description string
 }
 
-// String  ...
-func (proj GRGDProject) String() string {
-	var obj map[string]interface{}
-	// create json string from object
-	str, err := json.MarshalIndent(proj, "", "  ")
-	helpers.CheckErr(err)
-
-	// create simplified object from json string
-	json.Unmarshal([]byte(str), &obj)
-
-	f := colorjson.NewFormatter()
-	f.Indent = 4
-
-	// create colored json string from simplified object
-	data, err := f.Marshal(obj)
-	helpers.CheckErr(err)
-
-	return string(data)
-}
-
 // Save ...
-func (proj *GRGDProject) Save(db *gorm.DB) error {
+func (proj *GRGDProject) Save(db *gorm.DB, i ...interface{}) error {
 	db.Save(proj)
 	for k := range proj.Services {
 		proj.Services[k].Save(db)
@@ -49,9 +26,24 @@ func (proj *GRGDProject) Save(db *gorm.DB) error {
 	return nil
 }
 
+// Delete ...
+func (proj *GRGDProject) Delete(db *gorm.DB, i ...interface{}) error {
+	db.Delete(proj)
+	for k := range proj.Services {
+		proj.Services[k].Delete(db)
+	}
+	return nil
+}
+
 // BeforeUpdate ...
 func (proj *GRGDProject) BeforeUpdate(tx *gorm.DB) (err error) {
-	fmt.Println("Updating proj")
+	log.Trace("Updating proj")
+	return
+}
+
+// BeforeDelete ...
+func (proj *GRGDProject) BeforeDelete(tx *gorm.DB) (err error) {
+	log.Trace("Deleteoig proj")
 	return
 }
 
