@@ -1,47 +1,51 @@
-package actions
+package plugin
 
 import (
 	"sort"
 	"strconv"
 	"strings"
 
-	"github.com/gregod-com/grgd/helpers"
-	"github.com/gregod-com/grgd/implementations/pluginindex"
+	"grgd/controller/helper"
+	"grgd/controller/pluginindex"
+
 	"github.com/gregod-com/grgdplugincontracts"
 	cli "github.com/urfave/cli/v2"
 )
 
 // APluginList ...
 func APluginList(c *cli.Context) error {
-	var UI grgdplugincontracts.IUIPlugin
-	helpers.ExtractMetadataFatal(c.App.Metadata, "UIPlugin", &UI)
+	ext := helper.GetExtractor()
+	UI := ext.GetCore(c).GetUI()
+	configObject := ext.GetCore(c).GetConfig()
+	UI.Println(c, configObject)
 
-	index := pluginindex.CreatePluginIndexFromCLIContext(c)
-	head := []string{"Name", "Version", "Category", "Active", "Loaded", "URL"}
+	// index := pluginindex.CreatePluginIndexFromCLIContext(c)
+	// head := []string{"Name", "Version", "Category", "Active", "Loaded", "URL"}
 
-	rows := sortPluginMetadataSlice(index.GetPluginListActive())
+	// rows := sortPluginMetadataSlice(index.GetPluginListActive())
 
-	UI.Println(c, "Active Plugins")
-	UI.PrintTable(c, head, rows)
+	// UI.Println(c, "Active Plugins")
+	// UI.PrintTable(c, head, rows)
 
-	rows = sortPluginMetadataSlice(index.GetPluginListInactive())
+	// rows = sortPluginMetadataSlice(index.GetPluginListInactive())
 
-	UI.Println(c, "")
-	UI.Println(c, "InActive Plugins")
-	UI.PrintTable(c, head, rows)
+	// UI.Println(c, "")
+	// UI.Println(c, "InActive Plugins")
+	// UI.PrintTable(c, head, rows)
 
-	rows = sortPluginMetadataSlice(index.GetPluginListOffline())
+	// rows = sortPluginMetadataSlice(index.GetPluginListOffline())
 
-	UI.Println(c, "")
-	UI.Println(c, "Offline Plugins")
-	UI.PrintTable(c, head, rows)
+	// UI.Println(c, "")
+	// UI.Println(c, "Offline Plugins")
+	// UI.PrintTable(c, head, rows)
 	return nil
 }
 
 // APluginActivate ...
 func APluginActivate(c *cli.Context) error {
-	var UI grgdplugincontracts.IUIPlugin
-	helpers.ExtractMetadataFatal(c.App.Metadata, "UIPlugin", &UI)
+	ext := helper.GetExtractor()
+	UI := ext.GetCore(c).GetUI()
+
 	index := pluginindex.CreatePluginIndexFromCLIContext(c)
 	plugname := c.Args().First()
 	key := []string{}

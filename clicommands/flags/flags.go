@@ -5,7 +5,7 @@ import (
 )
 
 // GetFlags ...
-func GetFlags(app *cli.App) []cli.Flag {
+func GetFlags() []cli.Flag {
 	return []cli.Flag{
 		&cli.BoolFlag{
 			Name:    "debug",
@@ -21,6 +21,14 @@ func GetFlags(app *cli.App) []cli.Flag {
 			Name:    "silent",
 			Aliases: []string{"s"},
 			Usage:   "mute all outputs",
+		},
+		&cli.StringFlag{
+			Name:    "profile",
+			EnvVars: []string{"USER"},
+		},
+		&cli.StringFlag{
+			Name:  "log-level",
+			Value: "info",
 		},
 	}
 }
