@@ -1,5 +1,5 @@
 // Provides basic bulding blocks for advanced console UI
-package templates
+package view
 
 // GetHelpTemplate so if i start typing something here
 func GetHelpTemplate() string {
