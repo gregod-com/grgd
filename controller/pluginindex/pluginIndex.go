@@ -3,13 +3,13 @@ package pluginindex
 import (
 	"bufio"
 	"fmt"
+	"grgd/controller/helper"
 	"io/ioutil"
 	"log"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/gregod-com/grgd/helpers"
 	"github.com/gregod-com/grgdplugincontracts"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/mod/semver"
@@ -25,8 +25,8 @@ type PluginIndex struct {
 // CreatePluginIndexFromCLIContext ...
 func CreatePluginIndexFromCLIContext(c *cli.Context) grgdplugincontracts.IPluginIndex {
 	var pluginIndexPath string
-	helpers.ExtractMetadataFatal(c.App.Metadata, "pluginIndex", &pluginIndexPath)
-
+	ext := helper.GetExtractor()
+	ext.GetMetadataFatal(c.App.Metadata, "pluginIndex", &pluginIndexPath)
 	return CreatePluginIndex(pluginIndexPath)
 }
 
@@ -47,20 +47,20 @@ func (yamlObj *PluginIndex) initFromFile() error {
 
 // UnmarshalYAML ...
 func (yamlObj *PluginIndex) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	var base map[string]map[string]PluginMetadataImpl
+	// var base map[string]map[string]PluginMetadataImpl
 
-	err := unmarshal(&base)
-	if err != nil {
-		return err
-	}
+	// err := unmarshal(&base)
+	// if err != nil {
+	// 	return err
+	// }
 
-	yamlObj.PluginSettings = make(map[string]grgdplugincontracts.IPluginMetadata, len(base["plugins"]))
+	// yamlObj.PluginSettings = make(map[string]grgdplugincontracts.IPluginMetadata, len(base["plugins"]))
 
-	// move all concrete implementations to interfacemap
-	for k := range base["plugins"] {
-		v := base["plugins"][k]
-		yamlObj.PluginSettings[k] = &v
-	}
+	// // move all concrete implementations to interfacemap
+	// for k := range base["plugins"] {
+	// 	v := base["plugins"][k]
+	// 	yamlObj.PluginSettings[k] = &v
+	// }
 	return nil
 }
 
