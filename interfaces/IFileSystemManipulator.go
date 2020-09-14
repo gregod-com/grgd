@@ -1,0 +1,13 @@
+package interfaces
+
+import "os"
+
+// IFileSystemManipulator ...
+type IFileSystemManipulator interface {
+	// HomeDir ...
+	HomeDir(i ...string) string
+	// CheckOrCreateFolder ...
+	CheckOrCreateFolder(path string, permissions os.FileMode)
+	// PathExists ...
+	PathExists(path string) bool
+}
