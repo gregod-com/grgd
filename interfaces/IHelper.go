@@ -2,7 +2,7 @@ package interfaces
 
 // IHelper ...
 type IHelper interface {
-	CheckUserProfile(logger ILogger) string
+	CheckUserProfile() string
 	CheckFlag(flag string) bool
 	CheckFlagArg(flag string) string
 }
