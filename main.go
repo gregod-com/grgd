@@ -67,30 +67,3 @@ func main() {
 		log.Fatal(apperr)
 	}
 }
-
-func initCore() (I.ICore, []grgdplugincontracts.ICMDPlugin) {
-	helper_ := &helper.Helper{}
-	logger_ := helper.CreateLogger(helper_)
-	helper_.CheckUserProfile(logger_)
-	fsmanipulator_ := &helper.FSManipulator{}
-	fsmanipulator_.CheckOrCreateFolder(fsmanipulator_.HomeDir(".grgd"), os.FileMode(uint32(0760)))
-	pluginsPath := fsmanipulator_.HomeDir(".grgd", "plugins")
-
-	fsmanipulator_.CheckOrCreateFolder(pluginsPath, os.FileMode(uint32(0760)))
-	pluginsIndex := pluginindex.CreatePluginIndex(path.Join(pluginsPath, "index.yaml"))
-
-	dal_ := persistence.CreateGormDAL(fsmanipulator_.HomeDir(".grgd", "data.db"))
-	config_ := config.CreateConfigObject(dal_, logger_)
-	pluginloader_ := &helper.PluginLoader{}
-	downloader_ := &helper.Downloader{}
-
-	CMDPlugins, ui_ := pluginloader_.LoadPlugins(pluginsPath, pluginsIndex, fsmanipulator_)
-
-	// TODO: find elegant solution to update cli automatically
-	core := controller.CreateCore(time.Now(), logger_, config_, helper_, fsmanipulator_, pluginloader_, ui_, downloader_)
-
-	up := &helper.Updater{}
-	up.CheckUpdate(core)
-	return core, CMDPlugins
-
-}
