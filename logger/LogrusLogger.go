@@ -1,4 +1,4 @@
-package helper
+package logger
 
 import (
 	"grgd/interfaces"
@@ -6,8 +6,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// CreateLogger ....
-func CreateLogger(h interfaces.IHelper) interfaces.ILogger {
+// ProvideLogrusLogger ....
+func ProvideLogrusLogger(h interfaces.IHelper) interfaces.ILogger {
+	// h, _ := i[0].(interfaces.IHelper)
+
 	logger := logrus.New()
 	if h.CheckFlag("debug") || h.CheckFlag("d") {
 		logger.SetLevel(logrus.DebugLevel)
@@ -31,41 +33,41 @@ func CreateLogger(h interfaces.IHelper) interfaces.ILogger {
 	default:
 		logger.SetLevel(logrus.InfoLevel)
 	}
-	l := &Logger{logger}
-	return l
+	logrusLogger := &LogrusLogger{logger: logger}
+	return logrusLogger
 }
 
-// Logger ...
-type Logger struct {
+// LogrusLogger ...
+type LogrusLogger struct {
 	logger *logrus.Logger
 }
 
 // Trace ...
-func (l *Logger) Trace(i ...interface{}) {
+func (l *LogrusLogger) Trace(i ...interface{}) {
 	l.logger.Trace(i...)
 }
 
 // Debug ...
-func (l *Logger) Debug(i ...interface{}) {
+func (l *LogrusLogger) Debug(i ...interface{}) {
 	l.logger.Debug(i...)
 }
 
 // Info ...
-func (l *Logger) Info(i ...interface{}) {
+func (l *LogrusLogger) Info(i ...interface{}) {
 	l.logger.Info(i...)
 }
 
 // Warn ...
-func (l *Logger) Warn(i ...interface{}) {
+func (l *LogrusLogger) Warn(i ...interface{}) {
 	l.logger.Warn(i...)
 }
 
 // Error ...
-func (l *Logger) Error(i ...interface{}) {
+func (l *LogrusLogger) Error(i ...interface{}) {
 	l.logger.Error(i...)
 }
 
 // Fatal ...
-func (l *Logger) Fatal(i ...interface{}) {
+func (l *LogrusLogger) Fatal(i ...interface{}) {
 	l.logger.Fatal(i...)
 }
