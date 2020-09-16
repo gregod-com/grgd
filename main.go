@@ -22,7 +22,20 @@ import (
 )
 
 func main() {
-	core, CMDPlugins := initCore()
+	dependecies := []interface{}{
+		helper.ProvideDownloader,       // 0
+		helper.ProvideHelper,           // 0
+		view.ProvideFallbackUI,         // 0
+		logger.ProvideLogrusLogger,     // helper
+		helper.ProvideFSManipulator,    // logger
+		helper.ProvideUpdater,          // logger
+		persistence.ProvideDAL,         // fs
+		config.ProvideConfigObject,     // dal logger
+		pluginindex.ProvidePluginIndex, // config
+		helper.ProvidePluginLoader,     // pluginindex, fsmanipulator
+	}
+
+	core := core.RegisterDependecies(dependecies)
 
 	app := cli.NewApp()
 	app.Name = "grgd"
@@ -46,8 +59,13 @@ func main() {
 	app.Commands = append(app.Commands, clicommands.GetCommands(app)...)
 
 	// append native commands with commands found in loaded plugins
-	for _, plug := range CMDPlugins {
-		app.Commands = append(app.Commands, plug.GetCommands(nil)...)
+	for _, plug := range core.GetCMDPlugins() {
+		switch arr := plug.GetCommands(nil).(type) {
+		case []*cli.Command:
+			app.Commands = append(app.Commands, arr...)
+		default:
+			core.GetLogger().Error("Commands are not implemented as []*cli.Command but %T", arr)
+		}
 	}
 
 	// define behavior after every command execution
