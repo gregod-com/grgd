@@ -4,7 +4,7 @@ import (
 	"grgd/view"
 	"testing"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 	"gotest.tools/v3/assert"
 )
 

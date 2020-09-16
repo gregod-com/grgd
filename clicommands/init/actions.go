@@ -9,6 +9,6 @@ import (
 // AInit ...
 func AInit(c *cli.Context) error {
 	UI := helper.GetExtractor().GetCore(c).GetUI()
-	UI.Println(c, "this is the init command")
+	UI.Println("this is the init command")
 	return nil
 }

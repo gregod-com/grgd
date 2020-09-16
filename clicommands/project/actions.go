@@ -15,7 +15,7 @@ func AListProject(c *cli.Context) error {
 	profile := core.GetConfig().GetProfile()
 
 	rows := profile.GetProjectsTable()
-	UI.PrintTable(c, rows[0], rows[1:])
+	UI.PrintTable(rows[0], rows[1:], c)
 
 	return nil
 }
@@ -74,7 +74,7 @@ func AEditProject(c *cli.Context) error {
 	profile := core.GetConfig().GetProfile()
 	UI := core.GetUI()
 
-	UI.Println(c, profile)
+	UI.Println(profile)
 
 	return nil
 }

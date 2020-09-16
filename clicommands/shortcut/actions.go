@@ -15,7 +15,7 @@ func SubAShortcutAdd(c *cli.Context) error {
 	UI := core.GetUI()
 	// config := core.GetConfig()
 
-	UI.Println(c, "\nShortcuts: [add]")
+	UI.Println("\nShortcuts: [add]")
 
 	// if c.NArg() != 2 {
 	// 	return cli.NewExitError("You should enter a workload and a shortcut", 5)
@@ -46,7 +46,7 @@ func SubAShortcutRemove(c *cli.Context) error {
 	UI := core.GetUI()
 	// config := core.GetConfig()
 
-	UI.Println(c, "\nShortcuts: [remove]")
+	UI.Println("\nShortcuts: [remove]")
 
 	// if c.NArg() > 1 {
 	// 	return cli.NewExitError("You should only one shortcut at a time", 5)
@@ -75,7 +75,7 @@ func SubAShortcutList(c *cli.Context) error {
 	UI := core.GetUI()
 	// config := core.GetConfig()
 
-	UI.Println(c, "\nShortcuts: ")
+	UI.Println("\nShortcuts: ")
 	// overviewmap := map[string][]string{}
 	// for shortcut, workload := range config.GetWorkloadShortcuts() {
 	// 	overviewmap[workload] = append(overviewmap[workload], shortcut)
@@ -106,7 +106,7 @@ func TranslateShortcuts(c *cli.Context) []string {
 	UI := core.GetUI()
 	// config := core.GetConfig()
 
-	UI.Println(c, "\nShortcuts: Translate")
+	UI.Println("\nShortcuts: Translate")
 
 	// shortcuts := config.GetWorkloadShortcuts()
 	workloads := make([]string, c.NArg())

@@ -10,7 +10,9 @@ import (
 	"strings"
 
 	"github.com/common-nighthawk/go-figure"
+	"github.com/gregod-com/grgdplugincontracts"
 	cli "github.com/urfave/cli/v2"
+	"golang.org/x/sys/unix"
 )
 
 // ExecCommand ...
@@ -38,12 +40,17 @@ func ExtractCliContext(i interface{}) *cli.Context {
 	return c
 }
 
+// ProvideFallbackUI ...
+func ProvideFallbackUI() grgdplugincontracts.IUIPlugin {
+	return &FallbackUI{}
+}
+
 // FallbackUI ...
 type FallbackUI struct {
 }
 
 // ClearScreen ...
-func (p FallbackUI) ClearScreen(i interface{}) interface{} {
+func (p FallbackUI) ClearScreen(i ...interface{}) interface{} {
 	switch runtime.GOOS {
 	case "linux", "darwin":
 		out := ExecCommand("clear")
@@ -59,21 +66,52 @@ func (p FallbackUI) ClearScreen(i interface{}) interface{} {
 }
 
 // PrintPercentOfScreen ...
-func (p FallbackUI) PrintPercentOfScreen(i interface{}, str string, percent int) interface{} {
-
-	// percent int, c string
-	// TODO find way to easyly get terminal width
+func (p FallbackUI) PrintPercentOfScreen(percentStart int, percentEnd int, str ...interface{}) interface{} {
 	y := 100
-	y = int(y*percent) / 100
+	ws, err := getWinsize()
+	if err == nil {
+		y = int(ws.Col)
+	}
 
-	stringBuffer := strings.Repeat(str, y)
-	fmt.Print(stringBuffer)
+	if percentStart > 100 {
+		percentStart = 100
+	}
+	if percentStart < 0 {
+		percentStart = 0
+	}
+	if percentEnd > 100 {
+		percentEnd = 100
+	}
+	if percentEnd < 0 {
+		percentEnd = 0
+	}
+
+	if percentStart > percentEnd {
+		temp := percentEnd
+		percentEnd = percentStart
+		percentStart = temp
+	}
+
+	distance := percentEnd - percentStart
+
+	start := int(y*percentStart) / 100
+	width := int(y*distance) / 100
+	for _, k := range str {
+		s, ok := k.(string)
+		if !ok {
+			continue
+		}
+		times := width / len(s)
+		stringBuffer := strings.Repeat(" ", start)
+		stringBuffer += strings.Repeat(s, times)
+		fmt.Print(stringBuffer)
+	}
 	return nil
 }
 
 // PrintBanner ...
-func (p FallbackUI) PrintBanner(i interface{}) interface{} {
-	c := ExtractCliContext(i)
+func (p FallbackUI) PrintBanner(i ...interface{}) interface{} {
+	c := ExtractCliContext(i[0])
 
 	iamASCII := figure.NewFigure(c.App.Name, "standard", true)
 	fmt.Println(iamASCII.String())
@@ -81,14 +119,8 @@ func (p FallbackUI) PrintBanner(i interface{}) interface{} {
 	return nil
 }
 
-// PrintWorkloadOverview ...
-func (p FallbackUI) PrintWorkloadOverview(i interface{}) {
-	// c := ExtractCliContext(i)
-	// config := c.App.Metadata["config"].(I.IConfigObject)
-}
-
 // PrintTable ...
-func (p FallbackUI) PrintTable(i interface{}, heads []string, rows [][]string) interface{} {
+func (p FallbackUI) PrintTable(heads []string, rows [][]string, i ...interface{}) interface{} {
 
 	for _, v := range heads {
 		fmt.Printf("| %-20v", v)
@@ -109,22 +141,28 @@ func (p FallbackUI) PrintTable(i interface{}, heads []string, rows [][]string) i
 }
 
 // Println ...
-func (p FallbackUI) Println(i interface{}, str interface{}) interface{} {
-	// c := ExtractCliContext(i)
-	fmt.Println(str)
-	return nil
+func (p FallbackUI) Println(i ...interface{}) (int, error) {
+	return fmt.Println(i...)
 }
 
 // Printf ...
-func (p FallbackUI) Printf(str string, a ...interface{}) interface{} {
-	// c := ExtractCliContext(i)
-	fmt.Printf(str, a...)
-	return nil
+func (p FallbackUI) Printf(format string, a ...interface{}) (int, error) {
+	return fmt.Printf(format, a...)
 }
 
 // YesNoQuestion ...
-func (p FallbackUI) YesNoQuestion(i interface{}, question string) bool {
+func (p FallbackUI) YesNoQuestion(question string, i ...interface{}) bool {
 	fmt.Print(question + " [y/n] ")
+	answer := readLine()
+	if strings.Contains(answer, "y") {
+		return true
+	}
+	return false
+}
+
+// YesNoQuestionf ...
+func (p FallbackUI) YesNoQuestionf(question string, i ...interface{}) bool {
+	fmt.Printf(question+" [y/n] ", i...)
 	answer := readLine()
 	if strings.Contains(answer, "y") {
 		return true
@@ -135,6 +173,18 @@ func (p FallbackUI) YesNoQuestion(i interface{}, question string) bool {
 // Question ...
 func (p FallbackUI) Question(question string, i ...interface{}) error {
 	fmt.Print(question)
+	if len(i) > 0 {
+		answer, ok := i[0].(*string)
+		if input := readLine(); ok && input != "" {
+			*answer = input
+		}
+	}
+	return nil
+}
+
+// Questionf ...
+func (p FallbackUI) Questionf(question string, i ...interface{}) error {
+	fmt.Printf(question, i[1:])
 	if len(i) > 0 {
 		answer, ok := i[0].(*string)
 		if input := readLine(); ok && input != "" {
@@ -210,3 +260,13 @@ func readLine() string {
 // 	})
 // 	return sorted
 // }
+
+func getWinsize() (*unix.Winsize, error) {
+
+	ws, err := unix.IoctlGetWinsize(int(os.Stdout.Fd()), unix.TIOCGWINSZ)
+	if err != nil {
+		return nil, os.NewSyscallError("GetWinsize", err)
+	}
+
+	return ws, nil
+}

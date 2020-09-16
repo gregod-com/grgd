@@ -9,7 +9,7 @@ import (
 	"grgd/controller/pluginindex"
 
 	"github.com/gregod-com/grgdplugincontracts"
-	cli "github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v2"
 )
 
 // APluginList ...
@@ -17,14 +17,14 @@ func APluginList(c *cli.Context) error {
 	ext := helper.GetExtractor()
 	UI := ext.GetCore(c).GetUI()
 	configObject := ext.GetCore(c).GetConfig()
-	UI.Println(c, configObject)
+	UI.Println(configObject, c)
 
 	// index := pluginindex.CreatePluginIndexFromCLIContext(c)
 	// head := []string{"Name", "Version", "Category", "Active", "Loaded", "URL"}
 
 	// rows := sortPluginMetadataSlice(index.GetPluginListActive())
 
-	// UI.Println(c, "Active Plugins")
+	// UI.Println("Active Plugins",c)
 	// UI.PrintTable(c, head, rows)
 
 	// rows = sortPluginMetadataSlice(index.GetPluginListInactive())
@@ -59,15 +59,15 @@ func APluginActivate(c *cli.Context) error {
 
 	switch len(key) {
 	case 0:
-		UI.Println(c, "No matching plugin names")
+		UI.Println("No matching plugin names")
 	case 1:
-		UI.Println(c, "Found Match")
+		UI.Println("Found Match", c)
 		index.ToggleActive(key[0])
 		APluginList(c)
 	default:
-		UI.Println(c, "Multiple plugins found:")
+		UI.Println("Multiple plugins found:")
 		for _, k := range key {
-			UI.Println(c, k)
+			UI.Println(k)
 		}
 	}
 	return nil

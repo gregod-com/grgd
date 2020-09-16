@@ -11,7 +11,7 @@ func SubAConfigYAML(c *cli.Context) error {
 	ext := helper.GetExtractor()
 	UI := ext.GetCore(c).GetUI()
 	configObject := ext.GetCore(c).GetConfig()
-	UI.Println(c, configObject.DumpConfig("yaml"))
+	UI.Println(configObject.DumpConfig("yaml"), c)
 	return nil
 }
 
@@ -20,7 +20,7 @@ func SubAConfigJSON(c *cli.Context) error {
 	ext := helper.GetExtractor()
 	UI := ext.GetCore(c).GetUI()
 	configObject := ext.GetCore(c).GetConfig()
-	UI.Println(c, configObject.DumpConfig("json"))
+	UI.Println(configObject.DumpConfig("json"), c)
 	return nil
 }
 
@@ -29,6 +29,6 @@ func SubAConfigEdit(c *cli.Context) error {
 	// ext := helper.GetExtractor()
 	// UI := ext.GetCore(c).GetUI()
 	// configObject := ext.GetCore(c).GetConfig()
-	// UI.Println(c, configObject)
+	// UI.Println(configObject,c)
 	return nil
 }
