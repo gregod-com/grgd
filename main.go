@@ -52,6 +52,7 @@ func main() {
 		UIPlugin := helper.GetExtractor().GetCore(c).GetUI()
 		UIPlugin.ClearScreen(c)
 		UIPlugin.PrintBanner(c)
+		UIPlugin.Println("\u001b[33m", c.App.Version, "\u001b[0m")
 		return nil
 	}
 
