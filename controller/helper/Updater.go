@@ -18,13 +18,17 @@ type Updater struct {
 // CheckUpdate ...
 func (h *Updater) CheckUpdate(core interfaces.ICore) error {
 	UI := core.GetUI()
-	downloader := core.GetDownloader()
+	var downloader interfaces.IDownloader
+	err := core.Get(&downloader)
+	if err != nil {
+		return err
+	}
 	// core.GetConfig().GetPlu
 	// ext.GetMetadataFatal(c.App.Metadata, "pluginIndex", &repoIndex)
 	// ext.GetMetadataFatal(c.App.Metadata, "remoteIndex", &remoteIndex)
 	// ext.GetMetadataFatal(c.App.Metadata, "UIPlugin", &UI)
 
-	err := downloader.Load("file_location", "repo_url")
+	err = downloader.Load("file_location", "repo_url")
 	if err != nil {
 		return err
 	}
@@ -32,7 +36,7 @@ func (h *Updater) CheckUpdate(core interfaces.ICore) error {
 	// pluginsCurrent := PlugIndex.CreatePluginIndex(currentIndex)
 	// pluginsRemote := PlugIndex.CreatePluginIndex(remoteIndex)
 
-	UI.Println(nil, "Downloaded: ")
+	UI.Println("Downloaded: ")
 	// for _, plremote := range pluginsRemote.GetPluginList().([]PlugIndex.PluginMetadata) {
 	// 	for _, pllocal := range pluginsCurrent.GetPluginList().([]PlugIndex.PluginMetadata) {
 	// 		if plremote.Name == pllocal.Name {

@@ -13,9 +13,8 @@ type ICore interface {
 	GetUI() grgdplugincontracts.IUIPlugin
 	GetConfig() IConfigObject
 	GetHelper() IHelper
+	GetCMDPlugins() []grgdplugincontracts.ICMDPlugin
 	GetFileSystemManipulator() IFileSystemManipulator
-	GetPluginLoader() IPluginLoader
-	GetDownloader() IDownloader
 	Get(i interface{}) error
 	// var profilename string
 	// var databasePath string

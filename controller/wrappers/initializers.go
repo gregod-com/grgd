@@ -43,12 +43,12 @@ func InitNewProfile(
 	}
 
 	// fmt.Println(model)
-	// if !UI.YesNoQuestion(nil, "Looking good?") {
+	// if !UI.YesNoQuestion("Looking good?") {
 	// 	InitNewProfile(model, logger, UI)
 	// }
 
 	first := "your first "
-	for UI.YesNoQuestion(nil, "Should we setup "+first+"project now?") {
+	for UI.YesNoQuestion("Should we setup " + first + "project now?") {
 		newprofileWrapper := InitNewProject(&persistence.GRGDProject{}, logger, UI, fm)
 		model.Projects = append(model.Projects, newprofileWrapper.model)
 		first = "another "
@@ -75,7 +75,7 @@ func InitNewProject(
 	basepath = "/Users/gregor/iam"
 
 	for !fm.PathExists(basepath) {
-		if UI.YesNoQuestion(nil, "The path "+basepath+" does not seem to exists. Should we create the path now?") {
+		if UI.YesNoQuestion("The path " + basepath + " does not seem to exists. Should we create the path now?") {
 			fm.CheckOrCreateFolder(basepath, os.FileMode(uint32(0760)))
 			continue
 		}
@@ -85,7 +85,7 @@ func InitNewProject(
 	model.Name = name
 	model.Path = basepath
 
-	if UI.YesNoQuestion(nil, "Try to AUTOSETUP services?") {
+	if UI.YesNoQuestion("Try to AUTOSETUP services?") {
 		autosetup := AutosetupServices(model, logger, UI)
 		model.Services = append(model.Services, autosetup...)
 	}
@@ -115,7 +115,7 @@ func AutosetupServices(model *persistence.GRGDProject, logger interfaces.ILogger
 		if !file.IsDir() {
 			continue
 		}
-		if !UI.YesNoQuestion(nil, "Is "+file.Name()+" a folder containing a service you would like to add to the project?") {
+		if !UI.YesNoQuestion("Is " + file.Name() + " a folder containing a service you would like to add to the project?") {
 			continue
 		}
 		filepath.Walk(path.Join(model.Path, file.Name()), walker)

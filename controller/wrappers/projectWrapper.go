@@ -60,7 +60,7 @@ func (project *ProjectWrapper) GetValues(i ...interface{}) []string {
 
 // // Init ...
 // func (proj *GRGDProject) Init(db *gorm.DB, i ...interface{}) error {
-// 	if !UI.YesNoQuestion(nil, "Init project "+proj.Name+" now?") {
+// 	if !UI.YesNoQuestion("Init project "+proj.Name+" now?") {
 // 		return nil
 // 	}
 
@@ -68,7 +68,7 @@ func (project *ProjectWrapper) GetValues(i ...interface{}) []string {
 // 	UI.Question("Project path (absolute)["+proj.Path+"]: ", &proj.Path)
 // 	UI.Question("Project description ["+proj.Description+"]:", &proj.Description)
 
-// 	for UI.YesNoQuestion(nil, "Do you want to add (another) service to the project?") {
+// 	for UI.YesNoQuestion("Do you want to add (another) service to the project?") {
 // 		var service Service
 // 		if service.Init(db) != nil {
 // 			log.Error("Something went wrong when adding service")
@@ -83,7 +83,7 @@ func (project *ProjectWrapper) GetValues(i ...interface{}) []string {
 
 // // Edit ...
 // func (proj *GRGDProject) Edit(db *gorm.DB, i ...interface{}) error {
-// 	if !UI.YesNoQuestion(nil, "Edit project `"+proj.Name+"` now?") {
+// 	if !UI.YesNoQuestion("Edit project `"+proj.Name+"` now?") {
 // 		return nil
 // 	}
 
@@ -95,8 +95,8 @@ func (project *ProjectWrapper) GetValues(i ...interface{}) []string {
 // 		Edit(&proj.Services[k])
 // 	}
 
-// 	UI.Println(nil, proj)
-// 	if !UI.YesNoQuestion(nil, "Looking good?") {
+// 	UI.Println(proj)
+// 	if !UI.YesNoQuestion("Looking good?") {
 // 		proj.Edit(db)
 // 	}
 

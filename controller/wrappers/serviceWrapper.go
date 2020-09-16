@@ -54,13 +54,13 @@ func (service *ServiceWrapper) GetValues(i ...interface{}) []string {
 
 // // Edit ...
 // func (service *Service) Edit(db *gorm.DB, i ...interface{}) error {
-// 	UI.Println(nil, "Here in edit profile")
+// 	UI.Println("Here in edit profile")
 // 	return nil
 // }
 
 // // Init ...
 // func (service *Service) Init(db *gorm.DB, i ...interface{}) error {
-// 	if !UI.YesNoQuestion(nil, "Init service "+service.Name+" now?") {
+// 	if !UI.YesNoQuestion("Init service "+service.Name+" now?") {
 // 		return nil
 // 	}
 
