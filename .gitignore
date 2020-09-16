@@ -12,6 +12,8 @@
 *.out
 
 grgd
+main
+
 bin/
 
 .vscode/*
