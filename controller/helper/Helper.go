@@ -15,15 +15,15 @@ type Helper struct {
 }
 
 // CheckUserProfile ...
-func (h *Helper) CheckUserProfile(logger interfaces.ILogger) string {
+func (h *Helper) CheckUserProfile() string {
 	var profilename string
 	u, ok := os.LookupEnv("USER")
 	if !ok {
-		logger.Fatal("failed to lookup USER ENV VAR! Exiting")
+		h.logger.Fatal("failed to lookup USER ENV VAR! Exiting")
 	}
 
 	if u == "root" {
-		logger.Fatal("You should not run this app as root! Exiting")
+		h.logger.Fatal("You should not run this app as root! Exiting")
 	}
 
 	profilename = u
@@ -31,7 +31,7 @@ func (h *Helper) CheckUserProfile(logger interfaces.ILogger) string {
 	if p := h.CheckFlagArg("profile"); p != "" {
 		profilename = p
 	}
-	logger.Trace("Found profile")
+	h.logger.Trace("Found profile")
 	return profilename
 }
 
