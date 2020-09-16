@@ -6,7 +6,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	I "github.com/gregod-com/grgd/interfaces"
+	I "grgd/interfaces"
 
 	"gopkg.in/yaml.v2"
 )

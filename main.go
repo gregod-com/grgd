@@ -4,23 +4,20 @@ package main
 import (
 	"log"
 	"os"
-	"path"
 	"sort"
 	"time"
 
 	"grgd/clicommands"
 	"grgd/clicommands/flags"
-	"grgd/controller"
-	"grgd/persistence"
-	"grgd/view"
-
 	"grgd/controller/config"
 	"grgd/controller/helper"
 	"grgd/controller/pluginindex"
+	"grgd/core"
+	"grgd/interfaces"
+	"grgd/logger"
+	"grgd/persistence"
+	"grgd/view"
 
-	I "grgd/interfaces"
-
-	"github.com/gregod-com/grgdplugincontracts"
 	"github.com/urfave/cli/v2"
 )
 

@@ -3,7 +3,6 @@ package core
 import (
 	"errors"
 	"grgd/interfaces"
-	I "grgd/interfaces"
 	"log"
 	"reflect"
 	"time"
@@ -11,15 +10,8 @@ import (
 	"github.com/gregod-com/grgdplugincontracts"
 )
 
-// helperProvider func() I.IHelper,
-// loggerProvider func(a I.IHelper) I.ILogger,
-// fsmanipulatorProvider func(a I.ILogger) I.IFileSystemManipulator,
-// dalProvider func(a I.IFileSystemManipulator) I.IDAL,
-// configProvider func(a I.IDAL, b I.ILogger) I.IConfigObject,
-// downloaderProvider func() I.IDownloader,
-
 // RegisterDependecies ...
-func RegisterDependecies(implsTemp []interface{}) I.ICore {
+func RegisterDependecies(implsTemp []interface{}) interfaces.ICore {
 	impls := make(map[string]interface{})
 	impls["start"] = time.Now()
 

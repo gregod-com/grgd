@@ -1,10 +1,13 @@
-package helper
+package helper_test
 
 import (
-	"grgd/controller"
 	"grgd/interfaces/mocks"
 	"testing"
-	"time"
+
+	"grgd/controller/helper"
+	h "grgd/controller/helper"
+
+	"grgd/core"
 
 	"github.com/golang/mock/gomock"
 )

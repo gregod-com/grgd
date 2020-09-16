@@ -1,7 +1,7 @@
 package helper
 
 import (
-	"log"
+	"grgd/interfaces"
 	"os"
 	"path"
 )

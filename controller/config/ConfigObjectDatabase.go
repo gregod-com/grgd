@@ -2,7 +2,6 @@ package config
 
 import (
 	"github.com/gregod-com/grgdplugincontracts"
-	log "github.com/sirupsen/logrus"
 
 	"grgd/controller/helper"
 	"grgd/controller/wrappers"

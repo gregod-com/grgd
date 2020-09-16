@@ -2,10 +2,10 @@ package helper
 
 import (
 	"grgd/interfaces"
-	"grgd/view"
 	"io/ioutil"
 	"log"
 	"os"
+	"path"
 	"plugin"
 	"strings"
 
