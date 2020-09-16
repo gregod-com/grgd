@@ -11,6 +11,15 @@ import (
 	"grgd/interfaces"
 )
 
+// ProvideConfigObject ...
+func ProvideConfigObject(dal interfaces.IDAL, logger interfaces.ILogger) interfaces.IConfigObject {
+	config := &ConfigObjectDatabase{dal: dal, logger: logger}
+
+	// TODO more init for fields?
+
+	return config
+}
+
 // ConfigObjectDatabase ...
 type ConfigObjectDatabase struct {
 	dal            interfaces.IDAL
@@ -18,15 +27,6 @@ type ConfigObjectDatabase struct {
 	ui             grgdplugincontracts.IUIPlugin
 	profiles       map[string]interfaces.IProfile
 	currentProfile string
-}
-
-// CreateConfigObject ...
-func CreateConfigObject(dal interfaces.IDAL, logger interfaces.ILogger) interfaces.IConfigObject {
-	config := &ConfigObjectDatabase{dal: dal, logger: logger}
-
-	// TODO more init for fields?
-
-	return config
 }
 
 // // CreateConfigObjectDatabase ...
@@ -76,7 +76,7 @@ func (coDB *ConfigObjectDatabase) GetProfile() interfaces.IProfile {
 
 // AddProfile ...
 func (coDB *ConfigObjectDatabase) AddProfile(p interfaces.IProfile) error {
-	log.Fatal("here in add profile")
+	coDB.logger.Fatal("here in add profile")
 	return nil
 
 }
