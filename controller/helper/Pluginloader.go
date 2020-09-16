@@ -12,7 +12,22 @@ import (
 	"github.com/gregod-com/grgdplugincontracts"
 )
 
+// ProvidePluginLoader ...
+func ProvidePluginLoader(
+	fsm interfaces.IFileSystemManipulator,
+	config interfaces.IConfigObject,
+	index grgdplugincontracts.IPluginIndex,
+	logger interfaces.ILogger,
+) interfaces.IPluginLoader {
+	return &PluginLoader{fsm: fsm, index: index, config: config, logger: logger}
+}
+
+// PluginLoader ...
 type PluginLoader struct {
+	fsm    interfaces.IFileSystemManipulator
+	index  grgdplugincontracts.IPluginIndex
+	config interfaces.IConfigObject
+	logger interfaces.ILogger
 }
 
 // LoadPlugins ...

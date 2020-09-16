@@ -17,9 +17,16 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// ProvidePluginIndex ...
+func ProvidePluginIndex(config interfaces.IConfigObject, logger interfaces.ILogger) grgdplugincontracts.IPluginIndex {
+	return &PluginIndex{config: config, logger: logger}
+}
+
 // PluginIndex ...
 type PluginIndex struct {
 	path           string
+	config         interfaces.IConfigObject
+	logger         interfaces.ILogger
 	PluginSettings map[string]grgdplugincontracts.IPluginMetadata `yaml:"plugins"`
 }
 

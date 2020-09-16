@@ -5,8 +5,14 @@ import (
 	"os"
 )
 
+func ProvideHelper() interfaces.IHelper {
+	return &Helper{}
+}
+
 // Helper ...
-type Helper struct{}
+type Helper struct {
+	logger interfaces.ILogger
+}
 
 // CheckUserProfile ...
 func (h *Helper) CheckUserProfile(logger interfaces.ILogger) string {

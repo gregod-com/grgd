@@ -6,14 +6,23 @@ import (
 	"path"
 )
 
+// ProvideFSManipulator ...
+func ProvideFSManipulator(logger interfaces.ILogger) interfaces.IFileSystemManipulator {
+	fsm := &FSManipulator{logger: logger}
+	fsm.CheckOrCreateFolder(fsm.HomeDir(".grgd"), os.FileMode(uint32(0760)))
+	return fsm
+}
+
+// FSManipulator ...
 type FSManipulator struct {
+	logger interfaces.ILogger
 }
 
 // HomeDir ...
 func (h *FSManipulator) HomeDir(i ...string) string {
 	dir, errHomeDir := os.UserHomeDir()
 	if errHomeDir != nil {
-		log.Fatal(errHomeDir)
+		h.logger.Fatal(errHomeDir)
 	}
 	for _, v := range i {
 		dir = path.Join(dir, v)

@@ -7,6 +7,11 @@ import (
 	"os"
 )
 
+// ProvideDownloader ...
+func ProvideDownloader() interfaces.IDownloader {
+	return &Downloader{}
+}
+
 // Downloader ...
 type Downloader struct{}
 

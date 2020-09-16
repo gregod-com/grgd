@@ -16,10 +16,11 @@ func TestCheckUpdate(t *testing.T) {
 	// Given
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	updater := &Updater{}
+	updater := helper.ProvideUpdater()
 	mockDownloader := mocks.NewMockIDownloader(ctrl)
 	mockUIPlugin := mocks.NewMockIUIPlugin(ctrl)
-	core := controller.CreateCore(time.Now(), nil, nil, nil, nil, nil, mockUIPlugin, mockDownloader)
+	core := core.RegisterDependecies([]interface{}{h.ProvideHelper})
+	// time.Now(), nil, nil, nil, nil, nil, mockUIPlugin, mockDownloader)
 
 	// When
 	mockDownloader.EXPECT().Load(gomock.Eq("file_location"), gomock.Eq("repo_url")).Return(nil)

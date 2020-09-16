@@ -4,8 +4,15 @@ import (
 	"grgd/interfaces"
 )
 
+// ProvideUpdater ...
+func ProvideUpdater(logger interfaces.ILogger) interfaces.IUpdater {
+	up := &Updater{logger: logger}
+	return up
+}
+
 // Updater ...
 type Updater struct {
+	logger interfaces.ILogger
 }
 
 // CheckUpdate ...
