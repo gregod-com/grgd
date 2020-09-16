@@ -6,5 +6,5 @@ import (
 
 // IPluginLoader ...
 type IPluginLoader interface {
-	LoadPlugins(pluginFolder string, index grgdplugincontracts.IPluginIndex, fm IFileSystemManipulator) ([]grgdplugincontracts.ICMDPlugin, grgdplugincontracts.IUIPlugin)
+	LoadPlugins(pluginFolder string) ([]grgdplugincontracts.ICMDPlugin, grgdplugincontracts.IUIPlugin)
 }
