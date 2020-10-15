@@ -6,8 +6,8 @@ package mocks
 
 import (
 	gomock "github.com/golang/mock/gomock"
+	interfaces "github.com/gregod-com/grgd/interfaces"
 	cli "github.com/urfave/cli/v2"
-	interfaces "grgd/interfaces"
 	reflect "reflect"
 )
 

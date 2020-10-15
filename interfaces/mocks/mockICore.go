@@ -6,8 +6,8 @@ package mocks
 
 import (
 	gomock "github.com/golang/mock/gomock"
+	interfaces "github.com/gregod-com/grgd/interfaces"
 	grgdplugincontracts "github.com/gregod-com/grgdplugincontracts"
-	interfaces "grgd/interfaces"
 	reflect "reflect"
 	time "time"
 )
@@ -105,6 +105,20 @@ func (mr *MockICoreMockRecorder) GetHelper() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetHelper", reflect.TypeOf((*MockICore)(nil).GetHelper))
 }
 
+// GetCMDPlugins mocks base method
+func (m *MockICore) GetCMDPlugins() []grgdplugincontracts.ICMDPlugin {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCMDPlugins")
+	ret0, _ := ret[0].([]grgdplugincontracts.ICMDPlugin)
+	return ret0
+}
+
+// GetCMDPlugins indicates an expected call of GetCMDPlugins
+func (mr *MockICoreMockRecorder) GetCMDPlugins() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCMDPlugins", reflect.TypeOf((*MockICore)(nil).GetCMDPlugins))
+}
+
 // GetFileSystemManipulator mocks base method
 func (m *MockICore) GetFileSystemManipulator() interfaces.IFileSystemManipulator {
 	m.ctrl.T.Helper()
@@ -117,20 +131,6 @@ func (m *MockICore) GetFileSystemManipulator() interfaces.IFileSystemManipulator
 func (mr *MockICoreMockRecorder) GetFileSystemManipulator() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFileSystemManipulator", reflect.TypeOf((*MockICore)(nil).GetFileSystemManipulator))
-}
-
-// GetPluginLoader mocks base method
-func (m *MockICore) GetPluginLoader() interfaces.IPluginLoader {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPluginLoader")
-	ret0, _ := ret[0].(interfaces.IPluginLoader)
-	return ret0
-}
-
-// GetPluginLoader indicates an expected call of GetPluginLoader
-func (mr *MockICoreMockRecorder) GetPluginLoader() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPluginLoader", reflect.TypeOf((*MockICore)(nil).GetPluginLoader))
 }
 
 // Get mocks base method

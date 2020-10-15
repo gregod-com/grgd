@@ -7,7 +7,6 @@ package mocks
 import (
 	gomock "github.com/golang/mock/gomock"
 	grgdplugincontracts "github.com/gregod-com/grgdplugincontracts"
-	interfaces "grgd/interfaces"
 	reflect "reflect"
 )
 
@@ -35,16 +34,16 @@ func (m *MockIPluginLoader) EXPECT() *MockIPluginLoaderMockRecorder {
 }
 
 // LoadPlugins mocks base method
-func (m *MockIPluginLoader) LoadPlugins(pluginFolder string, index grgdplugincontracts.IPluginIndex, fm interfaces.IFileSystemManipulator) ([]grgdplugincontracts.ICMDPlugin, grgdplugincontracts.IUIPlugin) {
+func (m *MockIPluginLoader) LoadPlugins(pluginFolder string) ([]grgdplugincontracts.ICMDPlugin, grgdplugincontracts.IUIPlugin) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "LoadPlugins", pluginFolder, index, fm)
+	ret := m.ctrl.Call(m, "LoadPlugins", pluginFolder)
 	ret0, _ := ret[0].([]grgdplugincontracts.ICMDPlugin)
 	ret1, _ := ret[1].(grgdplugincontracts.IUIPlugin)
 	return ret0, ret1
 }
 
 // LoadPlugins indicates an expected call of LoadPlugins
-func (mr *MockIPluginLoaderMockRecorder) LoadPlugins(pluginFolder, index, fm interface{}) *gomock.Call {
+func (mr *MockIPluginLoaderMockRecorder) LoadPlugins(pluginFolder interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadPlugins", reflect.TypeOf((*MockIPluginLoader)(nil).LoadPlugins), pluginFolder, index, fm)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadPlugins", reflect.TypeOf((*MockIPluginLoader)(nil).LoadPlugins), pluginFolder)
 }

@@ -6,8 +6,7 @@ package mocks
 
 import (
 	gomock "github.com/golang/mock/gomock"
-	"github.com/urfave/cli/v2"
-	interfaces "grgd/interfaces"
+	interfaces "github.com/gregod-com/grgd/interfaces"
 	reflect "reflect"
 )
 
@@ -35,15 +34,15 @@ func (m *MockIUpdater) EXPECT() *MockIUpdaterMockRecorder {
 }
 
 // CheckUpdate mocks base method
-func (m *MockIUpdater) CheckUpdate(c *cli.Context, downloader interfaces.IDownloader, ext interfaces.IExtractor) error {
+func (m *MockIUpdater) CheckUpdate(core interfaces.ICore) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CheckUpdate", c, downloader, ext)
+	ret := m.ctrl.Call(m, "CheckUpdate", core)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CheckUpdate indicates an expected call of CheckUpdate
-func (mr *MockIUpdaterMockRecorder) CheckUpdate(c, downloader, ext interface{}) *gomock.Call {
+func (mr *MockIUpdaterMockRecorder) CheckUpdate(core interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUpdate", reflect.TypeOf((*MockIUpdater)(nil).CheckUpdate), c, downloader, ext)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUpdate", reflect.TypeOf((*MockIUpdater)(nil).CheckUpdate), core)
 }

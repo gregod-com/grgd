@@ -6,7 +6,6 @@ package mocks
 
 import (
 	gomock "github.com/golang/mock/gomock"
-	interfaces "grgd/interfaces"
 	reflect "reflect"
 )
 
@@ -34,17 +33,17 @@ func (m *MockIHelper) EXPECT() *MockIHelperMockRecorder {
 }
 
 // CheckUserProfile mocks base method
-func (m *MockIHelper) CheckUserProfile(logger interfaces.ILogger) string {
+func (m *MockIHelper) CheckUserProfile() string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CheckUserProfile", logger)
+	ret := m.ctrl.Call(m, "CheckUserProfile")
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
 // CheckUserProfile indicates an expected call of CheckUserProfile
-func (mr *MockIHelperMockRecorder) CheckUserProfile(logger interface{}) *gomock.Call {
+func (mr *MockIHelperMockRecorder) CheckUserProfile() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUserProfile", reflect.TypeOf((*MockIHelper)(nil).CheckUserProfile), logger)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUserProfile", reflect.TypeOf((*MockIHelper)(nil).CheckUserProfile))
 }
 
 // CheckFlag mocks base method

@@ -6,7 +6,7 @@ package mocks
 
 import (
 	gomock "github.com/golang/mock/gomock"
-	interfaces "grgd/interfaces"
+	interfaces "github.com/gregod-com/grgd/interfaces"
 	reflect "reflect"
 )
 
