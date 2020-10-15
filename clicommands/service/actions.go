@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"grgd/persistence"
+	I "grgd/interfaces"
 
 	"github.com/urfave/cli/v2"
 )
@@ -89,20 +89,20 @@ func AGroupService(c *cli.Context) error {
 	return nil
 }
 
-func getServiceIndexByName(arr []persistence.Service, name string) (int, error) {
+func getServiceIndexByName(arr []I.IService, name string) (int, error) {
 	for k, v := range arr {
-		if v.Name == name {
+		if v.GetName() == name {
 			return k, nil
 		}
 	}
 	return 0, errors.New("Name not found")
 }
 
-func sortServiceMetadataSlice(m []persistence.Service) [][]string {
+func sortServiceMetadataSlice(m []I.IService) [][]string {
 	rows := [][]string{}
 
 	sort.Slice(m, func(i, j int) bool {
-		switch strings.Compare(m[i].Name, m[j].Name) {
+		switch strings.Compare(m[i].GetName(), m[j].GetName()) {
 		case -1:
 			return true
 		default:
@@ -112,9 +112,9 @@ func sortServiceMetadataSlice(m []persistence.Service) [][]string {
 
 	for _, key := range m {
 		row := []string{}
-		row = append(row, key.Name)
-		row = append(row, key.Path)
-		row = append(row, strconv.FormatBool(key.Active))
+		row = append(row, key.GetName())
+		row = append(row, key.GetPath())
+		row = append(row, strconv.FormatBool(key.GetActive()))
 		rows = append(rows, row)
 	}
 

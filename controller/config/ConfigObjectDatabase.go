@@ -3,11 +3,6 @@ package config
 import (
 	"github.com/gregod-com/grgdplugincontracts"
 
-	"grgd/controller/helper"
-	"grgd/controller/wrappers"
-	"grgd/persistence"
-	"grgd/view"
-
 	"grgd/interfaces"
 )
 
@@ -68,7 +63,7 @@ func (coDB *ConfigObjectDatabase) GetProfile() interfaces.IProfile {
 			coDB.currentProfile = coDB.profiles[k].GetName()
 			return coDB.profiles[k]
 		}
-		coDB.AddProfile(wrappers.InitNewProfile(&persistence.Profile{Name: coDB.currentProfile}, coDB.logger, &view.FallbackUI{}, &helper.FSManipulator{}))
+		// coDB.AddProfile(wrappers.InitNewProfile(&persistence.Profile{Name: coDB.currentProfile}, coDB.logger, &view.FallbackUI{}, &helper.FSManipulator{}))
 		coDB.logger.Fatal("Current Profile not set! Init Here")
 	}
 	return current

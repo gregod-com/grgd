@@ -1,6 +1,6 @@
 # Go parameters
 GOCMD=go
-GOBUILD=$(GOCMD) build --trimpath
+GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
@@ -8,7 +8,7 @@ GORUN=$(GOCMD) run
 BINPATH=bin/
 BINARYNAME=grgd
 
-all: test build
+all: test build run
 build:
 	GO111MODULE=on $(GOBUILD) -o $(BINPATH)$(BINARYNAME)
 test:
@@ -16,8 +16,8 @@ test:
 run:
 	./$(BINPATH)$(BINARYNAME)
 
-linux: docker-build docker-run
+docker: docker-build docker-run
 docker-run:
 	docker run -it -v $(PWD)/bin/grgd-linux:/usr/local/bin/grgd -v $(HOME)/.grgd/:/root/.grgd/ -v $(HOME)/.grgd/plugins/binaries-linux/:/root/.grgd/plugins/binaries/ golang sh
 docker-build:
-	docker run --rm -it -v "$(GOPATH)":/go -v $(PWD):/src/ -w /src/ golang:latest $(GOBUILD) -o ./bin/grgd-linux
+	docker run --rm -it -v "$(GOPATH)":/go -v $(PWD):/src/ -w /src/ golang:1.14.6 $(GOBUILD) -o ./bin/grgd-linux
