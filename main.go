@@ -13,26 +13,39 @@ import (
 	"grgd/controller/helper"
 	"grgd/controller/pluginindex"
 	"grgd/core"
-	"grgd/interfaces"
-	"grgd/logger"
-	"grgd/persistence"
 	"grgd/view"
 
+	"github.com/gregod-com/grgd/gormdal"
+	"github.com/gregod-com/grgd/interfaces"
+	"github.com/gregod-com/grgd/logger"
 	"github.com/urfave/cli/v2"
 )
 
+type Hans struct {
+	frnaz int
+}
+
 func main() {
+	// der := Hans{}
+	// dieser := &Hans{}
+	var dl interfaces.IDownloader
+	dl = helper.ProvideDownloader()
+	var l interfaces.ILogger
+	var h interfaces.IHelper
+	h = helper.ProvideHelper()
+	l = logger.ProvideLogrusLogger(h)
+
 	dependecies := []interface{}{
-		helper.ProvideDownloader,       // 0
-		helper.ProvideHelper,           // 0
-		view.ProvideFallbackUI,         // 0
-		logger.ProvideLogrusLogger,     // helper
-		helper.ProvideFSManipulator,    // logger
-		helper.ProvideUpdater,          // logger
-		persistence.ProvideDAL,         // fs
-		config.ProvideConfigObject,     // dal logger
-		pluginindex.ProvidePluginIndex, // config
-		helper.ProvidePluginLoader,     // pluginindex, fsmanipulator
+		&dl,
+		helper.ProvideHelper,
+		view.ProvideFallbackUI,
+		&l,
+		helper.ProvideFSManipulator,
+		helper.ProvideUpdater,
+		gormdal.ProvideDAL,
+		config.ProvideConfigObject,
+		pluginindex.ProvidePluginIndex,
+		helper.ProvidePluginLoader,
 	}
 
 	core := core.RegisterDependecies(dependecies)
