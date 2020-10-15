@@ -1,4 +1,4 @@
-package persistence
+package gormdal
 
 import (
 	log "github.com/sirupsen/logrus"
