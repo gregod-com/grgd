@@ -1,0 +1,191 @@
+package profile
+
+import (
+	"sort"
+
+	"grgd/interfaces"
+	"grgd/persistence"
+
+	"github.com/gregod-com/grgdplugincontracts"
+)
+
+// ProvideProfile ...
+func ProvideProfile(id uint, projects map[string]interfaces.IProject) interfaces.IProfile {
+	return &Profile{id: id, projects: projects}
+}
+
+// Profile ...
+type Profile struct {
+	id               uint
+	name             string
+	homeDir          string
+	pluginDir        string
+	currentProjectID uint
+	initialized      bool
+	projects         map[string]interfaces.IProject
+}
+
+// InitNewProfile ...
+func InitNewProfile(
+	logger interfaces.ILogger,
+	UI grgdplugincontracts.IUIPlugin,
+	fm interfaces.IFileSystemManipulator) *Profile {
+	// defaults for new profile
+	model.HomeDir = fm.HomeDir()
+	model.PluginDir = fm.HomeDir(".grgd", "plugins")
+
+	UI.ClearScreen(nil)
+	UI.Printf("Hey %v, let's init your profile \n\n", model.Name)
+	UI.Question("Base profile directory [`Enter` for default: "+model.HomeDir+"]: ", &model.HomeDir)
+
+	for !fm.PathExists(model.HomeDir) {
+		answer := model.HomeDir
+		model.HomeDir = fm.HomeDir()
+		UI.Question("The path `"+answer+"` does not exists. Try again or use default ["+model.HomeDir+"]: ", model.HomeDir)
+	}
+
+	UI.Question("Base plugin directory [`Enter` for default: "+model.PluginDir+"]: ", &model.PluginDir)
+
+	for !fm.PathExists(model.PluginDir) {
+		answer := model.PluginDir
+		model.PluginDir = fm.HomeDir(".grgd", "plugins")
+		UI.Question("The path `"+answer+"` does not exists. Try again or use default ["+model.PluginDir+"]: ", &model.PluginDir)
+	}
+
+	// fmt.Println(model)
+	// if !UI.YesNoQuestion("Looking good?") {
+	// 	InitNewProfile(model, logger, UI)
+	// }
+
+	first := "your first "
+	for UI.YesNoQuestion("Should we setup " + first + "project now?") {
+		newProfile := InitNewProject(&persistence.GRGDProject{}, logger, UI, fm)
+		model.Projects = append(model.Projects, newProfile.model)
+		first = "another "
+	}
+
+	// CurrentProjectID uint
+	model.Initialized = true
+	return CreateProfile(model)
+}
+
+// CreateProfile ...
+func CreateProfile(mProfile *persistence.Profile) *Profile {
+	pros := make(map[string]interfaces.IProject)
+	for k, mProj := range mProfile.Projects {
+		// persistence.GetAll(&mProj)
+		pros[mProj.Name] = CreateProjectWrapper(mProfile.Projects[k])
+	}
+
+	return &Profile{model: mProfile, projects: pros}
+}
+
+// IsInitialized ...
+func (p *Profile) Model() interface{} {
+	return &p.model
+}
+
+// IsInitialized ...
+func (p *Profile) IsInitialized() bool {
+	return p.model.Initialized
+}
+
+// GetName ...
+func (p *Profile) GetName() string {
+	return p.model.Name
+}
+
+// GetBasePath ...
+func (p *Profile) GetBasePath() string {
+	return p.model.HomeDir
+}
+
+// GetProjects ....
+func (p *Profile) GetProjects() map[string]interfaces.IProject {
+	return p.projects
+}
+
+// GetProjectsTable ....
+func (p *Profile) GetProjectsTable() [][]string {
+	rows := [][]string{}
+	keys := []string{}
+	for k := range p.projects {
+		keys = append(keys, k)
+	}
+
+	sort.Strings(keys)
+
+	rows = append(rows, []string{"Current", "Name", "Path", "Description"})
+	for _, key := range keys {
+		row := []string{}
+		currentFlag := ""
+		if p.model.CurrentProjectID == p.projects[key].GetID() {
+			currentFlag = "*"
+		}
+		row = append(row, currentFlag)
+		row = append(row, p.projects[key].GetValues()...)
+		rows = append(rows, row)
+	}
+
+	return rows
+}
+
+// AddProject ...
+func (p *Profile) AddProject(proj string) error {
+	newProj := &persistence.GRGDProject{Name: proj}
+	p.projects[proj] = CreateProjectWrapper(newProj)
+	p.model.Projects = append(p.model.Projects, newProj)
+	return nil
+}
+
+// RemoveProject ...
+func (p *Profile) RemoveProject(proj interfaces.IProject) error {
+	delete(p.projects, proj.GetName())
+	return nil
+}
+
+// RemoveProjectByName ...
+func (p *Profile) RemoveProjectByName(proj string) error {
+	delete(p.projects, proj)
+	return nil
+}
+
+// GetCurrentProject ...
+func (p *Profile) GetCurrentProject() interfaces.IProject {
+	for _, v := range p.projects {
+		if v.GetID() == p.model.CurrentProjectID {
+			return p.projects[v.GetName()]
+		}
+	}
+	return nil
+}
+
+// SetCurrentProject ...
+func (p *Profile) SetCurrentProject(newProject interfaces.IProject) error {
+	p.model.CurrentProjectID = newProject.GetID()
+	return nil
+}
+
+// GetValues ...
+func (p *Profile) GetValues(i ...interface{}) []string {
+	return []string{p.model.Name, p.model.HomeDir}
+}
+
+// // String  ...
+
+// func (profile Profile) String() string {
+// 	var obj map[string]interface{}
+// 	// create json string from object
+// 	str, err := json.MarshalIndent(profile, "", "  ")
+
+// 	// create simplified object from json string
+// 	json.Unmarshal([]byte(str), &obj)
+
+// 	f := colorjson.NewFormatter()
+// 	f.Indent = 4
+
+// 	// create colored json string from simplified object
+// 	data, err := f.Marshal(obj)
+
+// 	return string(data)
+// }
