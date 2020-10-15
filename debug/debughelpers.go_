@@ -1,0 +1,22 @@
+package debug
+
+import (
+	"bytes"
+	"log"
+	"os/exec"
+
+	"github.com/bradleyjkemp/memviz"
+	"github.com/windler/dotgraph/renderer"
+)
+
+// PlotObject ...
+func PlotObject(i interface{}) {
+	r := renderer.PNGRenderer{
+		OutputFile: "/tmp/graph.png",
+	}
+	var buf bytes.Buffer
+	memviz.Map(&buf, i)
+	r.Render(buf.String())
+	exec.Command("open", "/tmp/graph.png").Run()
+	log.Fatal(2)
+}
