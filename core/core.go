@@ -3,6 +3,7 @@ package core
 import (
 	"errors"
 	"grgd/interfaces"
+	"grgd/view"
 	"log"
 	"reflect"
 	"time"
@@ -12,13 +13,11 @@ import (
 )
 
 // RegisterDependecies ...
-func RegisterDependecies(implsTemp []interface{}) interfaces.ICore {
+func RegisterDependecies(implsTemp map[string]interface{}) interfaces.ICore {
 	impls := make(map[string]interface{})
 	impls["start"] = time.Now()
+	iter, solved, solvedCurrent := 0, 0, -1
 
-	iter := 0
-	solved := 0
-	solvedCurrent := -1
 	for {
 		iter++
 		if solvedCurrent == 0 {
@@ -26,81 +25,48 @@ func RegisterDependecies(implsTemp []interface{}) interfaces.ICore {
 		}
 		solvedCurrent = 0
 
-		for _, elem := range implsTemp {
+		for target, elem := range implsTemp {
 			if elem == nil {
+				//  the implementation is nil
 				solvedCurrent++
-				break
+				continue
 			}
 
-			val := reflect.ValueOf(elem)
-			typ := reflect.TypeOf(elem)
-
-			switch val.Kind() {
-			// 		// 		case reflect.Ptr:
-			// 		// 			log.Printf("Found Ptr with val: %v, kind: %v, typeof %v", val, typ.Kind(), typ)
-			// 		// 			intrfce := typ.Elem()
-			// 		// 			log.Printf("Saving at %v", intrfce.String())
-
-			// 		// 			if _, ok := impls[intrfce.String()]; !ok {
-			// 		// 				impls[intrfce.String()] = reflect.ValueOf(elem).Elem().Interface()
-			// 		// 				continue
-			// 		// 			}
-
-			// 		// 			implsTemp = append(implsTemp[:k], implsTemp[k:])
-			// 		// 			break
+			switch reflect.ValueOf(elem).Kind() {
+			case reflect.Ptr:
+				// the implementation is provided directly
+				if _, ok := impls[target]; !ok {
+					impls[target] = elem
+				}
+				solvedCurrent++
 			case reflect.Func:
-				// 			// 		case reflect.Interface:
-				// 			// 			log.Fatalf("Passed unknow type to register: %T", elem)
-				// 			// 			implsTemp = append(implsTemp[:k], implsTemp[k:])
-				// 			// 			break
+				// the implementation is provided via the provider function
+				solvedCurrent += addDependecyFromProviderFunction(elem, impls)
+			case reflect.Interface:
+				log.Fatalf("Passed unknow type to register: %T", elem)
+				solvedCurrent++
 			default:
-				// 			// 			log.Printf("Found %T with val: %v, kind: %v, typeof %v", elem, val, typ.Kind(), typ)
-				// 			// 			log.Printf("Saving at %v", typ.String())
-				// 			// 			if _, ok := impls[typ.String()]; !ok {
-				// 			// 				implsTemp = append(implsTemp[:k], implsTemp[k:])
-				// 			// 				break
-				// 			// 			}
-				// 			// 			offset++
-				// 			implsTemp = append(implsTemp[:k], implsTemp[k:])
-				solvedCurrent++
-				continue
-			}
+				log.Printf("Found %T with val: %v, kind: %v, typeof %v",
+					elem,
+					reflect.ValueOf(elem),
+					reflect.TypeOf(elem).Kind(),
+					reflect.TypeOf(elem))
 
-			// 		if _, ok := impls[typ.Out(0).String()]; ok {
-			// 			continue
-			// 		}
-			injection := make([]reflect.Value, 0)
-			postpone := false
-			for dependecyNr := 0; dependecyNr < typ.NumIn(); dependecyNr++ {
-				depKey := typ.In(dependecyNr).String()
-				dep, ok := impls[depKey]
-				if !ok {
-					postpone = true
-				}
-				injection = append(injection, reflect.ValueOf(dep))
-			}
-			if !postpone {
-				key := typ.Out(0).String()
-				if _, ok := impls[key]; !ok {
-					impls[key] = reflect.ValueOf(elem).Call(injection)[0].Interface()
+				log.Printf("Saving at %v", reflect.TypeOf(elem).String())
+				if _, ok := impls[reflect.TypeOf(elem).String()]; !ok {
+					break
 				}
 				solvedCurrent++
-				continue
 			}
 		}
 
 		solved += solvedCurrent
-		if iter++; solved >= len(implsTemp) || iter > 100 {
+		if iter++; solved >= len(implsTemp) {
 			break
-		} else {
-			log.Printf("solvedcurrent %v solved %v of %v elem", solvedCurrent, solved, len(implsTemp))
 		}
-
 	}
 
 	core := &Core{implementations: impls}
-
-	// TODO: find elegant solution to update cli automatically
 
 	// TODO: store plugin information in database?
 	// configImpl.GetPluginsDir()
@@ -113,12 +79,44 @@ func RegisterDependecies(implsTemp []interface{}) interfaces.ICore {
 	// pluginsPath := fsmanipulatorImpl.HomeDir(".grgd", "plugins")
 	// CMDPlugins, _ := pl.LoadPlugins(pluginsPath)
 	// impls["commands"] = CMDPlugins
-	// for k := range impls {
-	// 	core.GetLogger().Trace(k)
-	// }
 
-	// upImpl.CheckUpdate(core)
+	for k, v := range impls {
+		core.GetLogger().Tracef("key: %v, value%v", k, v)
+	}
 	return core
+}
+
+func addDependecyFromProviderFunction(elem interface{}, impls map[string]interface{}) int {
+	typ := reflect.TypeOf(elem)
+
+	injection := make([]reflect.Value, 0)
+	postpone := false
+	for dependecyNr := 0; dependecyNr < typ.NumIn(); dependecyNr++ {
+		depKey := typ.In(dependecyNr)
+		dep, ok := impls[depKey.Name()]
+		if !ok {
+			switch depKey.Kind() {
+			case reflect.Slice:
+				if depKey.Elem().Name() == "" {
+					log.Printf("Impossible to inject unknown variadric interfaces")
+					return 1
+				}
+				postpone = true
+			default:
+				// if argument was not found yet in impls => try again later
+				postpone = true
+			}
+		}
+		injection = append(injection, reflect.ValueOf(dep))
+	}
+	if !postpone {
+		key := typ.Out(0).Name()
+		if _, ok := impls[key]; !ok {
+			impls[key] = reflect.ValueOf(elem).Call(injection)[0].Interface()
+		}
+		return 1
+	}
+	return 0
 }
 
 // Core ...
@@ -155,45 +153,46 @@ func (c *Core) Get(i interface{}) error {
 
 // GetLogger ...
 func (c *Core) GetLogger() interfaces.ILogger {
-	a, ok := c.implementations["interfaces.ILogger"].(interfaces.ILogger)
+	a, ok := c.implementations["ILogger"].(interfaces.ILogger)
 	if !ok {
-		log.Fatal("no logger found")
-		return nil
+		a = ProvideDefaultLogger()
+		c.implementations["ILogger"] = a
 	}
 	return a
 }
 
 // GetUI ...
 func (c *Core) GetUI() grgdplugincontracts.IUIPlugin {
-	a, ok := c.implementations["grgdplugincontracts.IUIPlugin"].(grgdplugincontracts.IUIPlugin)
+	a, ok := c.implementations["IUIPlugin"].(grgdplugincontracts.IUIPlugin)
 	if !ok {
-		return nil
+		a = view.ProvideFallbackUI()
+		c.implementations["IUIPlugin"] = a
 	}
 	return a
 }
 
 // GetConfig ...
 func (c *Core) GetConfig() interfaces.IConfigObject {
-	a, ok := c.implementations["interfaces.IConfigObject"].(interfaces.IConfigObject)
+	a, ok := c.implementations["IConfigObject"].(interfaces.IConfigObject)
 	if !ok {
-		return nil
+		log.Fatal("ConfigObject is nil")
 	}
 	return a
 }
 
 // GetHelper ...
 func (c *Core) GetHelper() interfaces.IHelper {
-	a, ok := c.implementations["interfaces.IHelper"].(interfaces.IHelper)
+	a, ok := c.implementations["IHelper"].(interfaces.IHelper)
 	if !ok {
 		a = helper.ProvideHelper()
-		c.implementations["interfaces.IHelper"] = a
+		c.implementations["IHelper"] = a
 	}
 	return a
 }
 
 // GetFileSystemManipulator ...
 func (c *Core) GetFileSystemManipulator() interfaces.IFileSystemManipulator {
-	a, ok := c.implementations["interfaces.IFileSystemManipulator"].(interfaces.IFileSystemManipulator)
+	a, ok := c.implementations["IFileSystemManipulator"].(interfaces.IFileSystemManipulator)
 	if !ok {
 		return nil
 	}

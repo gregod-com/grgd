@@ -9,43 +9,29 @@ import (
 
 	"grgd/clicommands"
 	"grgd/clicommands/flags"
-	"grgd/controller/config"
 	"grgd/controller/helper"
-	"grgd/controller/pluginindex"
 	"grgd/core"
 	"grgd/view"
 
+	"github.com/gregod-com/grgd/controller/config"
+	"github.com/gregod-com/grgd/controller/pluginindex"
 	"github.com/gregod-com/grgd/gormdal"
-	"github.com/gregod-com/grgd/interfaces"
 	"github.com/gregod-com/grgd/logger"
 	"github.com/urfave/cli/v2"
 )
 
-type Hans struct {
-	frnaz int
-}
-
 func main() {
-	// der := Hans{}
-	// dieser := &Hans{}
-	var dl interfaces.IDownloader
-	dl = helper.ProvideDownloader()
-	var l interfaces.ILogger
-	var h interfaces.IHelper
-	h = helper.ProvideHelper()
-	l = logger.ProvideLogrusLogger(h)
-
-	dependecies := []interface{}{
-		&dl,
-		helper.ProvideHelper,
-		view.ProvideFallbackUI,
-		&l,
-		helper.ProvideFSManipulator,
-		helper.ProvideUpdater,
-		gormdal.ProvideDAL,
-		config.ProvideConfigObject,
-		pluginindex.ProvidePluginIndex,
-		helper.ProvidePluginLoader,
+	dependecies := map[string]interface{}{
+		"IHelper":                helper.ProvideHelper,
+		"IUIPlugin":              view.ProvideFallbackUI,
+		"ILogger":                logger.ProvideLogrusLogger,
+		"IFileSystemManipulator": helper.ProvideFSManipulator,
+		"IUpdater":               helper.ProvideUpdater,
+		"IDAL":                   gormdal.ProvideDAL,
+		"IDownloader":            helper.ProvideDownloader,
+		"IConfigObject":          config.ProvideConfigObject,
+		"IPluginIndex":           pluginindex.ProvidePluginIndex,
+		"IPluginLoader":          helper.ProvidePluginLoader,
 	}
 
 	core := core.RegisterDependecies(dependecies)
@@ -53,7 +39,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "grgd"
 	app.Usage = "grgd cli"
-	app.Version = "0.8.0"
+	app.Version = "0.9.0"
 	app.Metadata = make(map[string]interface{})
 	app.Metadata["core"] = core
 	app.Flags = append(app.Flags, flags.GetFlags()...)

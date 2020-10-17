@@ -13,17 +13,15 @@ func TestRegisterDependecies_With_Nil(t *testing.T) {
 	// Given
 	// When
 	RegisterDependecies(
-		[]interface{}{
-			nil,
-		})
+		map[string]interface{}{})
 }
 
 func TestRegisterDependecies_With_Helper(t *testing.T) {
 	// Given
 	// When
 	RegisterDependecies(
-		[]interface{}{
-			helper.ProvideHelper,
+		map[string]interface{}{
+			"interfaces.IHelper": helper.ProvideHelper,
 		})
 }
 
@@ -32,8 +30,8 @@ func TestRegisterDependecies_With_Helper_2(t *testing.T) {
 
 	// When
 	mycore := RegisterDependecies(
-		[]interface{}{
-			helper.ProvideHelper,
+		map[string]interface{}{
+			"interfaces.IHelper": helper.ProvideHelper,
 		})
 
 	// Then
@@ -48,8 +46,8 @@ func TestRegisterDependecies_With_Helper_3(t *testing.T) {
 	// Given
 	// When
 	mycore := RegisterDependecies(
-		[]interface{}{
-			nil,
+		map[string]interface{}{
+			"hans": nil,
 		})
 
 	// Then
@@ -64,11 +62,11 @@ func TestRegisterDependecies_With_Helper_4(t *testing.T) {
 	// Given
 	// When
 	mycore := RegisterDependecies(
-		[]interface{}{
-			helper.ProvideHelper,
-			helper.ProvideHelper,
-			helper.ProvideHelper,
-			helper.ProvideHelper,
+		map[string]interface{}{
+			"interfaces.IHelper":  helper.ProvideHelper,
+			"interfaces.IHelper2": helper.ProvideHelper,
+			"interfaces.IHelper3": helper.ProvideHelper,
+			"interfaces.IHelper4": helper.ProvideHelper,
 		})
 
 	// Then
@@ -82,8 +80,8 @@ func TestRegisterDependecies_With_Helper_5(t *testing.T) {
 	// Given
 	// When
 	mycore := RegisterDependecies(
-		[]interface{}{
-			helper.ProvideHelper(),
+		map[string]interface{}{
+			"interfaces.IHelper": helper.ProvideHelper,
 		})
 
 	// Then
@@ -93,12 +91,12 @@ func TestRegisterDependecies_With_Helper_5(t *testing.T) {
 	assert.Implements(t, &helperint, hlpr)
 }
 
-func TestRegisterDependecies_With_Random_Values_1(t *testing.T) {
+func TestRegisterDependecies_With_Variadric_Provider(t *testing.T) {
 	// Given
 	// When
 	mycore := RegisterDependecies(
-		[]interface{}{
-			fmt.Println,
+		map[string]interface{}{
+			"fmt.Println": fmt.Println,
 		})
 
 	// Then
