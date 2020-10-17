@@ -9,8 +9,9 @@ import (
 // SubAConfigYAML ...
 func SubAConfigYAML(c *cli.Context) error {
 	ext := helper.GetExtractor()
-	UI := ext.GetCore(c).GetUI()
-	configObject := ext.GetCore(c).GetConfig()
+	core := ext.GetCore(c)
+	UI := core.GetUI()
+	configObject := core.GetConfig()
 	UI.Println(configObject.DumpConfig("yaml"), c)
 	return nil
 }
