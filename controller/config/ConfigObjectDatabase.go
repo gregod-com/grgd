@@ -9,9 +9,6 @@ import (
 // ProvideConfigObject ...
 func ProvideConfigObject(dal interfaces.IDAL, logger interfaces.ILogger) interfaces.IConfigObject {
 	config := &ConfigObjectDatabase{dal: dal, logger: logger}
-
-	// TODO more init for fields?
-
 	return config
 }
 
@@ -23,17 +20,6 @@ type ConfigObjectDatabase struct {
 	profiles       map[string]interfaces.IProfile
 	currentProfile string
 }
-
-// // CreateConfigObjectDatabase ...
-// func CreateConfigObjectDatabase(dbPath string, currentProfile string, logger interfaces.ILogger) interfaces.IConfigObject {
-// 	dbPointer := persistence.InitDatabase(dbPath)
-// 	m := make(map[string]interfaces.IProfile)
-// 	config := ConfigObjectDatabase{path: dbPath, db: dbPointer, profiles: m, logger: l}
-// 	config.GetAllProfiles()
-// 	config.currentProfile = currentProfile
-// 	config.GetProfile()
-// 	return &config
-// }
 
 // Save ...
 func (coDB *ConfigObjectDatabase) Save(i ...interface{}) error {
