@@ -1,5 +1,6 @@
 package interfaces
 
+// ILogger ...
 type ILogger interface {
 	Trace(i ...interface{})
 	Debug(i ...interface{})
@@ -7,4 +8,10 @@ type ILogger interface {
 	Warn(i ...interface{})
 	Error(i ...interface{})
 	Fatal(i ...interface{})
+	Tracef(format string, i ...interface{})
+	Debugf(format string, i ...interface{})
+	Infof(format string, i ...interface{})
+	Warnf(format string, i ...interface{})
+	Errorf(format string, i ...interface{})
+	Fatalf(format string, i ...interface{})
 }

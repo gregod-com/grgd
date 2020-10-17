@@ -71,3 +71,33 @@ func (l *LogrusLogger) Error(i ...interface{}) {
 func (l *LogrusLogger) Fatal(i ...interface{}) {
 	l.logger.Fatal(i...)
 }
+
+// Tracef ...
+func (l *LogrusLogger) Tracef(format string, i ...interface{}) {
+	l.logger.Tracef(format, i...)
+}
+
+// Debugf ...
+func (l *LogrusLogger) Debugf(format string, i ...interface{}) {
+	l.logger.Debugf(format, i...)
+}
+
+// Infof ...
+func (l *LogrusLogger) Infof(format string, i ...interface{}) {
+	l.logger.Infof(format, i...)
+}
+
+// Warnf ...
+func (l *LogrusLogger) Warnf(format string, i ...interface{}) {
+	l.logger.Warnf(format, i...)
+}
+
+// Errorf ...
+func (l *LogrusLogger) Errorf(format string, i ...interface{}) {
+	l.logger.Errorf(format, i...)
+}
+
+// Fatalf ...
+func (l *LogrusLogger) Fatalf(format string, i ...interface{}) {
+	l.logger.Fatalf(format, i...)
+}

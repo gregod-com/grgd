@@ -1,4 +1,4 @@
-package logger
+package core
 
 import (
 	"grgd/interfaces"
@@ -7,7 +7,7 @@ import (
 )
 
 // ProvideDefaultLogger ....
-func ProvideDefaultLogger(h interfaces.IHelper) interfaces.ILogger {
+func ProvideDefaultLogger() interfaces.ILogger {
 	logger := log.New(os.Stderr, "", 0)
 	defaultLogger := &DeafultLogger{logger: logger}
 	return defaultLogger
@@ -46,4 +46,34 @@ func (l *DeafultLogger) Error(i ...interface{}) {
 // Fatal ...
 func (l *DeafultLogger) Fatal(i ...interface{}) {
 	l.logger.Fatal(i...)
+}
+
+// Tracef ...
+func (l *DeafultLogger) Tracef(format string, i ...interface{}) {
+	l.logger.Printf(format, i...)
+}
+
+// Debugf ...
+func (l *DeafultLogger) Debugf(format string, i ...interface{}) {
+	l.logger.Printf(format, i...)
+}
+
+// Infof ...
+func (l *DeafultLogger) Infof(format string, i ...interface{}) {
+	l.logger.Printf(format, i...)
+}
+
+// Warnf ...
+func (l *DeafultLogger) Warnf(format string, i ...interface{}) {
+	l.logger.Printf(format, i...)
+}
+
+// Errorf ...
+func (l *DeafultLogger) Errorf(format string, i ...interface{}) {
+	l.logger.Printf(format, i...)
+}
+
+// Fatalf ...
+func (l *DeafultLogger) Fatalf(format string, i ...interface{}) {
+	l.logger.Fatalf(format, i...)
 }
