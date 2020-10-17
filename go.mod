@@ -10,6 +10,7 @@ require (
 	github.com/gregod-com/grgdplugincontracts v0.3.0
 	github.com/sirupsen/logrus v1.6.0
 	github.com/stretchr/testify v1.6.1
+	github.com/tj/assert v0.0.3
 	github.com/urfave/cli/v2 v2.2.0
 	golang.org/x/mod v0.3.0
 	golang.org/x/sys v0.0.0-20190422165155-953cdadca894
