@@ -5,6 +5,7 @@ import (
 	"grgd/interfaces"
 	"testing"
 
+	"github.com/gregod-com/grgd/controller/config"
 	"github.com/gregod-com/grgd/controller/helper"
 	"github.com/stretchr/testify/assert"
 )
@@ -97,6 +98,22 @@ func TestRegisterDependecies_With_Variadric_Provider(t *testing.T) {
 	mycore := RegisterDependecies(
 		map[string]interface{}{
 			"fmt.Println": fmt.Println,
+		})
+
+	// Then
+	assert.NotNil(t, mycore.GetHelper(), "core returned nil for helper")
+	hlpr := mycore.GetHelper()
+	var helperint interfaces.IHelper
+	assert.Implements(t, &helperint, hlpr)
+}
+
+func TestRegisterDependecies_With_Struct(t *testing.T) {
+	// Given
+	configStruct := config.ConfigObjectDatabase{}
+	// When
+	mycore := RegisterDependecies(
+		map[string]interface{}{
+			"test": configStruct,
 		})
 
 	// Then

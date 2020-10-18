@@ -4,11 +4,13 @@ import (
 	"errors"
 	"grgd/interfaces"
 	"grgd/view"
-	"log"
 	"reflect"
 	"time"
 
-	"github.com/gregod-com/grgd/controller/helper"
+	log "github.com/sirupsen/logrus"
+
+	"grgd/controller/helper"
+
 	"github.com/gregod-com/grgdplugincontracts"
 )
 
@@ -26,42 +28,33 @@ func RegisterDependecies(implsTemp map[string]interface{}) interfaces.ICore {
 		solvedCurrent = 0
 
 		for target, elem := range implsTemp {
+			if _, ok := impls[target]; ok {
+				continue
+			}
+
 			if elem == nil {
-				//  the implementation is nil
 				solvedCurrent++
 				continue
 			}
 
 			switch reflect.ValueOf(elem).Kind() {
-			case reflect.Ptr:
+			case reflect.Ptr, reflect.Struct:
 				// the implementation is provided directly
-				if _, ok := impls[target]; !ok {
-					impls[target] = elem
-				}
+				impls[target] = elem
 				solvedCurrent++
 			case reflect.Func:
 				// the implementation is provided via the provider function
 				solvedCurrent += addDependecyFromProviderFunction(elem, impls)
-			case reflect.Interface:
-				log.Fatalf("Passed unknow type to register: %T", elem)
-				solvedCurrent++
 			default:
-				log.Printf("Found %T with val: %v, kind: %v, typeof %v",
-					elem,
-					reflect.ValueOf(elem),
-					reflect.TypeOf(elem).Kind(),
-					reflect.TypeOf(elem))
-
-				log.Printf("Saving at %v", reflect.TypeOf(elem).String())
-				if _, ok := impls[reflect.TypeOf(elem).String()]; !ok {
-					break
-				}
+				log.Warnf("Type %v is not supported for injection. Ignoring.",
+					reflect.TypeOf(elem),
+				)
 				solvedCurrent++
 			}
 		}
 
 		solved += solvedCurrent
-		if iter++; solved >= len(implsTemp) {
+		if solved >= len(implsTemp) {
 			break
 		}
 	}
@@ -81,7 +74,7 @@ func RegisterDependecies(implsTemp map[string]interface{}) interfaces.ICore {
 	// impls["commands"] = CMDPlugins
 
 	for k, v := range impls {
-		core.GetLogger().Tracef("key: %v, value%v", k, v)
+		core.GetLogger().Tracef("%-25v ->\t%T", k, v)
 	}
 	return core
 }
@@ -137,7 +130,7 @@ func (c *Core) GetStartTime() time.Time {
 func (c *Core) Get(i interface{}) error {
 	val := reflect.ValueOf(i)
 	typ := reflect.TypeOf(i)
-	key := typ.Elem().String()
+	key := typ.Elem().Name()
 	logimpl, ok := c.implementations[key]
 	if !ok {
 		return errors.New("Could not find implementation for interface " + key)
