@@ -1,4 +1,4 @@
-package config
+package init
 
 import (
 	"grgd/controller/config"
@@ -32,7 +32,7 @@ func testHelperDefaultDepenedecyMap(ctrl *gomock.Controller) map[string]interfac
 	return deps
 }
 
-func TestSubAConfigYAML(t *testing.T) {
+func TestInit(t *testing.T) {
 	// Given
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -51,27 +51,5 @@ func TestSubAConfigYAML(t *testing.T) {
 	c := cli.NewContext(app, nil, nil)
 
 	// Then
-	assert.NoError(t, SubAConfigYAML(c))
-}
-
-func TestSubAConfigJSON(t *testing.T) {
-	// Given
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	depsMap := testHelperDefaultDepenedecyMap(ctrl)
-	mockUI := mocks.NewMockIUIPlugin(ctrl)
-	depsMap["IUIPlugin"] = mockUI
-	depsMap["IConfigObject"] = config.ProvideConfigObject
-	mockUI.EXPECT().Println(gomock.Any())
-
-	core := core.RegisterDependecies(depsMap)
-	app := cli.NewApp()
-	app.Metadata = make(map[string]interface{})
-	app.Metadata["core"] = core
-
-	// When
-	c := cli.NewContext(app, nil, nil)
-
-	// Then
-	assert.NoError(t, SubAConfigJSON(c))
+	assert.NoError(t, AInit(c))
 }

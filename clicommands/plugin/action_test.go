@@ -1,4 +1,4 @@
-package config
+package plugin
 
 import (
 	"grgd/controller/config"
@@ -32,7 +32,7 @@ func testHelperDefaultDepenedecyMap(ctrl *gomock.Controller) map[string]interfac
 	return deps
 }
 
-func TestSubAConfigYAML(t *testing.T) {
+func TestAPluginList(t *testing.T) {
 	// Given
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -51,18 +51,23 @@ func TestSubAConfigYAML(t *testing.T) {
 	c := cli.NewContext(app, nil, nil)
 
 	// Then
-	assert.NoError(t, SubAConfigYAML(c))
+	assert.NoError(t, APluginList(c))
 }
 
-func TestSubAConfigJSON(t *testing.T) {
+func TestAPluginActivate(t *testing.T) {
 	// Given
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	depsMap := testHelperDefaultDepenedecyMap(ctrl)
 	mockUI := mocks.NewMockIUIPlugin(ctrl)
+	mockPluginIndex := mocks.NewMockIPluginIndex(ctrl)
+
+	mockUI.EXPECT().Println(gomock.Any())
+	mockPluginIndex.EXPECT().GetPluginList()
+
 	depsMap["IUIPlugin"] = mockUI
 	depsMap["IConfigObject"] = config.ProvideConfigObject
-	mockUI.EXPECT().Println(gomock.Any())
+	depsMap["IPluginIndex"] = mockPluginIndex
 
 	core := core.RegisterDependecies(depsMap)
 	app := cli.NewApp()
@@ -73,5 +78,5 @@ func TestSubAConfigJSON(t *testing.T) {
 	c := cli.NewContext(app, nil, nil)
 
 	// Then
-	assert.NoError(t, SubAConfigJSON(c))
+	assert.NoError(t, APluginActivate(c))
 }

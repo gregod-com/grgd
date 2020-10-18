@@ -1,4 +1,4 @@
-package config
+package profile
 
 import (
 	"grgd/controller/config"
@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
 	"github.com/urfave/cli/v2"
 )
 
@@ -32,14 +31,11 @@ func testHelperDefaultDepenedecyMap(ctrl *gomock.Controller) map[string]interfac
 	return deps
 }
 
-func TestSubAConfigYAML(t *testing.T) {
+func TestAPluginList(t *testing.T) {
 	// Given
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	depsMap := testHelperDefaultDepenedecyMap(ctrl)
-	mockUI := mocks.NewMockIUIPlugin(ctrl)
-	mockUI.EXPECT().Println(gomock.Any())
-	depsMap["IUIPlugin"] = mockUI
 	depsMap["IConfigObject"] = config.ProvideConfigObject
 
 	core := core.RegisterDependecies(depsMap)
@@ -48,30 +44,8 @@ func TestSubAConfigYAML(t *testing.T) {
 	app.Metadata["core"] = core
 
 	// When
-	c := cli.NewContext(app, nil, nil)
+	// c := cli.NewContext(app, nil, nil)
 
 	// Then
-	assert.NoError(t, SubAConfigYAML(c))
-}
-
-func TestSubAConfigJSON(t *testing.T) {
-	// Given
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	depsMap := testHelperDefaultDepenedecyMap(ctrl)
-	mockUI := mocks.NewMockIUIPlugin(ctrl)
-	depsMap["IUIPlugin"] = mockUI
-	depsMap["IConfigObject"] = config.ProvideConfigObject
-	mockUI.EXPECT().Println(gomock.Any())
-
-	core := core.RegisterDependecies(depsMap)
-	app := cli.NewApp()
-	app.Metadata = make(map[string]interface{})
-	app.Metadata["core"] = core
-
-	// When
-	c := cli.NewContext(app, nil, nil)
-
-	// Then
-	assert.NoError(t, SubAConfigJSON(c))
+	// assert.NoError(t, APluginList(c))
 }
