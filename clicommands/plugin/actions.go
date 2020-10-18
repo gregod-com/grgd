@@ -1,12 +1,12 @@
 package plugin
 
 import (
+	"log"
 	"sort"
 	"strconv"
 	"strings"
 
 	"grgd/controller/helper"
-	"grgd/controller/pluginindex"
 
 	"github.com/gregod-com/grgdplugincontracts"
 	"github.com/urfave/cli/v2"
@@ -14,9 +14,9 @@ import (
 
 // APluginList ...
 func APluginList(c *cli.Context) error {
-	ext := helper.GetExtractor()
-	UI := ext.GetCore(c).GetUI()
-	configObject := ext.GetCore(c).GetConfig()
+	core := helper.GetExtractor().GetCore(c)
+	UI := core.GetUI()
+	configObject := core.GetConfig()
 	UI.Println(configObject, c)
 
 	// index := pluginindex.CreatePluginIndexFromCLIContext(c)
@@ -43,11 +43,18 @@ func APluginList(c *cli.Context) error {
 
 // APluginActivate ...
 func APluginActivate(c *cli.Context) error {
-	ext := helper.GetExtractor()
-	UI := ext.GetCore(c).GetUI()
+	core := helper.GetExtractor().GetCore(c)
+	UI := core.GetUI()
 
-	index := pluginindex.CreatePluginIndexFromCLIContext(c)
-	plugname := c.Args().First()
+	var index grgdplugincontracts.IPluginIndex
+	err := core.Get(&index)
+	if err != nil {
+		log.Fatalf("hellos %v", err.Error())
+	}
+
+	// index := pluginindex.CreatePluginIndexFromCLIContext(c)
+	// plugname := c.Args().First()
+	plugname := "franz"
 	key := []string{}
 
 	for _, v := range index.GetPluginList() {

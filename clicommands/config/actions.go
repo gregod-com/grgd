@@ -8,28 +8,23 @@ import (
 
 // SubAConfigYAML ...
 func SubAConfigYAML(c *cli.Context) error {
-	ext := helper.GetExtractor()
-	core := ext.GetCore(c)
+	core := helper.GetExtractor().GetCore(c)
 	UI := core.GetUI()
 	configObject := core.GetConfig()
-	UI.Println(configObject.DumpConfig("yaml"), c)
+	UI.Println(configObject.DumpConfig("yaml"))
 	return nil
 }
 
 // SubAConfigJSON ...
 func SubAConfigJSON(c *cli.Context) error {
-	ext := helper.GetExtractor()
-	UI := ext.GetCore(c).GetUI()
-	configObject := ext.GetCore(c).GetConfig()
-	UI.Println(configObject.DumpConfig("json"), c)
+	core := helper.GetExtractor().GetCore(c)
+	UI := core.GetUI()
+	configObject := core.GetConfig()
+	UI.Println(configObject.DumpConfig("json"))
 	return nil
 }
 
 // SubAConfigEdit ...
 func SubAConfigEdit(c *cli.Context) error {
-	// ext := helper.GetExtractor()
-	// UI := ext.GetCore(c).GetUI()
-	// configObject := ext.GetCore(c).GetConfig()
-	// UI.Println(configObject,c)
 	return nil
 }
