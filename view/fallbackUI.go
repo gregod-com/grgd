@@ -42,7 +42,7 @@ func ExtractCliContext(i interface{}) *cli.Context {
 
 // ProvideFallbackUI ...
 func ProvideFallbackUI() grgdplugincontracts.IUIPlugin {
-	return &FallbackUI{}
+	return new(FallbackUI)
 }
 
 // FallbackUI ...

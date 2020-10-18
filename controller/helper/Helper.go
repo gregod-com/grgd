@@ -5,8 +5,9 @@ import (
 	"os"
 )
 
+// ProvideHelper ...
 func ProvideHelper() interfaces.IHelper {
-	return &Helper{}
+	return new(Helper)
 }
 
 // Helper ...

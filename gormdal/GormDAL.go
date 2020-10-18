@@ -16,9 +16,8 @@ func ProvideDAL(fsmanipulator interfaces.IFileSystemManipulator) interfaces.IDAL
 	dbPath := fsmanipulator.HomeDir(".grgd", "gorm", dbName)
 	fsmanipulator.CheckOrCreateFolder(dbFolder, os.FileMode(uint32(0760)))
 
-	dal := &GormDAL{
-		datbasePath: dbPath,
-	}
+	dal := new(GormDAL)
+	dal.datbasePath = dbPath
 
 	dal.connect()
 	// dal.db.AutoMigrate(&Profile{})

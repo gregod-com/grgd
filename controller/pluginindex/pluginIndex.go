@@ -19,7 +19,10 @@ import (
 
 // ProvidePluginIndex ...
 func ProvidePluginIndex(config interfaces.IConfigObject, logger interfaces.ILogger) grgdplugincontracts.IPluginIndex {
-	return &PluginIndex{config: config, logger: logger}
+	plugIdx := new(PluginIndex)
+	plugIdx.config = config
+	plugIdx.logger = logger
+	return plugIdx
 }
 
 // PluginIndex ...

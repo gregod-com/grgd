@@ -8,7 +8,9 @@ import (
 
 // ProvideConfigObject ...
 func ProvideConfigObject(dal interfaces.IDAL, logger interfaces.ILogger) interfaces.IConfigObject {
-	config := &ConfigObjectDatabase{dal: dal, logger: logger}
+	config := new(ConfigObjectDatabase)
+	config.dal = dal
+	config.logger = logger
 	return config
 }
 

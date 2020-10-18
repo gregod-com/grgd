@@ -19,7 +19,12 @@ func ProvidePluginLoader(
 	index grgdplugincontracts.IPluginIndex,
 	logger interfaces.ILogger,
 ) interfaces.IPluginLoader {
-	return &PluginLoader{fsm: fsm, index: index, config: config, logger: logger}
+	plugLoader := new(PluginLoader)
+	plugLoader.fsm = fsm
+	plugLoader.index = index
+	plugLoader.config = config
+	plugLoader.logger = logger
+	return plugLoader
 }
 
 // PluginLoader ...

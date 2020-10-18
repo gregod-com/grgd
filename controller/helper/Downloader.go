@@ -9,7 +9,7 @@ import (
 
 // ProvideDownloader ...
 func ProvideDownloader() interfaces.IDownloader {
-	return &Downloader{}
+	return new(Downloader)
 }
 
 // Downloader ...

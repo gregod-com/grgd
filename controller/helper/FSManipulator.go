@@ -8,7 +8,8 @@ import (
 
 // ProvideFSManipulator ...
 func ProvideFSManipulator(logger interfaces.ILogger) interfaces.IFileSystemManipulator {
-	fsm := &FSManipulator{logger: logger}
+	fsm := new(FSManipulator)
+	fsm.logger = logger
 	fsm.CheckOrCreateFolder(fsm.HomeDir(".grgd"), os.FileMode(uint32(0760)))
 	return fsm
 }

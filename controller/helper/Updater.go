@@ -6,7 +6,8 @@ import (
 
 // ProvideUpdater ...
 func ProvideUpdater(logger interfaces.ILogger) interfaces.IUpdater {
-	up := &Updater{logger: logger}
+	up := new(Updater)
+	up.logger = logger
 	return up
 }
 
