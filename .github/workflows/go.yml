@@ -42,4 +42,17 @@ jobs:
     - name: Upload binary
       uses: actions/upload-artifact@v2
       with:
-        path: dist/*
+        name: grgd-v0.2.0-darwin
+        path: dist/grgd-darwin
+
+    - name: Upload binary
+      uses: actions/upload-artifact@v2
+      with:
+        name: grgd-v0.2.0-linux
+        path: dist/grgd-linux
+
+    - name: Upload binary
+      uses: actions/upload-artifact@v2
+      with:
+        name: grgd-v0.2.0-freebsd
+        path: dist/grgd-freebsd
