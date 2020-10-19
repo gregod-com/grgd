@@ -30,16 +30,20 @@ jobs:
             dep ensure
         fi
 
-    # - name: Build
-    #   run: go build -v .
-
     - name: Test
       run: go test -v ./...
 
-  # upload:
-  #   name: Upload
-  #   runs-on: ubuntu-latest
-  #   steps:
+    - name: Build
+      run: |
+        env GOOS=linux GOARCH=amd64 go build -o dist/grgd-linux .
+        env GOOS=darwin GOARCH=amd64 go build -o dist/grgd-darwin .
+        env GOOS=freebsd GOARCH=amd64 go build -o dist/grgd-freebsd .
+
+    - name: Upload binary
+      uses: actions/upload-artifact@v2
+      with:
+        name: grgd-v0.2.0
+        path: dist
 
   generate:
     name: Generate cross-platform builds
@@ -50,13 +54,8 @@ jobs:
     - name: Generate build files
       uses: thatisuday/go-cross-build@v1
       with:
-          platforms: 'linux/amd64, darwin/amd64, windows/amd64'
+          platforms: 'linux/amd64, darwin/amd64'
           package: 'main'
           name: 'grgd'
           compress: 'true'
           dest: 'dist'
-    - name: Upload binary
-      uses: actions/upload-artifact@v2
-      with:
-        name: grgd-v0.2.0
-        path: dist
