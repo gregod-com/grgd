@@ -1,9 +1,10 @@
 package helper
 
 import (
-	"grgd/interfaces"
 	"os"
 	"path"
+
+	"github.com/gregod-com/grgd/interfaces"
 )
 
 // ProvideFSManipulator ...

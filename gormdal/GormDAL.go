@@ -1,8 +1,9 @@
 package gormdal
 
 import (
-	"grgd/interfaces"
 	"os"
+
+	"github.com/gregod-com/grgd/interfaces"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"

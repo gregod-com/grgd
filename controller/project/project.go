@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	GI "grgd/interfaces"
+	GI "github.com/gregod-com/grgd/interfaces"
 
 	GPI "github.com/gregod-com/grgdplugincontracts"
 )

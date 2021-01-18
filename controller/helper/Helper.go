@@ -1,8 +1,9 @@
 package helper
 
 import (
-	"grgd/interfaces"
 	"os"
+
+	"github.com/gregod-com/grgd/interfaces"
 )
 
 // ProvideHelper ...

@@ -1,9 +1,10 @@
 package core
 
 import (
-	"grgd/interfaces"
 	"log"
 	"os"
+
+	"github.com/gregod-com/grgd/interfaces"
 )
 
 // ProvideDefaultLogger ....

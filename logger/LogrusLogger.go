@@ -1,15 +1,14 @@
 package logger
 
 import (
-	"grgd/interfaces"
+	"github.com/gregod-com/grgd/interfaces"
 
 	"github.com/sirupsen/logrus"
 )
 
 // ProvideLogrusLogger ....
 func ProvideLogrusLogger(h interfaces.IHelper) interfaces.ILogger {
-	// h, _ := i[0].(interfaces.IHelper)
-
+	// h, _ := i
 	logger := logrus.New()
 	if h.CheckFlag("debug") || h.CheckFlag("d") {
 		logger.SetLevel(logrus.DebugLevel)

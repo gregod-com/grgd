@@ -2,14 +2,15 @@ package core
 
 import (
 	"errors"
-	"grgd/interfaces"
-	"grgd/view"
 	"reflect"
 	"time"
 
+	"github.com/gregod-com/grgd/interfaces"
+	"github.com/gregod-com/grgd/view"
+
 	log "github.com/sirupsen/logrus"
 
-	"grgd/controller/helper"
+	"github.com/gregod-com/grgd/controller/helper"
 
 	"github.com/gregod-com/grgdplugincontracts"
 )

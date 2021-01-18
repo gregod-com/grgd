@@ -3,9 +3,10 @@ package helper
 import (
 	"errors"
 	"fmt"
-	"grgd/interfaces"
 	"log"
 	"reflect"
+
+	"github.com/gregod-com/grgd/interfaces"
 
 	"github.com/urfave/cli/v2"
 )

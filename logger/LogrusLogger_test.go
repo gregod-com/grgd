@@ -1,8 +1,9 @@
 package logger
 
 import (
-	"grgd/interfaces"
 	"testing"
+
+	"github.com/gregod-com/grgd/interfaces"
 
 	"github.com/golang/mock/gomock"
 	"github.com/gregod-com/grgd/core"
