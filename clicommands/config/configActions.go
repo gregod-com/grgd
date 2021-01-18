@@ -1,7 +1,7 @@
 package config
 
 import (
-	"grgd/controller/helper"
+	"github.com/gregod-com/grgd/controller/helper"
 
 	"github.com/urfave/cli/v2"
 )
@@ -10,8 +10,8 @@ import (
 func SubAConfigYAML(c *cli.Context) error {
 	core := helper.GetExtractor().GetCore(c)
 	UI := core.GetUI()
-	configObject := core.GetConfig()
-	UI.Println(configObject.DumpConfig("yaml"))
+	config := core.GetConfig()
+	UI.Println(config.DumpConfig("yaml"))
 	return nil
 }
 
@@ -19,8 +19,8 @@ func SubAConfigYAML(c *cli.Context) error {
 func SubAConfigJSON(c *cli.Context) error {
 	core := helper.GetExtractor().GetCore(c)
 	UI := core.GetUI()
-	configObject := core.GetConfig()
-	UI.Println(configObject.DumpConfig("json"))
+	config := core.GetConfig()
+	UI.Println(config.DumpConfig("json"))
 	return nil
 }
 

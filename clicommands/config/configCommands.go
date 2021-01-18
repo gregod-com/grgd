@@ -9,8 +9,8 @@ func GetCLICommands(app *cli.App) []*cli.Command {
 	return []*cli.Command{
 		{
 			Name:            "config",
+			Category:        "settings",
 			Usage:           "view and edit current configuration",
-			Aliases:         []string{"conf", "c"},
 			Flags:           app.Flags,
 			HideHelpCommand: true,
 			Subcommands: []*cli.Command{
@@ -29,11 +29,10 @@ func GetCLICommands(app *cli.App) []*cli.Command {
 					Flags:   app.Flags,
 				},
 				{
-					Name:    "edit",
-					Usage:   "edit the config file",
-					Aliases: []string{"e"},
-					Action:  SubAConfigEdit,
-					Flags:   app.Flags,
+					Name:   "edit",
+					Usage:  "edit the config file",
+					Action: SubAConfigEdit,
+					Flags:  app.Flags,
 				},
 			},
 		},
