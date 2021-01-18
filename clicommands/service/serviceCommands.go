@@ -8,10 +8,11 @@ import (
 func GetCLICommands(app *cli.App) []*cli.Command {
 	return []*cli.Command{
 		{
-			Name:    "services",
-			Aliases: []string{"s"},
-			Usage:   "Configuration for services",
-			Flags:   app.Flags,
+			Name:     "services",
+			Category: "settings",
+			Aliases:  []string{"s"},
+			Usage:    "Configuration for services",
+			Flags:    app.Flags,
 			Subcommands: []*cli.Command{
 				{
 					Name:    "list",

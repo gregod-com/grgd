@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	I "grgd/interfaces"
+	I "github.com/gregod-com/grgd/interfaces"
 
 	"github.com/urfave/cli/v2"
 )
