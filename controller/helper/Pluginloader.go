@@ -1,7 +1,6 @@
 package helper
 
 import (
-	"grgd/interfaces"
 	"io/ioutil"
 	"log"
 	"os"
@@ -9,13 +8,15 @@ import (
 	"plugin"
 	"strings"
 
+	"github.com/gregod-com/grgd/interfaces"
+
 	"github.com/gregod-com/grgdplugincontracts"
 )
 
 // ProvidePluginLoader ...
 func ProvidePluginLoader(
 	fsm interfaces.IFileSystemManipulator,
-	config interfaces.IConfigObject,
+	config interfaces.IConfig,
 	index grgdplugincontracts.IPluginIndex,
 	logger interfaces.ILogger,
 ) interfaces.IPluginLoader {
@@ -31,7 +32,7 @@ func ProvidePluginLoader(
 type PluginLoader struct {
 	fsm    interfaces.IFileSystemManipulator
 	index  grgdplugincontracts.IPluginIndex
-	config interfaces.IConfigObject
+	config interfaces.IConfig
 	logger interfaces.ILogger
 }
 
@@ -122,3 +123,20 @@ func (pl *PluginLoader) LoadPlugins(pluginFolder string) ([]grgdplugincontracts.
 	// pl.index.Finalize(allActiveMetaData, allAvailablePlugins)
 	return loadedCMDPlugins, loadedUIPlugin
 }
+
+// // Script ...
+// type Script struct {
+// }
+
+// // GetCommands ...
+// func (s Script) GetCommands(i interface{}) interface{} {
+// 	return nil
+// }
+
+// // LoadHack ...
+// func (pl *PluginLoader) LoadHack(pluginFolder string) []grgdplugincontracts.ICMDPlugin {
+// 	// hackBinariesFolder := path.Join(pluginFolder, "binaries")
+// 	// log.Fatal("called load hack here: " + pluginFolder)
+// 	script := Script{}
+// 	return []grgdplugincontracts.ICMDPlugin{script}
+// }
