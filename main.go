@@ -33,6 +33,8 @@ func main() {
 		"IConfig":                config.ProvideConfig,
 		"IPluginIndex":           pluginindex.ProvidePluginIndex,
 		"IPluginLoader":          helper.ProvidePluginLoader,
+		"IPinger":                helper.ProvidePinger,
+		"string":                 gormdal.ProvideDefaultDBPath,
 	}
 
 	core := core.RegisterDependecies(dependecies)
@@ -52,7 +54,24 @@ func main() {
 		UIPlugin := helper.GetExtractor().GetCore(c).GetUI()
 		UIPlugin.ClearScreen(c)
 		UIPlugin.PrintBanner(c)
-		UIPlugin.Println("\u001b[33m", c.App.Version, "\u001b[0m")
+		core := helper.GetExtractor().GetCore(c)
+		UI := core.GetUI()
+		var pinger interfaces.IPinger
+		helper.GetExtractor().GetCore(c).Get(&pinger)
+
+		connections := map[string]interface{}{
+			"first": &helper.Connection{
+				Endpoint: "https://www.google.com",
+				TimeOut:  100,
+				Success:  false,
+			},
+		}
+
+		pinger.CheckConnections(connections)
+		for _, v := range connections {
+			logger.Info(v)
+		}
+
 		return nil
 	}
 
