@@ -40,7 +40,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "grgd"
 	app.Usage = "grgd cli"
-	app.Version = "0.9.0"
+	app.Version = "0.10.4"
 	app.Metadata = make(map[string]interface{})
 	app.Metadata["core"] = core
 	app.Flags = append(app.Flags, flags.GetFlags()...)
