@@ -62,17 +62,17 @@ func RegisterDependecies(implsTemp map[string]interface{}) interfaces.ICore {
 
 	core := &Core{implementations: impls}
 
-	// TODO: store plugin information in database?
-	// configImpl.GetPluginsDir()
-	// fsmanipulatorImpl.CheckOrCreateFolder(pluginsPath, os.FileMode(uint32(0760)))
-	// pluginsIndex := pluginindex.CreatePluginIndex(path.Join(pluginsPath, "index.yaml"))
+	var pl interfaces.IPluginLoader
+	var fsmImpl interfaces.IFileSystemManipulator
 
-	// var pl interfaces.IPluginLoader
-	// core.Get(&pl)
-	// fsmanipulatorImpl := core.GetFileSystemManipulator()
-	// pluginsPath := fsmanipulatorImpl.HomeDir(".grgd", "plugins")
-	// CMDPlugins, _ := pl.LoadPlugins(pluginsPath)
-	// impls["commands"] = CMDPlugins
+	if core.Get(&fsmImpl) == nil && core.Get(&pl) == nil {
+		pluginsPath := fsmImpl.HomeDir(".grgd", "plugins")
+		// scriptsPath := fsmImpl.HomeDir(".grgd", "hack")
+		CMDPlugins, _ := pl.LoadPlugins(pluginsPath)
+		// hacks := pl.LoadHack(scriptsPath)
+		// CMDPlugins = append(CMDPlugins, hacks...)
+		impls["commands"] = CMDPlugins
+	}
 
 	for k, v := range impls {
 		core.GetLogger().Tracef("%-25v ->\t%T", k, v)
@@ -166,10 +166,10 @@ func (c *Core) GetUI() grgdplugincontracts.IUIPlugin {
 }
 
 // GetConfig ...
-func (c *Core) GetConfig() interfaces.IConfigObject {
-	a, ok := c.implementations["IConfigObject"].(interfaces.IConfigObject)
+func (c *Core) GetConfig() interfaces.IConfig {
+	a, ok := c.implementations["IConfig"].(interfaces.IConfig)
 	if !ok {
-		log.Fatal("ConfigObject is nil")
+		log.Fatalf("Config is nil")
 	}
 	return a
 }
@@ -180,15 +180,6 @@ func (c *Core) GetHelper() interfaces.IHelper {
 	if !ok {
 		a = helper.ProvideHelper()
 		c.implementations["IHelper"] = a
-	}
-	return a
-}
-
-// GetFileSystemManipulator ...
-func (c *Core) GetFileSystemManipulator() interfaces.IFileSystemManipulator {
-	a, ok := c.implementations["IFileSystemManipulator"].(interfaces.IFileSystemManipulator)
-	if !ok {
-		return nil
 	}
 	return a
 }
