@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"grgd/controller/helper"
+	"github.com/gregod-com/grgd/controller/helper"
 
 	"github.com/gregod-com/grgdplugincontracts"
 	"github.com/urfave/cli/v2"
@@ -16,8 +16,8 @@ import (
 func APluginList(c *cli.Context) error {
 	core := helper.GetExtractor().GetCore(c)
 	UI := core.GetUI()
-	configObject := core.GetConfig()
-	UI.Println(configObject, c)
+	config := core.GetConfig()
+	UI.Println(config, c)
 
 	// index := pluginindex.CreatePluginIndexFromCLIContext(c)
 	// head := []string{"Name", "Version", "Category", "Active", "Loaded", "URL"}
