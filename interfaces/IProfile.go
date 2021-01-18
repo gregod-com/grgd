@@ -13,5 +13,13 @@ type IProfile interface {
 	SetCurrentProject(p IProject) error
 	GetValues(i ...interface{}) []string
 	GetProjectsTable() [][]string
-	Model() interface{}
+	Model() IProfileModel
+}
+
+// IProfileModel ...
+type IProfileModel interface {
+	IsInitialized() bool
+	GetName() string
+	GetBasePath() string
+	GetCurrentProjectID() uint
 }

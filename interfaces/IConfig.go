@@ -1,11 +1,12 @@
 package interfaces
 
-// IConfigObject interface ...
-type IConfigObject interface {
+// IConfig interface ...
+type IConfig interface {
 	Save(i ...interface{}) error
 	GetAllProfiles() (map[string]IProfile, error)
+	// GetProfile returns the currently active profile
 	GetProfile() IProfile
-	GetProfileByName(profilename string) error
+	GetProfileByName(profilename string) (IProfile, error)
 	AddProfile(p IProfile) error
 	RemoveProfile(p IProfile) error
 

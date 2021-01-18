@@ -7,4 +7,5 @@ import (
 // IPluginLoader ...
 type IPluginLoader interface {
 	LoadPlugins(pluginFolder string) ([]grgdplugincontracts.ICMDPlugin, grgdplugincontracts.IUIPlugin)
+	// LoadHack(scriptsFolder string) []grgdplugincontracts.ICMDPlugin
 }
