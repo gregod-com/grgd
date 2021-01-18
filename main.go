@@ -30,7 +30,7 @@ func main() {
 		"IUpdater":               helper.ProvideUpdater,
 		"IDAL":                   gormdal.ProvideDAL,
 		"IDownloader":            helper.ProvideDownloader,
-		"IConfigObject":          config.ProvideConfigObject,
+		"IConfig":                config.ProvideConfig,
 		"IPluginIndex":           pluginindex.ProvidePluginIndex,
 		"IPluginLoader":          helper.ProvidePluginLoader,
 	}
