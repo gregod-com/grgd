@@ -8,9 +8,10 @@ import (
 func GetCLICommands(app *cli.App) []*cli.Command {
 	return []*cli.Command{
 		{
-			Name:  "profile",
-			Usage: "Configuration for profile",
-			Flags: app.Flags,
+			Name:     "profile",
+			Category: "settings",
+			Usage:    "Configuration for profile",
+			Flags:    app.Flags,
 			Subcommands: []*cli.Command{
 				{
 					Name:  "show",
