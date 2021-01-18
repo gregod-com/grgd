@@ -3,13 +3,14 @@ package pluginindex
 import (
 	"bufio"
 	"fmt"
-	"grgd/controller/helper"
-	"grgd/interfaces"
 	"io/ioutil"
 	"log"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/gregod-com/grgd/controller/helper"
+	"github.com/gregod-com/grgd/interfaces"
 
 	"github.com/gregod-com/grgdplugincontracts"
 	"github.com/urfave/cli/v2"
@@ -18,7 +19,7 @@ import (
 )
 
 // ProvidePluginIndex ...
-func ProvidePluginIndex(config interfaces.IConfigObject, logger interfaces.ILogger) grgdplugincontracts.IPluginIndex {
+func ProvidePluginIndex(config interfaces.IConfig, logger interfaces.ILogger) grgdplugincontracts.IPluginIndex {
 	plugIdx := new(PluginIndex)
 	plugIdx.config = config
 	plugIdx.logger = logger
@@ -28,7 +29,7 @@ func ProvidePluginIndex(config interfaces.IConfigObject, logger interfaces.ILogg
 // PluginIndex ...
 type PluginIndex struct {
 	path           string
-	config         interfaces.IConfigObject
+	config         interfaces.IConfig
 	logger         interfaces.ILogger
 	PluginSettings map[string]grgdplugincontracts.IPluginMetadata `yaml:"plugins"`
 }
