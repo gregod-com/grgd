@@ -10,9 +10,11 @@ import (
 	"strings"
 
 	"github.com/common-nighthawk/go-figure"
+	"github.com/gregod-com/grgd/interfaces"
 	"github.com/gregod-com/grgdplugincontracts"
 	cli "github.com/urfave/cli/v2"
 	"golang.org/x/sys/unix"
+	"golang.org/x/term"
 )
 
 // ExecCommand ...
@@ -112,31 +114,39 @@ func (p FallbackUI) PrintPercentOfScreen(percentStart int, percentEnd int, str .
 // PrintBanner ...
 func (p FallbackUI) PrintBanner(i ...interface{}) interface{} {
 	c := ExtractCliContext(i[0])
+	core := c.App.Metadata["core"].(interfaces.ICore)
 
 	iamASCII := figure.NewFigure(c.App.Name, "standard", true)
 	fmt.Println(iamASCII.String())
-
+	fmt.Printf("\u001b[33m %s\u001b[0m [profile: \u001b[33m%s\u001b[0m]\n",
+		c.App.Version,
+		core.GetConfig().GetProfile().GetName())
 	return nil
 }
 
 // PrintTable ...
 func (p FallbackUI) PrintTable(heads []string, rows [][]string, i ...interface{}) interface{} {
+	w, _, err := term.GetSize(2)
+	if err != nil {
+		fmt.Println(err)
+	}
+	colwidth := fmt.Sprint(w/len(heads) - len(heads) - 1)
 
 	for _, v := range heads {
-		fmt.Printf("| %-20v", v)
+		fmt.Printf("| %-"+colwidth+"v", v)
 	}
 	fmt.Println("")
 	for range heads {
-		fmt.Printf("| %-20v", "------")
+		fmt.Printf("| %-"+colwidth+"v", "------")
 	}
 	fmt.Println("")
 	for _, v := range rows {
 		for _, r := range v {
-			fmt.Printf("| %-20v", r)
+			fmt.Printf("| %-"+colwidth+"v", r)
 		}
 		fmt.Println()
 	}
-
+	fmt.Println()
 	return nil
 }
 

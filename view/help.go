@@ -18,7 +18,6 @@ func GetHelpTemplate() string {
 		{{- end}}
 	{{end}}
 	{{- if .VisibleCommands}}
- 	BuildIn COMMANDS:
 	{{- range .VisibleCategories}}
 	 	{{- if .Name}}
 	{{ .Name}}
