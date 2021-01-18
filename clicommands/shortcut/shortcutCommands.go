@@ -8,10 +8,11 @@ import (
 func GetCLICommands(app *cli.App) []*cli.Command {
 	return []*cli.Command{
 		{
-			Name:    "shortcuts",
-			Usage:   "Show and edit shortcut names for workloads",
-			Aliases: []string{"sc"},
-			Flags:   app.Flags,
+			Name:     "shortcuts",
+			Category: "settings",
+			Usage:    "Show and edit shortcut names for workloads",
+			Aliases:  []string{"sc"},
+			Flags:    app.Flags,
 			Subcommands: []*cli.Command{
 				{
 					Name:        "list",
