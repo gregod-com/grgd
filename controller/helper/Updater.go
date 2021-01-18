@@ -1,7 +1,7 @@
 package helper
 
 import (
-	"grgd/interfaces"
+	"github.com/gregod-com/grgd/interfaces"
 )
 
 // ProvideUpdater ...
@@ -18,40 +18,17 @@ type Updater struct {
 
 // CheckUpdate ...
 func (h *Updater) CheckUpdate(core interfaces.ICore) error {
-	UI := core.GetUI()
+	// UI := core.GetUI()
 	var downloader interfaces.IDownloader
 	err := core.Get(&downloader)
 	if err != nil {
 		return err
 	}
-	// core.GetConfig().GetPlu
-	// ext.GetMetadataFatal(c.App.Metadata, "pluginIndex", &repoIndex)
-	// ext.GetMetadataFatal(c.App.Metadata, "remoteIndex", &remoteIndex)
-	// ext.GetMetadataFatal(c.App.Metadata, "UIPlugin", &UI)
 
-	err = downloader.Load("file_location", "repo_url")
+	err = downloader.Load("/usr/local/bin/grgd", "https://s3.iamstudent.dev/public/grgd/grgd-darwin")
 	if err != nil {
 		return err
 	}
 
-	// pluginsCurrent := PlugIndex.CreatePluginIndex(currentIndex)
-	// pluginsRemote := PlugIndex.CreatePluginIndex(remoteIndex)
-
-	UI.Println("Downloaded: ")
-	// for _, plremote := range pluginsRemote.GetPluginList().([]PlugIndex.PluginMetadata) {
-	// 	for _, pllocal := range pluginsCurrent.GetPluginList().([]PlugIndex.PluginMetadata) {
-	// 		if plremote.Name == pllocal.Name {
-	// 			vlocal := semver.New(pllocal.Version)
-	// 			vremote := semver.New(plremote.Version)
-
-	// 			if vlocal.LessThan(*vremote) {
-	// 				question := fmt.Sprintf("Update plugin    %-15s to v%v (current %v)? [y/n]", plremote.Name, vremote, vlocal)
-	// 				if UI.YesNoQuestion(c, question) {
-	// 					DownloadFile("filepath", plremote.URL)
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
 	return nil
 }
