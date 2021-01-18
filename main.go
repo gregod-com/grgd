@@ -91,9 +91,11 @@ func main() {
 	// define behavior after every command execution
 	app.After = func(c *cli.Context) error {
 		core := helper.GetExtractor().GetCore(c)
-		logger := core.GetLogger()
-		// cnfg := core.GetConfig()
-		// cnfg.Save()
+		cnfg := core.GetConfig()
+		err := cnfg.Save()
+		if err != nil {
+			logger.Fatalf("So this has failes %v", err)
+		}
 		logger.Trace(time.Since(core.GetStartTime()))
 		return nil
 	}
