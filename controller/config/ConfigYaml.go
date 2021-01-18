@@ -6,21 +6,21 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	I "grgd/interfaces"
+	I "github.com/gregod-com/grgd/interfaces"
 
 	"gopkg.in/yaml.v2"
 )
 
-// CreateConfigObjectYAML ...
-func CreateConfigObjectYAML(configpath string) I.IConfigObject {
-	var obj = &ConfigObjectYAML{path: configpath}
+// CreateConfigYAML ...
+func CreateConfigYAML(configpath string) I.IConfig {
+	var obj = &ConfigYAML{path: configpath}
 	obj.initFromFile()
 	// return obj
 	return nil
 }
 
-// ConfigObjectYAML implements the IConfigObject based on yaml file...
-type ConfigObjectYAML struct {
+// ConfigYAML implements the IConfig based on yaml file...
+type ConfigYAML struct {
 	path         string
 	PluginConfig []string
 	PluginFolder []string
@@ -35,7 +35,7 @@ type ConfigObjectYAML struct {
 //                               |_|
 
 // InitFromFile ..
-func (yamlObj *ConfigObjectYAML) initFromFile() error {
+func (yamlObj *ConfigYAML) initFromFile() error {
 	// userpath, err := os.UserHomeDir()
 	// if err != nil {
 	// 	log.Fatal(err)
@@ -51,7 +51,7 @@ func (yamlObj *ConfigObjectYAML) initFromFile() error {
 	return nil
 }
 
-func (yamlObj *ConfigObjectYAML) getSourceAsBytes() []byte {
+func (yamlObj *ConfigYAML) getSourceAsBytes() []byte {
 	iamconf, err := ioutil.ReadFile(yamlObj.path)
 	if err != nil {
 		yamlObj.Update()
@@ -69,7 +69,7 @@ func (yamlObj *ConfigObjectYAML) getSourceAsBytes() []byte {
 //               |_|
 
 // Update ...
-func (yamlObj *ConfigObjectYAML) Update() error {
+func (yamlObj *ConfigYAML) Update() error {
 	yamlObj.LastUsed = time.Now()
 	newyaml, err := yaml.Marshal(yamlObj)
 	if err != nil {
@@ -84,28 +84,28 @@ func (yamlObj *ConfigObjectYAML) Update() error {
 }
 
 // GetSourceAsString ...
-func (yamlObj *ConfigObjectYAML) GetSourceAsString() string {
+func (yamlObj *ConfigYAML) GetSourceAsString() string {
 	return string(yamlObj.getSourceAsBytes())
 }
 
 // GetConfigPath ...
-func (yamlObj *ConfigObjectYAML) GetConfigPath() string {
+func (yamlObj *ConfigYAML) GetConfigPath() string {
 	return yamlObj.path
 }
 
 // GetProjectDirs ...
-func (yamlObj *ConfigObjectYAML) GetProjectDirs() []string {
+func (yamlObj *ConfigYAML) GetProjectDirs() []string {
 	// return yamlObj.ProjectDirectories
 	return []string{"das"}
 }
 
 // GetLastUsed ...
-func (yamlObj *ConfigObjectYAML) GetLastUsed() time.Time {
+func (yamlObj *ConfigYAML) GetLastUsed() time.Time {
 	return yamlObj.LastUsed
 }
 
 // // GetWorkloadMetadata ...
-// func (yamlObj *ConfigObjectYAML) GetWorkloadMetadata() map[string]I.IWorkloadMetadata {
+// func (yamlObj *ConfigYAML) GetWorkloadMetadata() map[string]I.IWorkloadMetadata {
 // 	var wlmeta = make(map[string]I.IWorkloadMetadata)
 // 	for k := range yamlObj.WorkloadsMetadata {
 // 		wlmeta[k] = yamlObj.WorkloadsMetadata[k]
@@ -114,7 +114,7 @@ func (yamlObj *ConfigObjectYAML) GetLastUsed() time.Time {
 // }
 
 // // GetWorkloads ...
-// func (yamlObj *ConfigObjectYAML) GetWorkloads() map[string]I.IWorkload {
+// func (yamlObj *ConfigYAML) GetWorkloads() map[string]I.IWorkload {
 // 	workloads := map[string]I.IWorkload{}
 // 	// for k := range yamlObj.WorkloadsMetadata {
 // 	// 	workloads[k] = dc.CreateWorkload(yamlObj.WorkloadsMetadata[k])
@@ -123,12 +123,12 @@ func (yamlObj *ConfigObjectYAML) GetLastUsed() time.Time {
 // }
 
 // // GetRegistries ...
-// func (yamlObj *ConfigObjectYAML) GetRegistries() map[string]string {
+// func (yamlObj *ConfigYAML) GetRegistries() map[string]string {
 // 	return yamlObj.Registries
 // }
 
 // // AddWorkloadShortcut ...
-// func (yamlObj *ConfigObjectYAML) AddWorkloadShortcut(shortcut string, workload string) error {
+// func (yamlObj *ConfigYAML) AddWorkloadShortcut(shortcut string, workload string) error {
 // 	// check if shortcut exists
 // 	if val := yamlObj.Shortcuts[shortcut]; val == "" {
 // 		// check if the workload name is valid
@@ -144,7 +144,7 @@ func (yamlObj *ConfigObjectYAML) GetLastUsed() time.Time {
 // }
 
 // // RemoveWorkloadShortcut ...
-// func (yamlObj *ConfigObjectYAML) RemoveWorkloadShortcut(shortcut string) error {
+// func (yamlObj *ConfigYAML) RemoveWorkloadShortcut(shortcut string) error {
 // 	// check if shortcut exists
 // 	if val := yamlObj.Shortcuts[shortcut]; val == "" {
 // 		return errors.New("ShortcutNotFound")
@@ -154,11 +154,11 @@ func (yamlObj *ConfigObjectYAML) GetLastUsed() time.Time {
 // }
 
 // // GetWorkloadShortcuts ...
-// func (yamlObj *ConfigObjectYAML) GetWorkloadShortcuts() map[string]string {
+// func (yamlObj *ConfigYAML) GetWorkloadShortcuts() map[string]string {
 // 	return yamlObj.Shortcuts
 // }
 
 // // GetWorkloadByShortcut ...
-// func (yamlObj *ConfigObjectYAML) GetWorkloadByShortcut(shortcut string) string {
+// func (yamlObj *ConfigYAML) GetWorkloadByShortcut(shortcut string) string {
 // 	return yamlObj.Shortcuts[shortcut]
 // }
