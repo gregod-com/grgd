@@ -38,6 +38,7 @@ func main() {
 	}
 
 	core := core.RegisterDependecies(dependecies)
+	logger := core.GetLogger()
 
 	app := cli.NewApp()
 	app.Name = "grgd"
@@ -45,15 +46,13 @@ func main() {
 	app.Version = "0.10.4"
 	app.Metadata = make(map[string]interface{})
 	app.Metadata["core"] = core
+	app.Metadata["AWS-REGION"] = "eu-central-1"
 	app.Flags = append(app.Flags, flags.GetFlags()...)
 	app.CustomAppHelpTemplate = view.GetHelpTemplate()
 	app.HideHelpCommand = true
 
 	// define behavior before every command execution
 	app.Before = func(c *cli.Context) error {
-		UIPlugin := helper.GetExtractor().GetCore(c).GetUI()
-		UIPlugin.ClearScreen(c)
-		UIPlugin.PrintBanner(c)
 		core := helper.GetExtractor().GetCore(c)
 		UI := core.GetUI()
 		var pinger interfaces.IPinger
@@ -72,6 +71,8 @@ func main() {
 			logger.Info(v)
 		}
 
+		UI.ClearScreen(c)
+		UI.PrintBanner(c)
 		return nil
 	}
 
@@ -84,7 +85,7 @@ func main() {
 		case []*cli.Command:
 			app.Commands = append(app.Commands, arr...)
 		default:
-			core.GetLogger().Error("Commands are not implemented as []*cli.Command but %T", arr)
+			logger.Errorf("Commands are not implemented as []*cli.Command but %T", arr)
 		}
 	}
 
