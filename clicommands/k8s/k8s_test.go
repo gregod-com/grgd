@@ -1,4 +1,4 @@
-package project
+package k8s
 
 import (
 	"testing"

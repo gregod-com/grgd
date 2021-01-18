@@ -1,8 +1,9 @@
 package helper
 
 import (
-	"grgd/view"
 	"testing"
+
+	"github.com/gregod-com/grgd/view"
 
 	"github.com/urfave/cli/v2"
 	"gotest.tools/v3/assert"

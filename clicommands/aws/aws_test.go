@@ -1,4 +1,4 @@
-package project
+package aws
 
 import (
 	"testing"

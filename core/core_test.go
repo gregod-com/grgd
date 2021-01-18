@@ -2,8 +2,9 @@ package core
 
 import (
 	"fmt"
-	"grgd/interfaces"
 	"testing"
+
+	"github.com/gregod-com/grgd/interfaces"
 
 	"github.com/gregod-com/grgd/controller/config"
 	"github.com/gregod-com/grgd/controller/helper"
@@ -109,7 +110,7 @@ func TestRegisterDependecies_With_Variadric_Provider(t *testing.T) {
 
 func TestRegisterDependecies_With_Struct(t *testing.T) {
 	// Given
-	configStruct := config.ConfigObjectDatabase{}
+	configStruct := config.ConfigDatabase{}
 	// When
 	mycore := RegisterDependecies(
 		map[string]interface{}{
