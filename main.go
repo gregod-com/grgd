@@ -7,16 +7,17 @@ import (
 	"sort"
 	"time"
 
-	"grgd/clicommands"
-	"grgd/clicommands/flags"
-	"grgd/controller/helper"
-	"grgd/core"
-	"grgd/view"
-
+	"github.com/gregod-com/grgd/clicommands"
+	"github.com/gregod-com/grgd/clicommands/flags"
 	"github.com/gregod-com/grgd/controller/config"
+	"github.com/gregod-com/grgd/controller/helper"
 	"github.com/gregod-com/grgd/controller/pluginindex"
+	"github.com/gregod-com/grgd/core"
 	"github.com/gregod-com/grgd/gormdal"
+	"github.com/gregod-com/grgd/interfaces"
 	"github.com/gregod-com/grgd/logger"
+	"github.com/gregod-com/grgd/view"
+
 	"github.com/urfave/cli/v2"
 )
 
