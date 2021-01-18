@@ -78,10 +78,10 @@ func (mr *MockICoreMockRecorder) GetUI() *gomock.Call {
 }
 
 // GetConfig mocks base method
-func (m *MockICore) GetConfig() interfaces.IConfigObject {
+func (m *MockICore) GetConfig() interfaces.IConfig {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetConfig")
-	ret0, _ := ret[0].(interfaces.IConfigObject)
+	ret0, _ := ret[0].(interfaces.IConfig)
 	return ret0
 }
 
@@ -117,20 +117,6 @@ func (m *MockICore) GetCMDPlugins() []grgdplugincontracts.ICMDPlugin {
 func (mr *MockICoreMockRecorder) GetCMDPlugins() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCMDPlugins", reflect.TypeOf((*MockICore)(nil).GetCMDPlugins))
-}
-
-// GetFileSystemManipulator mocks base method
-func (m *MockICore) GetFileSystemManipulator() interfaces.IFileSystemManipulator {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFileSystemManipulator")
-	ret0, _ := ret[0].(interfaces.IFileSystemManipulator)
-	return ret0
-}
-
-// GetFileSystemManipulator indicates an expected call of GetFileSystemManipulator
-func (mr *MockICoreMockRecorder) GetFileSystemManipulator() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFileSystemManipulator", reflect.TypeOf((*MockICore)(nil).GetFileSystemManipulator))
 }
 
 // Get mocks base method

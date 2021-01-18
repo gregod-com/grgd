@@ -192,10 +192,10 @@ func (mr *MockIProfileMockRecorder) GetProjectsTable() *gomock.Call {
 }
 
 // Model mocks base method
-func (m *MockIProfile) Model() interface{} {
+func (m *MockIProfile) Model() interfaces.IProfileModel {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Model")
-	ret0, _ := ret[0].(interface{})
+	ret0, _ := ret[0].(interfaces.IProfileModel)
 	return ret0
 }
 
@@ -203,4 +203,83 @@ func (m *MockIProfile) Model() interface{} {
 func (mr *MockIProfileMockRecorder) Model() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Model", reflect.TypeOf((*MockIProfile)(nil).Model))
+}
+
+// MockIProfileModel is a mock of IProfileModel interface
+type MockIProfileModel struct {
+	ctrl     *gomock.Controller
+	recorder *MockIProfileModelMockRecorder
+}
+
+// MockIProfileModelMockRecorder is the mock recorder for MockIProfileModel
+type MockIProfileModelMockRecorder struct {
+	mock *MockIProfileModel
+}
+
+// NewMockIProfileModel creates a new mock instance
+func NewMockIProfileModel(ctrl *gomock.Controller) *MockIProfileModel {
+	mock := &MockIProfileModel{ctrl: ctrl}
+	mock.recorder = &MockIProfileModelMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockIProfileModel) EXPECT() *MockIProfileModelMockRecorder {
+	return m.recorder
+}
+
+// IsInitialized mocks base method
+func (m *MockIProfileModel) IsInitialized() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsInitialized")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// IsInitialized indicates an expected call of IsInitialized
+func (mr *MockIProfileModelMockRecorder) IsInitialized() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsInitialized", reflect.TypeOf((*MockIProfileModel)(nil).IsInitialized))
+}
+
+// GetName mocks base method
+func (m *MockIProfileModel) GetName() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetName")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetName indicates an expected call of GetName
+func (mr *MockIProfileModelMockRecorder) GetName() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetName", reflect.TypeOf((*MockIProfileModel)(nil).GetName))
+}
+
+// GetBasePath mocks base method
+func (m *MockIProfileModel) GetBasePath() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBasePath")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetBasePath indicates an expected call of GetBasePath
+func (mr *MockIProfileModelMockRecorder) GetBasePath() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBasePath", reflect.TypeOf((*MockIProfileModel)(nil).GetBasePath))
+}
+
+// GetCurrentProjectID mocks base method
+func (m *MockIProfileModel) GetCurrentProjectID() uint {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCurrentProjectID")
+	ret0, _ := ret[0].(uint)
+	return ret0
+}
+
+// GetCurrentProjectID indicates an expected call of GetCurrentProjectID
+func (mr *MockIProfileModelMockRecorder) GetCurrentProjectID() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCurrentProjectID", reflect.TypeOf((*MockIProfileModel)(nil).GetCurrentProjectID))
 }

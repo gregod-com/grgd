@@ -6,6 +6,7 @@ package mocks
 
 import (
 	gomock "github.com/golang/mock/gomock"
+	interfaces "github.com/gregod-com/grgd/interfaces"
 	reflect "reflect"
 )
 
@@ -33,74 +34,72 @@ func (m *MockIDAL) EXPECT() *MockIDALMockRecorder {
 }
 
 // Create mocks base method
-func (m *MockIDAL) Create(i ...interface{}) error {
+func (m *MockIDAL) Create(i interface{}) error {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
-	for _, a := range i {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "Create", varargs...)
+	ret := m.ctrl.Call(m, "Create", i)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Create indicates an expected call of Create
-func (mr *MockIDALMockRecorder) Create(i ...interface{}) *gomock.Call {
+func (mr *MockIDALMockRecorder) Create(i interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockIDAL)(nil).Create), i...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockIDAL)(nil).Create), i)
 }
 
 // Read mocks base method
-func (m *MockIDAL) Read(i ...interface{}) (interface{}, error) {
+func (m *MockIDAL) Read(i interface{}) error {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
-	for _, a := range i {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "Read", varargs...)
-	ret0, _ := ret[0].(interface{})
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret := m.ctrl.Call(m, "Read", i)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // Read indicates an expected call of Read
-func (mr *MockIDALMockRecorder) Read(i ...interface{}) *gomock.Call {
+func (mr *MockIDALMockRecorder) Read(i interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Read", reflect.TypeOf((*MockIDAL)(nil).Read), i...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Read", reflect.TypeOf((*MockIDAL)(nil).Read), i)
 }
 
 // Update mocks base method
-func (m *MockIDAL) Update(i ...interface{}) error {
+func (m *MockIDAL) Update(i interface{}) error {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
-	for _, a := range i {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "Update", varargs...)
+	ret := m.ctrl.Call(m, "Update", i)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Update indicates an expected call of Update
-func (mr *MockIDALMockRecorder) Update(i ...interface{}) *gomock.Call {
+func (mr *MockIDALMockRecorder) Update(i interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockIDAL)(nil).Update), i...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockIDAL)(nil).Update), i)
 }
 
 // Delete mocks base method
-func (m *MockIDAL) Delete(i ...interface{}) error {
+func (m *MockIDAL) Delete(i interface{}) error {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
-	for _, a := range i {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "Delete", varargs...)
+	ret := m.ctrl.Call(m, "Delete", i)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Delete indicates an expected call of Delete
-func (mr *MockIDALMockRecorder) Delete(i ...interface{}) *gomock.Call {
+func (mr *MockIDALMockRecorder) Delete(i interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockIDAL)(nil).Delete), i...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockIDAL)(nil).Delete), i)
+}
+
+// GetProfile mocks base method
+func (m *MockIDAL) GetProfile() (interfaces.IProfileModel, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetProfile")
+	ret0, _ := ret[0].(interfaces.IProfileModel)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetProfile indicates an expected call of GetProfile
+func (mr *MockIDALMockRecorder) GetProfile() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProfile", reflect.TypeOf((*MockIDAL)(nil).GetProfile))
 }
