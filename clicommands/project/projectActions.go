@@ -3,7 +3,7 @@ package project
 import (
 	"errors"
 
-	"grgd/controller/helper"
+	"github.com/gregod-com/grgd/controller/helper"
 
 	"github.com/urfave/cli/v2"
 )
