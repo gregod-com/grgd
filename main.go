@@ -17,6 +17,7 @@ import (
 	"github.com/gregod-com/grgd/interfaces"
 	"github.com/gregod-com/grgd/logger"
 	"github.com/gregod-com/grgd/view"
+	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/urfave/cli/v2"
 )
@@ -43,10 +44,14 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "grgd"
 	app.Usage = "grgd cli"
-	app.Version = "0.10.6"
+	app.Version = "0.12.1"
+	clientCfg, err := clientcmd.NewDefaultClientConfigLoadingRules().Load()
+	if err != nil {
+		logger.Warn("Could not read kube config")
+	}
 	app.Metadata = make(map[string]interface{})
 	app.Metadata["core"] = core
-	app.Metadata["AWS-REGION"] = "eu-central-1"
+	app.Metadata["kubeContext"] = clientCfg.CurrentContext
 	app.Flags = append(app.Flags, flags.GetFlags()...)
 	app.CustomAppHelpTemplate = view.GetHelpTemplate()
 	app.HideHelpCommand = true
@@ -77,7 +82,7 @@ func main() {
 	}
 
 	// define native commands available also without plugins
-	app.Commands = append(app.Commands, clicommands.GetCommands(app)...)
+	app.Commands = append(app.Commands, clicommands.GetCommands(app, core)...)
 
 	// append native commands with commands found in loaded plugins
 	for _, plug := range core.GetCMDPlugins() {
