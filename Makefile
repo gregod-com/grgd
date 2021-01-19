@@ -7,25 +7,30 @@ GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
 GORUN=$(GOCMD) run
 BINPATH=bin/
-BINARYNAME=grgd-darwin
+BINARYNAME=grgd
+OS=darwin
+PLATFORM=amd64
 
-all: test build-native stats
+all: test build-native stats index
 
 test:
 	cd interfaces && ./makeMocks.sh
 	$(GOTEST) ./...
 
 build-native:
-	GO111MODULE=on $(GOBUILD) -o $(BINPATH)$(BINARYNAME)
+	GO111MODULE=on $(GOBUILD) -o $(BINPATH)$(BINARYNAME)-$(OS)-$(PLATFORM)
 
 run:
 	./$(BINPATH)$(BINARYNAME)
 
 stats:
-	du -sh $(BINPATH)$(BINARYNAME)
+	du -sh $(BINPATH)$(BINARYNAME)-$(OS)-$(PLATFORM)
+
+index:
+	./indexer.sh $(BINARYNAME) $(OS) $(PLATFORM) $(VERSION) >> bin/index.yaml
 
 upload:
-	mc cp $(BINPATH)$(BINARYNAME) minio/public/grgd/$(BINARYNAME)
+	mc mirror --remove --overwrite bin/ minio/public/grgd/
 
 cover:
 	$(GOTEST) -coverprofile=coverage.out -cover ./...
