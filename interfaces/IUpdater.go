@@ -2,5 +2,5 @@ package interfaces
 
 // IUpdater ...
 type IUpdater interface {
-	CheckUpdate(core ICore) error
+	CheckUpdate(version string, core ICore) error
 }

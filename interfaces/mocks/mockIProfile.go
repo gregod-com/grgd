@@ -75,6 +75,20 @@ func (mr *MockIProfileMockRecorder) GetBasePath() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBasePath", reflect.TypeOf((*MockIProfile)(nil).GetBasePath))
 }
 
+// GetUpdateURL mocks base method
+func (m *MockIProfile) GetUpdateURL() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUpdateURL")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetUpdateURL indicates an expected call of GetUpdateURL
+func (mr *MockIProfileMockRecorder) GetUpdateURL() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUpdateURL", reflect.TypeOf((*MockIProfile)(nil).GetUpdateURL))
+}
+
 // GetProjects mocks base method
 func (m *MockIProfile) GetProjects() map[string]interfaces.IProject {
 	m.ctrl.T.Helper()
@@ -205,6 +219,20 @@ func (mr *MockIProfileMockRecorder) Model() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Model", reflect.TypeOf((*MockIProfile)(nil).Model))
 }
 
+// GetMetaMap mocks base method
+func (m *MockIProfile) GetMetaMap() map[string]string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetMetaMap")
+	ret0, _ := ret[0].(map[string]string)
+	return ret0
+}
+
+// GetMetaMap indicates an expected call of GetMetaMap
+func (mr *MockIProfileMockRecorder) GetMetaMap() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMetaMap", reflect.TypeOf((*MockIProfile)(nil).GetMetaMap))
+}
+
 // MockIProfileModel is a mock of IProfileModel interface
 type MockIProfileModel struct {
 	ctrl     *gomock.Controller
@@ -282,4 +310,32 @@ func (m *MockIProfileModel) GetCurrentProjectID() uint {
 func (mr *MockIProfileModelMockRecorder) GetCurrentProjectID() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCurrentProjectID", reflect.TypeOf((*MockIProfileModel)(nil).GetCurrentProjectID))
+}
+
+// GetUpdateURL mocks base method
+func (m *MockIProfileModel) GetUpdateURL() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUpdateURL")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetUpdateURL indicates an expected call of GetUpdateURL
+func (mr *MockIProfileModelMockRecorder) GetUpdateURL() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUpdateURL", reflect.TypeOf((*MockIProfileModel)(nil).GetUpdateURL))
+}
+
+// GetMetaMap mocks base method
+func (m *MockIProfileModel) GetMetaMap() map[string]string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetMetaMap")
+	ret0, _ := ret[0].(map[string]string)
+	return ret0
+}
+
+// GetMetaMap indicates an expected call of GetMetaMap
+func (mr *MockIProfileModelMockRecorder) GetMetaMap() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMetaMap", reflect.TypeOf((*MockIProfileModel)(nil).GetMetaMap))
 }

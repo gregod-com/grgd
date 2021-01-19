@@ -12,7 +12,10 @@ func TestLoadTESTProfile(t *testing.T) {
 	// Given
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	dal := setupDatabase(mocks.NewMockIFileSystemManipulator(ctrl))
+	fsm := mocks.NewMockIFileSystemManipulator(ctrl)
+	fsm.EXPECT().HomeDir(gomock.Any(), gomock.Any()).AnyTimes()
+	fsm.EXPECT().CheckOrCreateFolder(gomock.Any(), gomock.Any()).AnyTimes()
+	dal := setupDatabase(fsm)
 	defer tearDownDatabase(dal)
 
 	// When
@@ -32,7 +35,10 @@ func TestDeleteTESTProfile(t *testing.T) {
 	// Given
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	dal := setupDatabase(mocks.NewMockIFileSystemManipulator(ctrl))
+	fsm := mocks.NewMockIFileSystemManipulator(ctrl)
+	fsm.EXPECT().HomeDir(gomock.Any(), gomock.Any()).AnyTimes()
+	fsm.EXPECT().CheckOrCreateFolder(gomock.Any(), gomock.Any()).AnyTimes()
+	dal := setupDatabase(fsm)
 	defer tearDownDatabase(dal)
 
 	// When
@@ -50,7 +56,10 @@ func TestEditTESTProfile(t *testing.T) {
 	// Given
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	dal := setupDatabase(mocks.NewMockIFileSystemManipulator(ctrl))
+	fsm := mocks.NewMockIFileSystemManipulator(ctrl)
+	fsm.EXPECT().HomeDir(gomock.Any(), gomock.Any()).AnyTimes()
+	fsm.EXPECT().CheckOrCreateFolder(gomock.Any(), gomock.Any()).AnyTimes()
+	dal := setupDatabase(fsm)
 	defer tearDownDatabase(dal)
 
 	// When

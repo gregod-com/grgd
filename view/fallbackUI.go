@@ -118,9 +118,10 @@ func (p FallbackUI) PrintBanner(i ...interface{}) interface{} {
 
 	iamASCII := figure.NewFigure(c.App.Name, "standard", true)
 	fmt.Println(iamASCII.String())
-	fmt.Printf("\u001b[33m %s\u001b[0m [profile: \u001b[33m%s\u001b[0m]\n",
+	fmt.Printf("version: \u001b[33m %s\u001b[0m ||| profile: \u001b[33m%s\u001b[0m ||| k8s-ctx: \u001b[33m%s\u001b[0m \n\n",
 		c.App.Version,
-		core.GetConfig().GetProfile().GetName())
+		core.GetConfig().GetProfile().GetName(),
+		c.App.Metadata["kubeContext"])
 	return nil
 }
 

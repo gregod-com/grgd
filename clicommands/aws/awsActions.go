@@ -21,16 +21,17 @@ func ADBConnector(c *cli.Context) error {
 	core := helper.GetExtractor().GetCore(c)
 	UI := core.GetUI()
 	logger := core.GetLogger()
-
-	awsregion, ok := c.App.Metadata["AWS-REGION"].(string)
+	awsregion, ok := core.GetConfig().GetProfile().GetMetaMap()["AWSRegion"]
 	if !ok {
 		logger.Fatal("AWS-REGION not defined")
 	}
+
 	sess, err := session.NewSession(&aws.Config{
 		Region:      aws.String(awsregion),
 		Credentials: credentials.NewSharedCredentials("", "default"),
 	})
 	if err != nil {
+		logger.Warnf("Type of error: %T ", err)
 		logger.Fatal(err.Error())
 	}
 
@@ -41,7 +42,15 @@ func ADBConnector(c *cli.Context) error {
 			switch aerr.Code() {
 			case rds.ErrCodeDBInstanceNotFoundFault:
 				logger.Fatalf(rds.ErrCodeDBInstanceNotFoundFault, aerr.Error())
+			case "SharedCredsLoad":
+				logger.Warn("============================================")
+				logger.Warn("It looks like you are missing the credetials files in ~/.aws/")
+				logger.Warn("Add them manually, see here https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html")
+				logger.Warn("or install aws-cli and use the login command")
+				logger.Warn("============================================")
+				logger.Fatalf(aerr.Error())
 			default:
+				logger.Warnf("Type of error: %T %v", aerr, aerr.Code())
 				logger.Fatalf(aerr.Error())
 			}
 		} else {
@@ -64,10 +73,10 @@ func ANodeConnector(c *cli.Context) error {
 	var fsm interfaces.IFileSystemManipulator
 	core.Get(&fsm)
 
-	heads := []string{"Nr", "Instance ID", "IP", "Avail. Zone", "DNS Name"}
+	heads := []string{"Nr (AZ)", "Instance ID", "IP", "DNS Name"}
 	rows := [][]string{}
 
-	awsregion, ok := c.App.Metadata["AWS-REGION"].(string)
+	awsregion, ok := core.GetConfig().GetProfile().GetMetaMap()["AWSRegion"]
 	if !ok {
 		logger.Fatal("AWS-REGION not defined")
 	}
@@ -82,15 +91,31 @@ func ANodeConnector(c *cli.Context) error {
 	ec2Svc := ec2.New(sess)
 	result, err := ec2Svc.DescribeInstances(nil)
 	if err != nil {
-		logger.Fatal("Error", err)
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			case "SharedCredsLoad":
+				logger.Warn("============================================")
+				logger.Warn("It looks like you are missing the credetials files in ~/.aws/")
+				logger.Warn("Add them manually, see here https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html")
+				logger.Warn("or install aws-cli and use the login command")
+				logger.Warn("============================================")
+				logger.Fatalf(aerr.Error())
+			default:
+				logger.Warnf("Type of error: %T %v", aerr, aerr.Code())
+				logger.Fatalf(aerr.Error())
+			}
+		} else {
+			logger.Fatalf(err.Error())
+		}
+		return err
 	}
+
 	for k, res := range result.Reservations {
 		instanceMetadata := []string{}
 		for _, instance := range res.Instances {
-			instanceMetadata = append(instanceMetadata, strconv.Itoa(k+1))
+			instanceMetadata = append(instanceMetadata, strconv.Itoa(k+1)+" ("+*instance.Placement.AvailabilityZone+")")
 			instanceMetadata = append(instanceMetadata, *instance.InstanceId)
 			instanceMetadata = append(instanceMetadata, *instance.PublicIpAddress)
-			instanceMetadata = append(instanceMetadata, *instance.Placement.AvailabilityZone)
 			instanceMetadata = append(instanceMetadata, *instance.PublicDnsName)
 		}
 		rows = append(rows, instanceMetadata)

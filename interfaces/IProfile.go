@@ -5,6 +5,7 @@ type IProfile interface {
 	IsInitialized() bool
 	GetName() string
 	GetBasePath() string
+	GetUpdateURL() string
 	GetProjects() map[string]IProject
 	AddProject(p string) error
 	RemoveProject(p IProject) error
@@ -14,6 +15,7 @@ type IProfile interface {
 	GetValues(i ...interface{}) []string
 	GetProjectsTable() [][]string
 	Model() IProfileModel
+	GetMetaMap() map[string]string
 }
 
 // IProfileModel ...
@@ -22,4 +24,6 @@ type IProfileModel interface {
 	GetName() string
 	GetBasePath() string
 	GetCurrentProjectID() uint
+	GetUpdateURL() string
+	GetMetaMap() map[string]string
 }

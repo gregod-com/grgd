@@ -1,6 +1,7 @@
 package gormdal
 
 import (
+	"log"
 	"os"
 
 	"github.com/gregod-com/grgd/interfaces"
@@ -14,11 +15,13 @@ import (
 // ProvideDAL ...
 func ProvideDAL(dbPath string, fsmanipulator interfaces.IFileSystemManipulator) interfaces.IDAL {
 	dal := new(GormDAL)
-	dal.datbasePath = dbPath
+	dal.databasePath = dbPath
+
+	dbFolder := fsmanipulator.HomeDir(".grgd", "gorm")
+	fsmanipulator.CheckOrCreateFolder(dbFolder, os.FileMode(uint32(0760)))
+
 	if dbPath == "" {
-		dbFolder := fsmanipulator.HomeDir(".grgd", "gorm")
-		fsmanipulator.CheckOrCreateFolder(dbFolder, os.FileMode(uint32(0760)))
-		dal.datbasePath = fsmanipulator.HomeDir(".grgd", "gorm", "data.db")
+		dal.databasePath = fsmanipulator.HomeDir(".grgd", "gorm", "data.db")
 	}
 
 	dal.connect()
@@ -40,8 +43,8 @@ func ProvideTESTDBPath(fsmanipulator interfaces.IFileSystemManipulator) string {
 
 // GormDAL ...
 type GormDAL struct {
-	datbasePath string
-	db          *gorm.DB
+	databasePath string
+	db           *gorm.DB
 }
 
 // Create ...
@@ -78,13 +81,11 @@ func (dal *GormDAL) GetAll(array []interface{}) error {
 }
 
 func (dal *GormDAL) connect() {
-	if dal.datbasePath == "" {
-		dal.datbasePath = "./database.db"
-	}
-	db, err := gorm.Open(sqlite.Open(dal.datbasePath+"?cache=shared&mode=memory"), &gorm.Config{
+	log.Printf("Connecting to %v", dal.databasePath)
+	db, err := gorm.Open(sqlite.Open(dal.databasePath+"?cache=shared&mode=memory"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent)})
 	if err != nil {
-		panic("failed to connect database")
+		log.Fatal("failed to connect database")
 	}
 	dal.db = db
 }

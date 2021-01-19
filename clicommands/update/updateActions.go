@@ -9,16 +9,13 @@ import (
 // AUpdate ...
 func AUpdate(c *cli.Context) error {
 	core := helper.GetExtractor().GetCore(c)
-	UI := core.GetUI()
 	logger := core.GetLogger()
 	var updater interfaces.IUpdater
 	core.Get(&updater)
 
-	err := updater.CheckUpdate(core)
+	err := updater.CheckUpdate(c.App.Version, core)
 	if err != nil {
 		logger.Fatal(err)
 	}
-	UI.Println("this is the update command")
-
 	return nil
 }

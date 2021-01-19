@@ -7,6 +7,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/gregod-com/grgd/interfaces"
 	"github.com/urfave/cli/v2"
 )
 
@@ -17,13 +18,12 @@ func checkErr(err error) {
 }
 
 // GetCLICommands ...
-func GetCLICommands(app *cli.App) []*cli.Command {
-	homedir, err := os.UserHomeDir()
-	if err != nil {
-		return nil
-	}
+func GetCLICommands(app *cli.App, core interfaces.ICore) []*cli.Command {
+	var fsm interfaces.IFileSystemManipulator
+	core.Get(&fsm)
 
-	hackFolder := path.Join(homedir, ".grgd", "hack")
+	hackFolder := fsm.HomeDir(".grgd", "hack")
+	fsm.CheckOrCreateFolder(hackFolder, 0774)
 
 	fileinfo, err := ioutil.ReadDir(hackFolder)
 	checkErr(err)
@@ -39,11 +39,11 @@ func GetCLICommands(app *cli.App) []*cli.Command {
 
 		os.Chmod(pluginPath, 0744)
 
-		name, err := catchOutput(pluginPath, "name")
+		name, err := catchOutput(pluginPath, true, "name")
 		checkErr(err)
-		shortcuts, err := catchOutput(pluginPath, "shortcuts")
+		shortcuts, err := catchOutput(pluginPath, true, "shortcuts")
 		checkErr(err)
-		description, err := catchOutput(pluginPath, "description")
+		description, err := catchOutput(pluginPath, true, "description")
 		checkErr(err)
 
 		current := cli.Command{

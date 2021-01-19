@@ -13,6 +13,8 @@ type ProfileModel struct {
 	Projects         []*ProjectModel `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	CurrentProjectID uint
 	Initialized      bool
+	UpdateURL        string
+	AWSRegion        string
 }
 
 // IsInitialized ...
@@ -33,4 +35,20 @@ func (profile *ProfileModel) GetBasePath() string {
 // GetCurrentProjectID ...
 func (profile *ProfileModel) GetCurrentProjectID() uint {
 	return profile.CurrentProjectID
+}
+
+// GetUpdateURL ...
+func (profile *ProfileModel) GetUpdateURL() string {
+	return profile.UpdateURL
+}
+
+// GetMetaMap ...
+func (profile *ProfileModel) GetMetaMap() map[string]string {
+	return map[string]string{
+		"Name":      profile.Name,
+		"UpdateURL": profile.UpdateURL,
+		"HomeDir":   profile.HomeDir,
+		"AWSRegion": profile.AWSRegion,
+		"PluginDir": profile.PluginDir,
+	}
 }

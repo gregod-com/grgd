@@ -34,15 +34,15 @@ func (m *MockIUpdater) EXPECT() *MockIUpdaterMockRecorder {
 }
 
 // CheckUpdate mocks base method
-func (m *MockIUpdater) CheckUpdate(core interfaces.ICore) error {
+func (m *MockIUpdater) CheckUpdate(version string, core interfaces.ICore) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CheckUpdate", core)
+	ret := m.ctrl.Call(m, "CheckUpdate", version, core)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CheckUpdate indicates an expected call of CheckUpdate
-func (mr *MockIUpdaterMockRecorder) CheckUpdate(core interface{}) *gomock.Call {
+func (mr *MockIUpdaterMockRecorder) CheckUpdate(version, core interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUpdate", reflect.TypeOf((*MockIUpdater)(nil).CheckUpdate), core)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUpdate", reflect.TypeOf((*MockIUpdater)(nil).CheckUpdate), version, core)
 }

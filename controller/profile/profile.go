@@ -1,6 +1,8 @@
 package profile
 
 import (
+	"log"
+	"net/http"
 	"sort"
 
 	"github.com/gregod-com/grgd/gormdal"
@@ -21,6 +23,8 @@ type Profile struct {
 	projects map[string]interfaces.IProject
 }
 
+var updateurl = "https://s3.iamstudent.dev/public/grgd/index.yaml"
+
 // InitNewProfile ...
 func InitNewProfile(
 	name string,
@@ -33,6 +37,8 @@ func InitNewProfile(
 	profileModel.Name = name
 	profileModel.HomeDir = fm.HomeDir(".grgd")
 	profileModel.PluginDir = fm.HomeDir(".grgd", "hack")
+	profileModel.UpdateURL = updateurl
+	profileModel.AWSRegion = "eu-central-1"
 
 	UI.ClearScreen()
 	UI.Printf("Hey %v, let's init your profile \n\n", profileModel.Name)
@@ -48,17 +54,34 @@ func InitNewProfile(
 			profileModel.HomeDir)
 	}
 
-	UI.Questionf("Base scripts directory [%s]: ", profileModel.PluginDir, profileModel.PluginDir)
+	UI.Questionf("Base scripts directory [%s]: ", &profileModel.PluginDir, profileModel.PluginDir)
 
 	for !fm.PathExists(profileModel.PluginDir) {
 		answer := profileModel.PluginDir
 		profileModel.PluginDir = fm.HomeDir(".grgd", "hack")
-		UI.Questionf("The path `%s` does not exists. Try again or use default [%s]: ", answer, profileModel.PluginDir, profileModel.PluginDir)
+		UI.Questionf("The path `%s` does not exists. Try again or use default [%s]: ", answer, &profileModel.PluginDir, profileModel.PluginDir)
 	}
 
-	// CurrentProjectID uint
+	UI.Questionf("URL to fetch updates from: [%s]: ", &profileModel.UpdateURL, profileModel.UpdateURL)
+
+	for !ping(profileModel.UpdateURL) {
+		answer := profileModel.UpdateURL
+		profileModel.UpdateURL = updateurl
+		UI.Questionf("The url `%s` it not reachable. Use anyways or use default [%s]: ", answer, profileModel.UpdateURL, profileModel.UpdateURL)
+	}
+
 	profileModel.Initialized = true
 	return CreateProfile(&profileModel)
+}
+
+func ping(url string) bool {
+	log.Println("checking " + url)
+	resp, err := http.Get(url)
+	log.Println("got " + resp.Status)
+	if err != nil || resp.StatusCode != 200 {
+		return false
+	}
+	return true
 }
 
 // CreateProfile ...
@@ -71,9 +94,19 @@ func CreateProfile(profileModel interfaces.IProfileModel) *Profile {
 	return &Profile{model: profileModel}
 }
 
+// GetMetaMap ...
+func (p *Profile) GetMetaMap() map[string]string {
+	return p.model.GetMetaMap()
+}
+
 // Model ...
 func (p *Profile) Model() interfaces.IProfileModel {
 	return p.model
+}
+
+// GetUpdateURL ...
+func (p *Profile) GetUpdateURL() string {
+	return p.model.GetUpdateURL()
 }
 
 // IsInitialized ...

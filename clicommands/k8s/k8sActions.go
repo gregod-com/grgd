@@ -9,12 +9,12 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 	"sort"
 	"strings"
 
 	"github.com/gregod-com/grgd/controller/helper"
+	"github.com/gregod-com/grgd/interfaces"
 	"github.com/urfave/cli/v2"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -124,8 +124,9 @@ func ACertificate(c *cli.Context) error {
 func AContext(c *cli.Context) error {
 	core := helper.GetExtractor().GetCore(c)
 	logger := core.GetLogger()
-	home, _ := os.UserHomeDir()
-	kubeConfigPath := path.Join(home, ".kube", "config")
+	var fsm interfaces.IFileSystemManipulator
+	core.Get(&fsm)
+	kubeConfigPath := fsm.HomeDir(".kube", "config")
 
 	if c.NArg() > 0 {
 		actualContextName, err := lookupContext(c.Args().First())

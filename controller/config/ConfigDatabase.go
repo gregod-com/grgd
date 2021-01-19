@@ -42,8 +42,6 @@ type ConfigDatabase struct {
 
 // Save ...
 func (coDB *ConfigDatabase) Save(i ...interface{}) error {
-	// coDB.dal.Update(i)
-
 	for k := range coDB.profiles {
 		err := coDB.dal.Update(coDB.profiles[k].Model())
 		if err != nil {
@@ -165,14 +163,10 @@ func (coDB *ConfigDatabase) SetConfigPath(path string) error {
 // DumpConfig ...
 func (coDB *ConfigDatabase) DumpConfig(i ...interface{}) interface{} {
 	profile := coDB.GetProfile()
-	coDB.ui.Println("Nodel: ")
-	coDB.ui.Println(profile.Model())
-	coDB.ui.Println("Name: ")
-	coDB.ui.Println(profile.GetName())
-	b, err := yaml.Marshal(profile.Model)
+	b, err := yaml.Marshal(profile.Model())
 	if err != nil {
 		coDB.logger.Fatal(err)
 	}
-	coDB.logger.Warn(string(b))
+	coDB.ui.Printf("---- YAML for profile: [%v] ----- \n%v \n", profile.GetName(), string(b))
 	return profile
 }

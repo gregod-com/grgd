@@ -44,9 +44,11 @@ func (d *Downloader) Load(filepath string, url string) error {
 	counter := &WriteCounter{}
 	// Write the body to file
 	_, err = io.Copy(out, io.TeeReader(resp.Body, counter))
+	fmt.Println()
 	return err
 }
 
+// WriteCounter ...
 type WriteCounter struct {
 	Total uint64
 }
@@ -58,6 +60,7 @@ func (wc *WriteCounter) Write(p []byte) (int, error) {
 	return n, nil
 }
 
+// PrintProgress ...
 func (wc WriteCounter) PrintProgress() {
 	// Clear the line by using a character return to go back to the start and remove
 	// the remaining characters by filling it with spaces
