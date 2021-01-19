@@ -6,12 +6,13 @@ import (
 	"github.com/gregod-com/grgd/clicommands/hack"
 	"github.com/gregod-com/grgd/clicommands/k8s"
 	"github.com/gregod-com/grgd/clicommands/update"
+	"github.com/gregod-com/grgd/interfaces"
 
 	"github.com/urfave/cli/v2"
 )
 
 // GetCommands ...
-func GetCommands(app *cli.App) []*cli.Command {
+func GetCommands(app *cli.App, core interfaces.ICore) []*cli.Command {
 	var myCommands []*cli.Command
 
 	myCommands = append(myCommands, aws.GetCLICommands(app)...)
@@ -20,7 +21,7 @@ func GetCommands(app *cli.App) []*cli.Command {
 	// myCommands = append(myCommands, initialise.GetCLICommands(app)...)
 	// myCommands = append(myCommands, shortcut.GetCLICommands(app)...)
 	myCommands = append(myCommands, update.GetCLICommands(app)...)
-	myCommands = append(myCommands, hack.GetCLICommands(app)...)
+	myCommands = append(myCommands, hack.GetCLICommands(app, core)...)
 
 	// myCommands = append(myCommands, project.GetCLICommands(app)...)
 	// myCommands = append(myCommands, service.GetCLICommands(app)...)
