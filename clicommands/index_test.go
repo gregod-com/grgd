@@ -6,13 +6,12 @@ import (
 
 	"github.com/gregod-com/grgd/controller/config"
 	"github.com/gregod-com/grgd/controller/helper"
-	"github.com/gregod-com/grgd/controller/pluginindex"
 	"github.com/gregod-com/grgd/core"
 	"github.com/gregod-com/grgd/gormdal"
 	"github.com/gregod-com/grgd/logger"
 	"github.com/gregod-com/grgd/view"
+	"github.com/tj/assert"
 	"github.com/urfave/cli/v2"
-	"gotest.tools/v3/assert"
 )
 
 func TestGetCommands(t *testing.T) {
@@ -28,8 +27,6 @@ func TestGetCommands(t *testing.T) {
 		"IDAL":                   gormdal.ProvideDAL,
 		"IDownloader":            helper.ProvideDownloader,
 		"IConfig":                config.ProvideConfig,
-		"IPluginIndex":           pluginindex.ProvidePluginIndex,
-		"IPluginLoader":          helper.ProvidePluginLoader,
 		"IPinger":                helper.ProvidePinger,
 		"string":                 gormdal.ProvideDefaultDBPath,
 	}
@@ -39,7 +36,7 @@ func TestGetCommands(t *testing.T) {
 	cmds := GetCommands(app, core)
 
 	// Then
-	assert.Assert(t, nil, "here in nil")
+	assert.Nil(t, nil, "here in nil")
 	if len(cmds) == 0 {
 		t.Error("no good")
 	}
@@ -54,5 +51,5 @@ func TestGetUser(t *testing.T) {
 	// Given
 	// When
 	// Then
-	assert.Assert(t, true)
+	assert.True(t, true)
 }

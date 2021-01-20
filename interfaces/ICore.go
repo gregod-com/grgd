@@ -2,17 +2,15 @@ package interfaces
 
 import (
 	"time"
-
-	"github.com/gregod-com/grgdplugincontracts"
 )
 
 // ICore ...
 type ICore interface {
 	GetStartTime() time.Time
 	GetLogger() ILogger
-	GetUI() grgdplugincontracts.IUIPlugin
+	GetUI() IUIPlugin
 	GetConfig() IConfig
 	GetHelper() IHelper
-	GetCMDPlugins() []grgdplugincontracts.ICMDPlugin
+	GetCMDPlugins() []ICMDPlugin
 	Get(i interface{}) error
 }

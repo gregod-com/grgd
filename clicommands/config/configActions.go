@@ -2,7 +2,6 @@ package config
 
 import (
 	"github.com/gregod-com/grgd/controller/helper"
-
 	"github.com/urfave/cli/v2"
 )
 

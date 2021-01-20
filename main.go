@@ -11,7 +11,6 @@ import (
 	"github.com/gregod-com/grgd/clicommands/flags"
 	"github.com/gregod-com/grgd/controller/config"
 	"github.com/gregod-com/grgd/controller/helper"
-	"github.com/gregod-com/grgd/controller/pluginindex"
 	"github.com/gregod-com/grgd/core"
 	"github.com/gregod-com/grgd/gormdal"
 	"github.com/gregod-com/grgd/interfaces"
@@ -32,8 +31,6 @@ func main() {
 		"IDAL":                   gormdal.ProvideDAL,
 		"IDownloader":            helper.ProvideDownloader,
 		"IConfig":                config.ProvideConfig,
-		"IPluginIndex":           pluginindex.ProvidePluginIndex,
-		"IPluginLoader":          helper.ProvidePluginLoader,
 		"IPinger":                helper.ProvidePinger,
 		"string":                 gormdal.ProvideDefaultDBPath,
 	}

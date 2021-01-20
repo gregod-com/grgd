@@ -3,8 +3,6 @@ package config
 import (
 	"os"
 
-	"github.com/gregod-com/grgdplugincontracts"
-	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 
 	"github.com/gregod-com/grgd/controller/profile"
@@ -13,7 +11,7 @@ import (
 
 // ProvideConfig ...
 func ProvideConfig(dal interfaces.IDAL,
-	ui grgdplugincontracts.IUIPlugin,
+	ui interfaces.IUIPlugin,
 	logger interfaces.ILogger,
 	fsm interfaces.IFileSystemManipulator) interfaces.IConfig {
 	config := new(ConfigDatabase)
@@ -34,7 +32,7 @@ func ProvideConfig(dal interfaces.IDAL,
 type ConfigDatabase struct {
 	dal            interfaces.IDAL
 	logger         interfaces.ILogger
-	ui             grgdplugincontracts.IUIPlugin
+	ui             interfaces.IUIPlugin
 	fsm            interfaces.IFileSystemManipulator
 	profiles       map[string]interfaces.IProfile
 	currentProfile string
@@ -45,7 +43,7 @@ func (coDB *ConfigDatabase) Save(i ...interface{}) error {
 	for k := range coDB.profiles {
 		err := coDB.dal.Update(coDB.profiles[k].Model())
 		if err != nil {
-			log.Fatal(err)
+			coDB.logger.Fatal(err)
 		}
 	}
 
@@ -81,7 +79,7 @@ func (coDB *ConfigDatabase) GetProfile() interfaces.IProfile {
 
 		if _, ok := coDB.profiles[coDB.currentProfile]; !ok {
 			if coDB.InitNewProfile(coDB.currentProfile) != nil {
-				log.Fatal("Could not create new profile")
+				coDB.logger.Fatal("Could not create new profile")
 			}
 		}
 	}

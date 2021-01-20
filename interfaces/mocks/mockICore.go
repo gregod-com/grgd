@@ -7,7 +7,6 @@ package mocks
 import (
 	gomock "github.com/golang/mock/gomock"
 	interfaces "github.com/gregod-com/grgd/interfaces"
-	grgdplugincontracts "github.com/gregod-com/grgdplugincontracts"
 	reflect "reflect"
 	time "time"
 )
@@ -64,10 +63,10 @@ func (mr *MockICoreMockRecorder) GetLogger() *gomock.Call {
 }
 
 // GetUI mocks base method
-func (m *MockICore) GetUI() grgdplugincontracts.IUIPlugin {
+func (m *MockICore) GetUI() interfaces.IUIPlugin {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUI")
-	ret0, _ := ret[0].(grgdplugincontracts.IUIPlugin)
+	ret0, _ := ret[0].(interfaces.IUIPlugin)
 	return ret0
 }
 
@@ -106,10 +105,10 @@ func (mr *MockICoreMockRecorder) GetHelper() *gomock.Call {
 }
 
 // GetCMDPlugins mocks base method
-func (m *MockICore) GetCMDPlugins() []grgdplugincontracts.ICMDPlugin {
+func (m *MockICore) GetCMDPlugins() []interfaces.ICMDPlugin {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCMDPlugins")
-	ret0, _ := ret[0].([]grgdplugincontracts.ICMDPlugin)
+	ret0, _ := ret[0].([]interfaces.ICMDPlugin)
 	return ret0
 }
 

@@ -7,8 +7,6 @@ import (
 
 	"github.com/gregod-com/grgd/gormdal"
 	"github.com/gregod-com/grgd/interfaces"
-
-	"github.com/gregod-com/grgdplugincontracts"
 )
 
 // ProvideProfile ...
@@ -29,7 +27,7 @@ var updateurl = "https://s3.iamstudent.dev/public/grgd/index.yaml"
 func InitNewProfile(
 	name string,
 	logger interfaces.ILogger,
-	UI grgdplugincontracts.IUIPlugin,
+	UI interfaces.IUIPlugin,
 	fm interfaces.IFileSystemManipulator) *Profile {
 
 	var profileModel gormdal.ProfileModel

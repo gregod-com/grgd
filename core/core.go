@@ -2,17 +2,14 @@ package core
 
 import (
 	"errors"
+	"log"
 	"reflect"
 	"time"
 
 	"github.com/gregod-com/grgd/interfaces"
 	"github.com/gregod-com/grgd/view"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/gregod-com/grgd/controller/helper"
-
-	"github.com/gregod-com/grgdplugincontracts"
 )
 
 // RegisterDependecies ...
@@ -47,7 +44,7 @@ func RegisterDependecies(implsTemp map[string]interface{}) interfaces.ICore {
 				// the implementation is provided via the provider function
 				solvedCurrent += addDependecyFromProviderFunction(elem, impls)
 			default:
-				log.Warnf("Type %v is not supported for injection. Ignoring.",
+				log.Printf("Type %v is not supported for injection. Ignoring.",
 					reflect.TypeOf(elem),
 				)
 				solvedCurrent++
@@ -156,8 +153,8 @@ func (c *Core) GetLogger() interfaces.ILogger {
 }
 
 // GetUI ...
-func (c *Core) GetUI() grgdplugincontracts.IUIPlugin {
-	a, ok := c.implementations["IUIPlugin"].(grgdplugincontracts.IUIPlugin)
+func (c *Core) GetUI() interfaces.IUIPlugin {
+	a, ok := c.implementations["IUIPlugin"].(interfaces.IUIPlugin)
 	if !ok {
 		a = view.ProvideFallbackUI()
 		c.implementations["IUIPlugin"] = a
@@ -185,8 +182,8 @@ func (c *Core) GetHelper() interfaces.IHelper {
 }
 
 // GetCMDPlugins ...
-func (c *Core) GetCMDPlugins() []grgdplugincontracts.ICMDPlugin {
-	cmds, ok := c.implementations["commands"].([]grgdplugincontracts.ICMDPlugin)
+func (c *Core) GetCMDPlugins() []interfaces.ICMDPlugin {
+	cmds, ok := c.implementations["commands"].([]interfaces.ICMDPlugin)
 	if ok {
 		return cmds
 	}

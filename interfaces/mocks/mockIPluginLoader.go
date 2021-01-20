@@ -6,7 +6,7 @@ package mocks
 
 import (
 	gomock "github.com/golang/mock/gomock"
-	grgdplugincontracts "github.com/gregod-com/grgdplugincontracts"
+	interfaces "github.com/gregod-com/grgd/interfaces"
 	reflect "reflect"
 )
 
@@ -34,11 +34,11 @@ func (m *MockIPluginLoader) EXPECT() *MockIPluginLoaderMockRecorder {
 }
 
 // LoadPlugins mocks base method
-func (m *MockIPluginLoader) LoadPlugins(pluginFolder string) ([]grgdplugincontracts.ICMDPlugin, grgdplugincontracts.IUIPlugin) {
+func (m *MockIPluginLoader) LoadPlugins(pluginFolder string) ([]interfaces.ICMDPlugin, interfaces.IUIPlugin) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "LoadPlugins", pluginFolder)
-	ret0, _ := ret[0].([]grgdplugincontracts.ICMDPlugin)
-	ret1, _ := ret[1].(grgdplugincontracts.IUIPlugin)
+	ret0, _ := ret[0].([]interfaces.ICMDPlugin)
+	ret1, _ := ret[1].(interfaces.IUIPlugin)
 	return ret0, ret1
 }
 

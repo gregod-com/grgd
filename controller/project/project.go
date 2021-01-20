@@ -9,14 +9,12 @@ import (
 	"strings"
 
 	GI "github.com/gregod-com/grgd/interfaces"
-
-	GPI "github.com/gregod-com/grgdplugincontracts"
 )
 
 // ProvideProject ...
 func ProvideProject(
 	logger GI.ILogger,
-	ui GPI.IUIPlugin,
+	ui GI.IUIPlugin,
 	fsm GI.IFileSystemManipulator,
 	services map[string]GI.IService) GI.IProject {
 	return &Project{logger: logger, ui: ui, fsm: fsm, services: services}
@@ -31,7 +29,7 @@ type Project struct {
 	description string
 	services    map[string]GI.IService
 	logger      GI.ILogger
-	ui          GPI.IUIPlugin
+	ui          GI.IUIPlugin
 	fsm         GI.IFileSystemManipulator
 }
 

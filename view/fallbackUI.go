@@ -11,7 +11,6 @@ import (
 
 	"github.com/common-nighthawk/go-figure"
 	"github.com/gregod-com/grgd/interfaces"
-	"github.com/gregod-com/grgdplugincontracts"
 	cli "github.com/urfave/cli/v2"
 	"golang.org/x/sys/unix"
 	"golang.org/x/term"
@@ -43,7 +42,7 @@ func ExtractCliContext(i interface{}) *cli.Context {
 }
 
 // ProvideFallbackUI ...
-func ProvideFallbackUI() grgdplugincontracts.IUIPlugin {
+func ProvideFallbackUI() interfaces.IUIPlugin {
 	return new(FallbackUI)
 }
 
