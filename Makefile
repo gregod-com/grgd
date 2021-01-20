@@ -27,7 +27,7 @@ stats:
 	du -sh $(BINPATH)$(BINARYNAME)-$(OS)-$(PLATFORM)
 
 index:
-	./indexer.sh $(BINARYNAME) $(OS) $(PLATFORM) $(VERSION) >> bin/index.yaml
+	./idxer $(BINARYNAME) $(OS) $(PLATFORM)
 
 upload:
 	mc mirror --remove --overwrite bin/ minio/public/grgd/
