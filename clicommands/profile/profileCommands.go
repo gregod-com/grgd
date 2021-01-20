@@ -14,9 +14,10 @@ func GetCLICommands(app *cli.App) []*cli.Command {
 			Flags:    app.Flags,
 			Subcommands: []*cli.Command{
 				{
-					Name:  "show",
-					Usage: "Show all profile infos",
-					Flags: app.Flags,
+					Name:   "show",
+					Usage:  "Show all profile infos",
+					Flags:  app.Flags,
+					Action: AListProfiles,
 				},
 			},
 		},

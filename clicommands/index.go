@@ -16,17 +16,17 @@ func GetCommands(app *cli.App, core interfaces.ICore) []*cli.Command {
 	var myCommands []*cli.Command
 
 	myCommands = append(myCommands, aws.GetCLICommands(app)...)
-	myCommands = append(myCommands, k8s.GetCLICommands(app)...)
 	myCommands = append(myCommands, config.GetCLICommands(app)...)
-	myCommands = append(myCommands, update.GetCLICommands(app)...)
 	myCommands = append(myCommands, hack.GetCLICommands(app, core)...)
-
-	// myCommands = append(myCommands, initialise.GetCLICommands(app)...)
+	myCommands = append(myCommands, k8s.GetCLICommands(app)...)
 	// myCommands = append(myCommands, profile.GetCLICommands(app)...)
 	// myCommands = append(myCommands, project.GetCLICommands(app)...)
+	// myCommands = append(myCommands, serve.GetCLICommands(app)...)
 	// myCommands = append(myCommands, service.GetCLICommands(app)...)
-
 	// myCommands = append(myCommands, stack.GetCLICommands(app)...)
+	myCommands = append(myCommands, update.GetCLICommands(app)...)
+
+	// myCommands = append(myCommands, initialise.GetCLICommands(app)...)
 
 	return myCommands
 }
