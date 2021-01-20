@@ -7,9 +7,7 @@ require (
 	github.com/common-nighthawk/go-figure v0.0.0-20200609044655-c4b36f998cf2
 	github.com/golang/mock v1.4.4
 	github.com/golang/protobuf v1.4.3 // indirect
-	github.com/gregod-com/grgdplugincontracts v0.3.0
 	github.com/sirupsen/logrus v1.6.0
-	github.com/stretchr/testify v1.6.1
 	github.com/tj/assert v0.0.3
 	github.com/urfave/cli/v2 v2.2.0
 	golang.org/x/mod v0.3.0
@@ -18,7 +16,6 @@ require (
 	gopkg.in/yaml.v2 v2.3.0
 	gorm.io/driver/sqlite v1.1.3
 	gorm.io/gorm v1.20.1
-	gotest.tools/v3 v3.0.2
 	k8s.io/api v0.19.4
 	k8s.io/apimachinery v0.19.4
 	k8s.io/client-go v0.19.4
