@@ -1,11 +1,15 @@
 package helper
 
 import (
+	"bytes"
 	"io/ioutil"
+	"log"
 	"os"
+	"os/exec"
 	"path"
 	"runtime"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/gregod-com/grgd/interfaces"
@@ -37,6 +41,26 @@ func (h *Updater) CheckUpdate(version string, core interfaces.ICore) error {
 	UI := core.GetUI()
 
 	indexpath := path.Join(cnfg.GetProfile().GetBasePath(), "index.yaml")
+	versionMap := map[string]string{}
+
+	// SCRIPTS
+	hackFolder := path.Join(cnfg.GetProfile().GetBasePath(), "hack")
+
+	fileinfo, err := ioutil.ReadDir(hackFolder)
+	if err != nil {
+		return err
+	}
+
+	// iterate over grgd hack folder
+	for _, f := range fileinfo {
+		scriptPath := path.Join(hackFolder, f.Name())
+		if strings.HasPrefix(scriptPath, ".") {
+			continue
+		}
+		cName := catchOut(scriptPath, "name")
+		cVersion := catchOut(scriptPath, "version")
+		versionMap[cName] = cVersion
+	}
 
 	err = downloader.Load(indexpath, cnfg.GetProfile().GetUpdateURL())
 	if err != nil {
@@ -55,12 +79,42 @@ func (h *Updater) CheckUpdate(version string, core interfaces.ICore) error {
 
 	UI.Println("----SCRIPTS/HACK----")
 	for scriptname, script := range indexObject.Releases["grgd-hacks"].Targets {
-		for semversion, dlMeta := range script.Versions {
-			UI.Printf("%-20v %v -> %v\n", scriptname, semversion, dlMeta.URL)
-			scriptname = ""
+		sn := scriptname
+		didUpdate := false
+		sortedScriptVersions := []string{}
+		for semversion := range script.Versions {
+			sortedScriptVersions = append(sortedScriptVersions, semversion)
 		}
+		sortSemverSlice(sortedScriptVersions)
+
+		for _, semversion := range sortedScriptVersions {
+			remark := ""
+			switch semver.Compare(versionMap[scriptname], semversion) {
+			case -1:
+				remark = "(newer)"
+			case 0:
+				remark = "(current)"
+			case 1:
+				remark = "(older)"
+			}
+			UI.Printf("%-20v %-10v %v -> %v\n", sn, remark, semversion, script.Versions[semversion].URL)
+			if didUpdate == false && remark == "(newer)" && UI.YesNoQuestionf("Would you like to update script `%v` from %v to %v now?",
+				scriptname,
+				versionMap[scriptname],
+				semversion) {
+				UI.Println("DOWNLOADING!!!!")
+				err = downloader.Load(path.Join(hackFolder, scriptname+"-partial"), script.Versions[semversion].URL)
+				if err != nil {
+					return err
+				}
+				os.Rename(path.Join(hackFolder, scriptname+"-partial"), path.Join(hackFolder, scriptname))
+				os.Chmod(path.Join(hackFolder, scriptname), 0744)
+				didUpdate = true
+			}
+			sn = ""
+		}
+		UI.Println()
 	}
-	UI.Println()
 
 	UI.Println("----GRGD-CLI-------")
 	newerVersions := []string{}
@@ -69,8 +123,8 @@ func (h *Updater) CheckUpdate(version string, core interfaces.ICore) error {
 	for k := range indexObject.Releases["grgd-cli"].Targets[runtime.GOOS+"-"+runtime.GOARCH].Versions {
 		sortedversions = append(sortedversions, k)
 	}
-	sort.Strings(sortedversions)
-
+	sortSemverSlice(sortedversions)
+	grgd := "grgd"
 	for _, k := range sortedversions {
 		v := indexObject.Releases["grgd-cli"].Targets[runtime.GOOS+"-"+runtime.GOARCH].Versions[k]
 		if len(os.Args) > 2 {
@@ -78,15 +132,21 @@ func (h *Updater) CheckUpdate(version string, core interfaces.ICore) error {
 				newerVersions = append(newerVersions, k)
 			}
 		}
+		remark := ""
 		switch semver.Compare("v"+version, k) {
 		case -1:
 			newerVersions = append(newerVersions, k)
-			UI.Printf("%v (new)     -> %v \n", k, v.URL)
+			remark = "(newer)"
+			// UI.Printf("%v (new)     -> %v \n", k, v.URL)
 		case 0:
-			UI.Printf("%v (current) -> %v \n", k, v.URL)
+			remark = "(current)"
+			// UI.Printf("%v (current) -> %v \n", k, v.URL)
 		case 1:
-			UI.Printf("%v (old)     -> %v \n", k, v.URL)
+			remark = "(older)"
+			// UI.Printf("%v (old)     -> %v \n", k, v.URL)
 		}
+		UI.Printf("%-20v %-10v %v -> %v\n", grgd, remark, k, v.URL)
+		grgd = ""
 	}
 
 	UI.Println("-------------------")
@@ -102,6 +162,30 @@ func (h *Updater) CheckUpdate(version string, core interfaces.ICore) error {
 		os.Chmod("/usr/local/bin/grgd", 0744)
 	}
 
+	return nil
+}
+
+func catchOut(binPath string, args ...string) string {
+	cmd := exec.Command(binPath, args...)
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		log.Fatal("Error executing: " + err.Error())
+	}
+	return strings.TrimSuffix(out.String(), "\n")
+}
+
+func sortSemverSlice(semverSlice []string) error {
+	// sort.Strings(sortedScriptVersions)
+	sort.Slice(semverSlice, func(i, j int) bool {
+		switch semver.Compare(semverSlice[i], semverSlice[j]) {
+		case 1:
+			return true
+		default:
+			return false
+		}
+	})
 	return nil
 }
 
