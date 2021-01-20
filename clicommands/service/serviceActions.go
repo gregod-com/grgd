@@ -6,15 +6,16 @@ import (
 	"strconv"
 	"strings"
 
-	I "github.com/gregod-com/grgd/interfaces"
-
+	"github.com/gregod-com/grgd/controller/helper"
+	"github.com/gregod-com/grgd/interfaces"
 	"github.com/urfave/cli/v2"
 )
 
 // AListService ...
 func AListService(c *cli.Context) error {
-	// logger := helpers.ExtractLogger(c)
-	// UI := helpers.ExtractUI(c)
+	core := helper.GetExtractor().GetCore(c)
+	logger := core.GetLogger()
+	logger.Trace("This is the list service command")
 
 	// var profile *persistence.Profile
 	// helpers.ExtractMetadataFatal(c.App.Metadata, "profile", &profile)
@@ -89,7 +90,7 @@ func AGroupService(c *cli.Context) error {
 	return nil
 }
 
-func getServiceIndexByName(arr []I.IService, name string) (int, error) {
+func getServiceIndexByName(arr []interfaces.IService, name string) (int, error) {
 	for k, v := range arr {
 		if v.GetName() == name {
 			return k, nil
@@ -98,7 +99,7 @@ func getServiceIndexByName(arr []I.IService, name string) (int, error) {
 	return 0, errors.New("Name not found")
 }
 
-func sortServiceMetadataSlice(m []I.IService) [][]string {
+func sortServiceMetadataSlice(m []interfaces.IService) [][]string {
 	rows := [][]string{}
 
 	sort.Slice(m, func(i, j int) bool {

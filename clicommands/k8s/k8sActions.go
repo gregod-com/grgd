@@ -7,7 +7,6 @@ import (
 	"encoding/pem"
 	"errors"
 	"flag"
-	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
@@ -34,9 +33,7 @@ func ACertificate(c *cli.Context) error {
 	heads := []string{"Name", "Common Name"}
 	rows := [][]string{}
 
-	ctx := context.Background()
-
-	secrets, err := clientset.CoreV1().Secrets("").List(ctx, metav1.ListOptions{})
+	secrets, err := clientset.CoreV1().Secrets("").List(context.Background(), metav1.ListOptions{})
 	if err != nil {
 		logger.Warnf(
 			"%s\nAre you sure you are pointing to the correct k8s cluster?\n\n",
@@ -82,7 +79,7 @@ func ACertificate(c *cli.Context) error {
 	}
 
 	if len(matchingSecrets) > 1 {
-		fmt.Printf("There were %v hits... please define certificate name closer\n", len(matchingSecrets))
+		UI.Printf("There were %v hits... please define certificate name closer\n", len(matchingSecrets))
 		for _, i := range matchingSecrets {
 			logger.Debug(i)
 		}

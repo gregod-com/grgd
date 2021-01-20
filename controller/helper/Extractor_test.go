@@ -5,8 +5,8 @@ import (
 
 	"github.com/gregod-com/grgd/view"
 
+	"github.com/tj/assert"
 	"github.com/urfave/cli/v2"
-	"gotest.tools/v3/assert"
 )
 
 func TestExtractMetadataWithValidString_1(t *testing.T) {
@@ -20,7 +20,7 @@ func TestExtractMetadataWithValidString_1(t *testing.T) {
 	result := ext.GetMetadata(testmap, "one", &container)
 
 	// Then
-	assert.NilError(t, result, "Extract produces error")
+	assert.Nil(t, result, "Extract produces error")
 	assert.Equal(t, "Hello", container)
 }
 
@@ -35,7 +35,7 @@ func TestExtractMetadataWithValidString_2(t *testing.T) {
 	result := ext.GetMetadata(testmap, "two", &container)
 
 	// Then
-	assert.NilError(t, result, "Extract produces error")
+	assert.Nil(t, result, "Extract produces error")
 	assert.Equal(t, "World", container)
 
 }
@@ -51,7 +51,7 @@ func TestExtractMetadataWithValidInt_1(t *testing.T) {
 	result := ext.GetMetadata(testmap, "three", &container)
 
 	// Then
-	assert.NilError(t, result, "Extract produces error")
+	assert.Nil(t, result, "Extract produces error")
 	assert.Equal(t, 3, container)
 
 }
@@ -82,7 +82,7 @@ func TestExtractMetadataWithValidSturct_1(t *testing.T) {
 	result := ext.GetMetadata(testmap, "one", &container)
 
 	// Then
-	assert.NilError(t, result, "Extract produces error")
+	assert.Nil(t, result, "Extract produces error")
 
 }
 

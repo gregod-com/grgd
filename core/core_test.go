@@ -8,7 +8,7 @@ import (
 
 	"github.com/gregod-com/grgd/controller/config"
 	"github.com/gregod-com/grgd/controller/helper"
-	"github.com/stretchr/testify/assert"
+	"github.com/tj/assert"
 )
 
 func TestRegisterDependecies_With_Nil(t *testing.T) {

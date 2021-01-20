@@ -1,9 +1,12 @@
 package initialise
 
-import "github.com/urfave/cli/v2"
+import (
+	"github.com/gregod-com/grgd/interfaces"
+	"github.com/urfave/cli/v2"
+)
 
 // GetCLICommands ...
-func GetCLICommands(app *cli.App) []*cli.Command {
+func GetCLICommands(app *cli.App, core interfaces.ICore) []*cli.Command {
 	return []*cli.Command{
 		{
 			Name:            "initialise",

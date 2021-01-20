@@ -8,7 +8,7 @@ import (
 	"github.com/gregod-com/grgd/interfaces/mocks"
 
 	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
+	"github.com/tj/assert"
 	"github.com/urfave/cli/v2"
 )
 
@@ -59,5 +59,5 @@ func TestInit(t *testing.T) {
 	c := cli.NewContext(app, nil, nil)
 
 	// Then
-	assert.NoError(t, AInit(c))
+	assert.Nil(t, AInit(c))
 }
