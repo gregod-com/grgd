@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  build:
+  test:
     name: Build
     runs-on: ubuntu-latest
     steps:
@@ -33,11 +33,16 @@ jobs:
     - name: Test
       run: go test -v ./...
 
+    - name: Get the version
+      id: get_version
+      run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
+
     - name: Build
       run: |
-        env GOOS=linux GOARCH=amd64 go build -o dist/grgd-linux-amd64-${GITHUB_REF##*/} .
-        env GOOS=darwin GOARCH=amd64 go build -o dist/grgd-darwin-amd64-${GITHUB_REF##*/} .
-        env GOOS=freebsd GOARCH=amd64 go build -o dist/grgd-freebsd-amd64-${GITHUB_REF##*/} .
+        echo ${{ steps.get_version.outputs.VERSION }}
+        # env GOOS=linux GOARCH=amd64 go build -o dist/grgd-linux-amd64- .
+        # env GOOS=darwin GOARCH=amd64 go build -o dist/grgd-darwin-amd64-${GITHUB_REF##*/} .
+        # env GOOS=freebsd GOARCH=amd64 go build -o dist/grgd-freebsd-amd64-${GITHUB_REF##*/} .
 
     - name: Upload binary
       uses: actions/upload-artifact@v2
