@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Set up Go 1.x
+    - name: Set up Go 1.15
       uses: actions/setup-go@v2
       with:
-        go-version: ^1.13
+        go-version: ^1.15
       id: go
 
     - name: Check out code into the Go module directory
@@ -35,24 +35,30 @@ jobs:
 
     - name: Build
       run: |
-        env GOOS=linux GOARCH=amd64 go build -o dist/grgd-linux .
-        env CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -o dist/grgd-darwin .
-        env GOOS=freebsd GOARCH=amd64 go build -o dist/grgd-freebsd .
+        env GOOS=linux GOARCH=amd64 go build -o dist/grgd-linux-amd64-${GITHUB_REF##*/} .
+        env GOOS=darwin GOARCH=amd64 go build -o dist/grgd-darwin-amd64-${GITHUB_REF##*/} .
+        env GOOS=freebsd GOARCH=amd64 go build -o dist/grgd-freebsd-amd64-${GITHUB_REF##*/} .
 
     - name: Upload binary
       uses: actions/upload-artifact@v2
       with:
-        name: grgd-v0.2.0-darwin
-        path: dist/grgd-darwin
+        name: grgd-darwin-amd64-${GITHUB_REF##*/}
+        path: dist/grgd-darwin-amd64-${GITHUB_REF##*/}
 
-    - name: Upload binary
-      uses: actions/upload-artifact@v2
-      with:
-        name: grgd-v0.2.0-linux
-        path: dist/grgd-linux
+    # - name: Upload binary
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: grgd-v0.2.0-darwin
+    #     path: dist/grgd-darwin
 
-    - name: Upload binary
-      uses: actions/upload-artifact@v2
-      with:
-        name: grgd-v0.2.0-freebsd
-        path: dist/grgd-freebsd
+    # - name: Upload binary
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: grgd-v0.2.0-linux
+    #     path: dist/grgd-linux
+
+    # - name: Upload binary
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: grgd-v0.2.0-freebsd
+    #     path: dist/grgd-freebsd
