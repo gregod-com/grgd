@@ -63,16 +63,15 @@ jobs:
 
     - name: Build
       run: |
-        echo ${{ steps.get_version.outputs.VERSION }}
-        # env GOOS=linux GOARCH=amd64 go build -o dist/grgd-linux-amd64- .
-        # env GOOS=darwin GOARCH=amd64 go build -o dist/grgd-darwin-amd64-${GITHUB_REF##*/} .
-        # env GOOS=freebsd GOARCH=amd64 go build -o dist/grgd-freebsd-amd64-${GITHUB_REF##*/} .
+        env GOOS=linux GOARCH=amd64 go build -o dist/grgd-linux-amd64-${{ steps.get_version.outputs.VERSION }} .
+        env GOOS=darwin GOARCH=amd64 go build -o dist/grgd-darwin-amd64-${{ steps.get_version.outputs.VERSION }} .
+        env GOOS=freebsd GOARCH=amd64 go build -o dist/grgd-freebsd-amd64-${{ steps.get_version.outputs.VERSION }} .
 
     - name: Upload binary
       uses: actions/upload-artifact@v2
       with:
-        name: grgd-darwin-amd64-${GITHUB_REF##*/}
-        path: dist/grgd-darwin-amd64-${GITHUB_REF##*/}
+        name: grgd-darwin-amd64-${{ steps.get_version.outputs.VERSION }}
+        path: dist/grgd-darwin-amd64-${{ steps.get_version.outputs.VERSION }}
 
     # - name: Upload binary
     #   uses: actions/upload-artifact@v2
