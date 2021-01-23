@@ -41,7 +41,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "grgd"
 	app.Usage = "grgd cli"
-	app.Version = "0.12.14"
+	app.Version = "0.12.15"
 	clientCfg, err := clientcmd.NewDefaultClientConfigLoadingRules().Load()
 	if err != nil {
 		logger.Warn("Could not read kube config")

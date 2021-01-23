@@ -95,13 +95,24 @@ jobs:
         release_name: Release ${{ github.ref }}
         draft: false
         prerelease: false
-    - name: Upload Release Asset
-      id: upload-release-asset 
-      uses: actions/upload-release-asset@v1
+    # - name: Upload Release Asset
+    #   id: upload-release-asset 
+    #   uses: actions/upload-release-asset@v1
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #   with:
+    #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+    #     asset_path: dist/grgd-darwin-amd64-${{ steps.get_version.outputs.VERSION }}
+    #     asset_name: grgd-darwin-amd64-${{ steps.get_version.outputs.VERSION }}
+    #     asset_content_type: application/zip
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: |
+          dist/grgd-darwin-amd64-${{ steps.get_version.outputs.VERSION }}
+          dist/grgd-linux-amd64-${{ steps.get_version.outputs.VERSION }}
+          dist/grgd-freebsd-amd64-${{ steps.get_version.outputs.VERSION }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: dist/grgd-darwin-amd64-${{ steps.get_version.outputs.VERSION }}
-        asset_name: grgd-darwin-amd64-${{ steps.get_version.outputs.VERSION }}
-        asset_content_type: application/zip
