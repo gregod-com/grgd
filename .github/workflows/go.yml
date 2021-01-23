@@ -73,20 +73,32 @@ jobs:
         name: grgd-darwin-amd64-${{ steps.get_version.outputs.VERSION }}
         path: dist/grgd-darwin-amd64-${{ steps.get_version.outputs.VERSION }}
 
-    # - name: Upload binary
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: grgd-v0.2.0-darwin
-    #     path: dist/grgd-darwin
+    - name: Upload binary
+      uses: actions/upload-artifact@v2
+      with:
+        name: grgd-linux-amd64-${{ steps.get_version.outputs.VERSION }}
+        path: dist/grgd-linux-amd64-${{ steps.get_version.outputs.VERSION }}
 
-    # - name: Upload binary
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: grgd-v0.2.0-linux
-    #     path: dist/grgd-linux
+    - name: Upload binary
+      uses: actions/upload-artifact@v2
+      with:
+        name: grgd-freebsd-amd64-${{ steps.get_version.outputs.VERSION }}
+        path: dist/grgd-freebsd-amd64-${{ steps.get_version.outputs.VERSION }}
 
-    # - name: Upload binary
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: grgd-v0.2.0-freebsd
-    #     path: dist/grgd-freebsd
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE
