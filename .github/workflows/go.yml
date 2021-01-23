@@ -101,4 +101,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: dist/grgd-darwin-amd64-${{ steps.get_version.outputs.VERSION }}
+        asset_name: grgd-darwin-amd64-${{ steps.get_version.outputs.VERSION }}
+        asset_content_type: application/zip
