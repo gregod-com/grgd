@@ -6,5 +6,5 @@ type IDAL interface {
 	Read(i interface{}) error
 	Update(i interface{}) error
 	Delete(i interface{}) error
-	GetProfile() (IProfileModel, error)
+	ReadAll(i interface{}) (map[string]interface{}, error)
 }
