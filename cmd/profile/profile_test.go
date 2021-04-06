@@ -3,12 +3,9 @@ package profile
 import (
 	"testing"
 
-	"github.com/gregod-com/grgd/controller/config"
-	"github.com/gregod-com/grgd/core"
 	"github.com/gregod-com/grgd/interfaces/mocks"
 
 	"github.com/golang/mock/gomock"
-	"github.com/urfave/cli/v2"
 )
 
 func testHelperDefaultDepenedecyMap(ctrl *gomock.Controller) map[string]interface{} {
@@ -24,7 +21,6 @@ func testHelperDefaultDepenedecyMap(ctrl *gomock.Controller) map[string]interfac
 	mockLogger.EXPECT().Trace(gomock.Any()).AnyTimes()
 	mockPlLoader.EXPECT().LoadPlugins(gomock.Any())
 	mockFSM.EXPECT().HomeDir(".grgd", "plugins")
-	mockDAL.EXPECT().GetProfile().AnyTimes()
 
 	deps := map[string]interface{}{
 		"IHelper":                mockHelper,
@@ -41,15 +37,15 @@ func testHelperDefaultDepenedecyMap(ctrl *gomock.Controller) map[string]interfac
 
 func TestAPluginList(t *testing.T) {
 	// Given
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	depsMap := testHelperDefaultDepenedecyMap(ctrl)
-	depsMap["IConfig"] = config.ProvideConfig
+	// ctrl := gomock.NewController(t)
+	// defer ctrl.Finish()
+	// depsMap := testHelperDefaultDepenedecyMap(ctrl)
+	// depsMap["IConfig"] = config.ProvideConfig
 
-	core := core.RegisterDependecies(depsMap)
-	app := cli.NewApp()
-	app.Metadata = make(map[string]interface{})
-	app.Metadata["core"] = core
+	// core := core.RegisterDependecies(depsMap)
+	// app := cli.NewApp()
+	// app.Metadata = make(map[string]interface{})
+	// app.Metadata["core"] = core
 
 	// When
 	// c := cli.NewContext(app, nil, nil)

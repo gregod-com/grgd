@@ -1,7 +1,7 @@
 package profile
 
 import (
-	"github.com/gregod-com/grgd/controller/helper"
+	"github.com/gregod-com/grgd/pkg/helper"
 	"github.com/urfave/cli/v2"
 )
 
