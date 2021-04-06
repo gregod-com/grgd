@@ -6,8 +6,8 @@ import (
 
 	"github.com/gregod-com/grgd/interfaces"
 
-	"github.com/gregod-com/grgd/controller/config"
-	"github.com/gregod-com/grgd/controller/helper"
+	"github.com/gregod-com/grgd/pkg/config"
+	"github.com/gregod-com/grgd/pkg/helper"
 	"github.com/tj/assert"
 )
 
