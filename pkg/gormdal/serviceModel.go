@@ -15,3 +15,13 @@ type ServiceModel struct {
 	Initialized    bool
 	ProjectModelID uint
 }
+
+// GetID ...
+func (s *ServiceModel) GetID() uint {
+	return s.ID
+}
+
+// GetName ...
+func (s *ServiceModel) GetName() string {
+	return s.Name
+}

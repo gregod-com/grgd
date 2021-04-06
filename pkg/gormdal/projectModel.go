@@ -20,3 +20,13 @@ type ProjectTag struct {
 	gorm.Model
 	Name string
 }
+
+// GetID ...
+func (p *ProjectModel) GetID() uint {
+	return p.ID
+}
+
+// GetName ...
+func (p *ProjectModel) GetName() string {
+	return p.Name
+}

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/gregod-com/grgd/interfaces"
 	"github.com/gregod-com/grgd/interfaces/mocks"
 	"github.com/tj/assert"
 )
@@ -13,10 +14,14 @@ func TestLoadTESTProject(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	fsm := mocks.NewMockIFileSystemManipulator(ctrl)
-	fsm.EXPECT().HomeDir(gomock.Any(), gomock.Any()).AnyTimes()
+	logger := mocks.NewMockILogger(ctrl)
+
+	fsm.EXPECT().LoadBootConfig().Return(&interfaces.Bootconfig{DatabasePath: "testdatabase"}).AnyTimes()
 	fsm.EXPECT().CheckOrCreateFolder(gomock.Any(), gomock.Any()).AnyTimes()
-	dal := setupDatabase(fsm)
-	defer tearDownDatabase(dal)
+	fsm.EXPECT().CheckOrCreateParentFolder(gomock.Any(), gomock.Any()).AnyTimes()
+	fsm.EXPECT().HomeDir(gomock.Any(), gomock.Any()).AnyTimes()
+	dal := setupDatabase(fsm, logger)
+	defer tearDownDatabase(fsm)
 
 	// When
 	search := ProjectModel{Name: "TESTProject"}
@@ -33,10 +38,14 @@ func TestDeleteTESTProject(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	fsm := mocks.NewMockIFileSystemManipulator(ctrl)
-	fsm.EXPECT().HomeDir(gomock.Any(), gomock.Any()).AnyTimes()
+	logger := mocks.NewMockILogger(ctrl)
+
+	fsm.EXPECT().LoadBootConfig().Return(&interfaces.Bootconfig{DatabasePath: "testdatabase"}).AnyTimes()
 	fsm.EXPECT().CheckOrCreateFolder(gomock.Any(), gomock.Any()).AnyTimes()
-	dal := setupDatabase(fsm)
-	defer tearDownDatabase(dal)
+	fsm.EXPECT().CheckOrCreateParentFolder(gomock.Any(), gomock.Any()).AnyTimes()
+	fsm.EXPECT().HomeDir(gomock.Any(), gomock.Any()).AnyTimes()
+	dal := setupDatabase(fsm, logger)
+	defer tearDownDatabase(fsm)
 
 	// When
 	search := &ProjectModel{Name: "TESTProject"}
@@ -54,10 +63,14 @@ func TestEditTESTProject(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	fsm := mocks.NewMockIFileSystemManipulator(ctrl)
-	fsm.EXPECT().HomeDir(gomock.Any(), gomock.Any()).AnyTimes()
+	logger := mocks.NewMockILogger(ctrl)
+
+	fsm.EXPECT().LoadBootConfig().Return(&interfaces.Bootconfig{DatabasePath: "testdatabase"}).AnyTimes()
 	fsm.EXPECT().CheckOrCreateFolder(gomock.Any(), gomock.Any()).AnyTimes()
-	dal := setupDatabase(fsm)
-	defer tearDownDatabase(dal)
+	fsm.EXPECT().CheckOrCreateParentFolder(gomock.Any(), gomock.Any()).AnyTimes()
+	fsm.EXPECT().HomeDir(gomock.Any(), gomock.Any()).AnyTimes()
+	dal := setupDatabase(fsm, logger)
+	defer tearDownDatabase(fsm)
 
 	// When
 	search := &ProfileModel{Name: "TESTProject"}
@@ -79,10 +92,14 @@ func TestAddProjectToProfile(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	fsm := mocks.NewMockIFileSystemManipulator(ctrl)
-	fsm.EXPECT().HomeDir(gomock.Any(), gomock.Any()).AnyTimes()
+	logger := mocks.NewMockILogger(ctrl)
+
+	fsm.EXPECT().LoadBootConfig().Return(&interfaces.Bootconfig{DatabasePath: "testdatabase"}).AnyTimes()
 	fsm.EXPECT().CheckOrCreateFolder(gomock.Any(), gomock.Any()).AnyTimes()
-	dal := setupDatabase(fsm)
-	defer tearDownDatabase(dal)
+	fsm.EXPECT().CheckOrCreateParentFolder(gomock.Any(), gomock.Any()).AnyTimes()
+	fsm.EXPECT().HomeDir(gomock.Any(), gomock.Any()).AnyTimes()
+	dal := setupDatabase(fsm, logger)
+	defer tearDownDatabase(fsm)
 
 	// When
 	searchProfile := &ProfileModel{Name: "TESTProfile"}
