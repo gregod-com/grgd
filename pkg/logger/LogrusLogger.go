@@ -1,20 +1,22 @@
 package logger
 
 import (
+	"fmt"
+	"os"
+	"runtime"
+
 	"github.com/gregod-com/grgd/interfaces"
 
 	"github.com/sirupsen/logrus"
 )
 
 // ProvideLogrusLogger ....
-func ProvideLogrusLogger(h interfaces.IHelper) interfaces.ILogger {
-	// h, _ := i
+func ProvideLogrusLogger() interfaces.ILogger {
 	logger := logrus.New()
-	if h.CheckFlag("debug") || h.CheckFlag("d") {
+	if checkFlag("debug") || checkFlag("d") {
 		logger.SetLevel(logrus.DebugLevel)
-		return logger
 	}
-	switch h.CheckFlagArg("log-level") {
+	switch checkFlagArg("log-level") {
 	case "trace":
 		logger.SetLevel(logrus.TraceLevel)
 	case "debug":
@@ -33,17 +35,52 @@ func ProvideLogrusLogger(h interfaces.IHelper) interfaces.ILogger {
 		logger.SetLevel(logrus.InfoLevel)
 	}
 	logrusLogger := &LogrusLogger{logger: logger}
+	logrusLogger.Tracef("provide %T", logrusLogger)
 	return logrusLogger
+}
+
+// CheckFlagArg ...
+func checkFlagArg(flag string) string {
+	for k, v := range os.Args {
+		if v == "--"+flag && len(os.Args) > k+1 {
+			return os.Args[k+1]
+		}
+	}
+	return ""
+}
+
+// CheckFlag ...
+func checkFlag(flag string) bool {
+	for _, v := range os.Args {
+		if v == "-"+flag {
+			return true
+		}
+		if v == "--"+flag {
+			return true
+		}
+	}
+	return false
 }
 
 // LogrusLogger ...
 type LogrusLogger struct {
 	logger *logrus.Logger
+	pkg    string
+}
+
+// GetLevel ...
+func (l *LogrusLogger) GetLevel(i ...interface{}) string {
+	return l.logger.GetLevel().String()
 }
 
 // Trace ...
 func (l *LogrusLogger) Trace(i ...interface{}) {
-	l.logger.Trace(i...)
+	pc := make([]uintptr, 15)
+	n := runtime.Callers(2, pc)
+	frames := runtime.CallersFrames(pc[:n])
+	frame, _ := frames.Next()
+	format := fmt.Sprintf("[%s] %s", frame.Function, i)
+	l.logger.Trace(format)
 }
 
 // Debug ...
@@ -73,6 +110,11 @@ func (l *LogrusLogger) Fatal(i ...interface{}) {
 
 // Tracef ...
 func (l *LogrusLogger) Tracef(format string, i ...interface{}) {
+	pc := make([]uintptr, 15)
+	n := runtime.Callers(2, pc)
+	frames := runtime.CallersFrames(pc[:n])
+	frame, _ := frames.Next()
+	format = fmt.Sprintf("[%s] %s", frame.Function, format)
 	l.logger.Tracef(format, i...)
 }
 
