@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/gregod-com/grgd/controller/helper"
+	"github.com/gregod-com/grgd/pkg/helper"
 	"github.com/urfave/cli/v2"
 )
 
@@ -10,7 +10,7 @@ func SubAConfigYAML(c *cli.Context) error {
 	core := helper.GetExtractor().GetCore(c)
 	UI := core.GetUI()
 	config := core.GetConfig()
-	UI.Println(config.DumpConfig("yaml"))
+	UI.Println(config)
 	return nil
 }
 
