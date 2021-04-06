@@ -3,6 +3,7 @@ package helper
 import (
 	"log"
 	"net/http"
+	"reflect"
 
 	"github.com/gregod-com/grgd/interfaces"
 )
@@ -14,16 +15,19 @@ type Connection struct {
 	Success  bool
 }
 
-// Pinger ...
-type Pinger struct {
-	logger interfaces.ILogger
-}
-
 // ProvidePinger ...
 func ProvidePinger(logger interfaces.ILogger) interfaces.IPinger {
 	pinger := new(Pinger)
+	pinger.pkg = reflect.TypeOf(Pinger{}).PkgPath()
 	pinger.logger = logger
+	pinger.logger.Tracef("provide %T", pinger)
 	return pinger
+}
+
+// Pinger ...
+type Pinger struct {
+	logger interfaces.ILogger
+	pkg    string
 }
 
 // CheckConnections ...

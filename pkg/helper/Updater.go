@@ -21,6 +21,7 @@ import (
 func ProvideUpdater(logger interfaces.ILogger) interfaces.IUpdater {
 	up := new(Updater)
 	up.logger = logger
+	logger.Tracef("provide %T", up)
 	return up
 }
 
@@ -40,11 +41,11 @@ func (h *Updater) CheckUpdate(version string, core interfaces.ICore) error {
 	cnfg := core.GetConfig()
 	UI := core.GetUI()
 
-	indexpath := path.Join(cnfg.GetProfile().GetBasePath(), "index.yaml")
+	indexpath := path.Join(cnfg.GetActiveProfile().GetBasePath(), "index.yaml")
 	versionMap := map[string]string{}
 
 	// SCRIPTS
-	hackFolder := path.Join(cnfg.GetProfile().GetBasePath(), "hack")
+	hackFolder := path.Join(cnfg.GetActiveProfile().GetBasePath(), "hack")
 
 	fileinfo, err := ioutil.ReadDir(hackFolder)
 	if err != nil {
@@ -62,7 +63,7 @@ func (h *Updater) CheckUpdate(version string, core interfaces.ICore) error {
 		versionMap[cName] = cVersion
 	}
 
-	err = downloader.Load(indexpath, cnfg.GetProfile().GetUpdateURL())
+	err = downloader.Load(indexpath, cnfg.GetActiveProfile().GetUpdateURL())
 	if err != nil {
 		return err
 	}
