@@ -1,0 +1,13 @@
+syntax = "proto3";
+package interfaces;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "grgd/pkg/types";
+
+message Project {
+    string name = 1;
+    string path = 2;
+    google.protobuf.Timestamp last_updated = 3;
+    string config_file = 4;
+  }
