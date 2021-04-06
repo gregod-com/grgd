@@ -4,7 +4,9 @@ package view
 // GetHelpTemplate so if i start typing something here
 func GetHelpTemplate() string {
 	return `
- 	USAGE:
+
+
+USAGE:
 	{{- if .UsageText}}
 		{{.UsageText}}
 	{{- else}}
@@ -17,6 +19,7 @@ func GetHelpTemplate() string {
 		{{- else}} [arguments...]
 		{{- end}}
 	{{end}}
+COMMANDS:
 	{{- if .VisibleCommands}}
 	{{- range .VisibleCategories}}
 	 	{{- if .Name}}
@@ -30,8 +33,8 @@ func GetHelpTemplate() string {
 	{{- end}}
 	{{if .VisibleFlags}}
 	GLOBAL OPTIONS:
-	{{- range $index, $option := .VisibleFlags}}
-		{{if $index}}
+		{{- range $index, $option := .VisibleFlags}}
+			{{if $index}}
 		{{- end}}
 		{{- printf "%-20v" $option }}
 	{{- end}}

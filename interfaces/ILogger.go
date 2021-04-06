@@ -2,6 +2,7 @@ package interfaces
 
 // ILogger ...
 type ILogger interface {
+	GetLevel(i ...interface{}) string
 	Trace(i ...interface{})
 	Debug(i ...interface{})
 	Info(i ...interface{})
