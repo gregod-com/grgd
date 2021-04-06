@@ -3,7 +3,7 @@ package project
 import (
 	"errors"
 
-	"github.com/gregod-com/grgd/controller/helper"
+	"github.com/gregod-com/grgd/pkg/helper"
 	"github.com/urfave/cli/v2"
 )
 
@@ -11,7 +11,7 @@ import (
 func AListProject(c *cli.Context) error {
 	core := helper.GetExtractor().GetCore(c)
 	UI := core.GetUI()
-	profile := core.GetConfig().GetProfile()
+	profile := core.GetConfig().GetActiveProfile()
 
 	rows := profile.GetProjectsTable()
 	UI.PrintTable(rows[0], rows[1:], c)
@@ -22,7 +22,7 @@ func AListProject(c *cli.Context) error {
 // ASwitchProject ...
 func ASwitchProject(c *cli.Context) error {
 	core := helper.GetExtractor().GetCore(c)
-	profile := core.GetConfig().GetProfile()
+	profile := core.GetConfig().GetActiveProfile()
 
 	if p, ok := profile.GetProjects()[c.Args().First()]; ok {
 		profile.SetCurrentProject(p)
@@ -70,7 +70,7 @@ func AAddProject(c *cli.Context) error {
 // AEditProject ...
 func AEditProject(c *cli.Context) error {
 	core := helper.GetExtractor().GetCore(c)
-	profile := core.GetConfig().GetProfile()
+	profile := core.GetConfig().GetActiveProfile()
 	UI := core.GetUI()
 
 	UI.Println(profile)
