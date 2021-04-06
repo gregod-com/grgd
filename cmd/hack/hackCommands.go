@@ -48,7 +48,7 @@ func GetCLICommands(app *cli.App, core interfaces.ICore) []*cli.Command {
 
 		current := cli.Command{
 			Name:        name,
-			Category:    "local hack",
+			Category:    "plugins",
 			Usage:       description,
 			Aliases:     strings.Split(shortcuts, ","),
 			Action:      AExec,
