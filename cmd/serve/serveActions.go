@@ -3,7 +3,7 @@ package serve
 import (
 	"net/http"
 
-	"github.com/gregod-com/grgd/controller/helper"
+	"github.com/gregod-com/grgd/pkg/helper"
 	"github.com/urfave/cli/v2"
 )
 
@@ -11,7 +11,7 @@ import (
 func AServe(c *cli.Context) error {
 	core := helper.GetExtractor().GetCore(c)
 	logger := core.GetLogger()
-	// profile := core.GetConfig().GetProfile()
+	// profile := core.GetConfig().GetActiveProfile()
 
 	mux := http.NewServeMux()
 	// mux.Handle("/", http.FileServer(AssetFile()))
