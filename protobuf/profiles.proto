@@ -1,0 +1,13 @@
+syntax = "proto3";
+package interfaces;
+
+import "google/protobuf/timestamp.proto";
+import "protobuf/profile.proto";
+
+option go_package = "grgd/pkg/types";
+
+// Our address book file is just one of these.
+message Profiles {
+    repeated Profile profiles = 1;
+    google.protobuf.Timestamp last_updated = 2;
+  }

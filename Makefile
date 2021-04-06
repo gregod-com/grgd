@@ -54,3 +54,16 @@ docker-build-bin:
 docker-build:
 	docker build -t registry.gitlab.com/iamdevelopment/iamk3d:latest .
 	docker push registry.gitlab.com/iamdevelopment/iamk3d:latest
+
+tdd:
+	fswatch -o ../* | xargs -n1 -I{} bash -c 'clear && go test ./...'
+
+mocks:
+	@for f in interfaces/*.go; do \
+		echo generate $${f}; \
+		mockgen --source=$${f} -destination interfaces/mocks/mock`basename $${f}` -package mocks; \
+	done
+
+proto:
+	protoc  --go_out=../  protobuf/*.proto
+

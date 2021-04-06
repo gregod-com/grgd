@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"sort"
 	"strings"
 
 	"github.com/common-nighthawk/go-figure"
@@ -42,32 +43,40 @@ func ExtractCliContext(i interface{}) *cli.Context {
 }
 
 // ProvideFallbackUI ...
-func ProvideFallbackUI() interfaces.IUIPlugin {
-	return new(FallbackUI)
+func ProvideFallbackUI(logger interfaces.ILogger) interfaces.IUIPlugin {
+	ui := new(FallbackUI)
+	logger.Tracef("provide %T", ui)
+	ui.logger = logger
+	return ui
 }
 
 // FallbackUI ...
 type FallbackUI struct {
+	logger interfaces.ILogger
 }
 
 // ClearScreen ...
-func (p FallbackUI) ClearScreen(i ...interface{}) interface{} {
-	switch runtime.GOOS {
-	case "linux", "darwin":
-		out := ExecCommand("clear")
-		fmt.Println(out)
-	case "windows":
-		out := ExecCommand("cmd", "/c", "cls")
-		fmt.Println(out)
-	default:
-		fmt.Printf("ClearScreen not implemented for %v\n", runtime.GOOS)
+func (ui FallbackUI) ClearScreen(i ...interface{}) interface{} {
+	ui.logger.Tracef("")
+	if ui.logger.GetLevel() != "trace" && ui.logger.GetLevel() != "debug" {
+		switch runtime.GOOS {
+		case "linux", "darwin":
+			out := ExecCommand("clear")
+			fmt.Println(out)
+		case "windows":
+			out := ExecCommand("cmd", "/c", "cls")
+			fmt.Println(out)
+		default:
+			fmt.Printf("ClearScreen not implemented for %v\n", runtime.GOOS)
+		}
 	}
-
 	return nil
 }
 
 // PrintPercentOfScreen ...
-func (p FallbackUI) PrintPercentOfScreen(percentStart int, percentEnd int, str ...interface{}) interface{} {
+func (ui FallbackUI) PrintPercentOfScreen(percentStart int, percentEnd int, str ...interface{}) interface{} {
+	ui.logger.Tracef("")
+
 	y := 100
 	ws, err := getWinsize()
 	if err == nil {
@@ -111,21 +120,72 @@ func (p FallbackUI) PrintPercentOfScreen(percentStart int, percentEnd int, str .
 }
 
 // PrintBanner ...
-func (p FallbackUI) PrintBanner(i ...interface{}) interface{} {
+func (ui FallbackUI) PrintBanner(i ...interface{}) interface{} {
+	ui.logger.Tracef("")
 	c := ExtractCliContext(i[0])
-	core := c.App.Metadata["core"].(interfaces.ICore)
+	core, ok := c.App.Metadata["core"].(interfaces.ICore)
+	if !ok {
+		ui.logger.Fatalf("Missing core in metadata!")
+	}
+	unsorted := []string{}
+	longestMetaKey := 0
+	longestMetaValue := 0
+	for k, v := range core.GetConfig().GetActiveProfile().GetValuesAsMap() {
+		unsorted = append(unsorted, k)
+		if longestMetaKey < len(k) {
+			longestMetaKey = len(k)
+		}
+		if longestMetaValue < len(v) {
+			longestMetaValue = len(v)
+		}
+	}
+	longestMetaKey++
+	longestMetaValue++
+
+	meta := []string{}
+	for key, value := range map[string]string{
+		"version": c.App.Version,
+		"profile": core.GetConfig().GetActiveProfile().GetName(),
+	} {
+		meta = append(meta, fmt.Sprintf("%-*s \u001b[33m %-*s\u001b[0m", longestMetaKey, key, longestMetaValue, value))
+	}
+
+	sort.Strings(unsorted)
+	for _, key := range unsorted {
+		meta = append(meta, fmt.Sprintf("%-*s \u001b[33m %-*s\u001b[0m", longestMetaKey, key, longestMetaValue, core.GetConfig().GetActiveProfile().GetMetaData(key)))
+	}
+
+	// fmt.Srintf("version: \u001b[33m %s\u001b[0m", c.App.Version),
+	// ||| profile: \u001b[33m%s\u001b[0m",
+	// core.GetConfig().GetActiveProfile().GetName(),
 
 	iamASCII := figure.NewFigure(c.App.Name, "standard", true)
-	fmt.Println(iamASCII.String())
-	fmt.Printf("version: \u001b[33m %s\u001b[0m ||| profile: \u001b[33m%s\u001b[0m ||| k8s-ctx: \u001b[33m%s\u001b[0m \n\n",
-		c.App.Version,
-		core.GetConfig().GetProfile().GetName(),
-		c.App.Metadata["kubeContext"])
+	longestLine := 0
+	nrOfBannerLines := len(iamASCII.Slicify())
+	for _, line := range iamASCII.Slicify() {
+		if len(line) > longestLine {
+			longestLine = len(line)
+		}
+	}
+	for k, line := range iamASCII.Slicify() {
+		tag1 := ""
+		tag2 := ""
+		if k <= len(meta)-1 {
+			tag1 = meta[k]
+		}
+		if nrOfBannerLines < len(meta) && k+nrOfBannerLines <= len(meta)-1 {
+			tag2 = meta[k+nrOfBannerLines]
+		}
+
+		fmt.Printf("%-*s%s| %s\n", longestLine+2, line, tag1, tag2)
+	}
+	fmt.Println()
 	return nil
 }
 
 // PrintTable ...
-func (p FallbackUI) PrintTable(heads []string, rows [][]string, i ...interface{}) interface{} {
+func (ui FallbackUI) PrintTable(heads []string, rows [][]string, i ...interface{}) interface{} {
+	ui.logger.Tracef("")
 	w, _, err := term.GetSize(2)
 	if err != nil {
 		fmt.Println(err)
@@ -151,17 +211,20 @@ func (p FallbackUI) PrintTable(heads []string, rows [][]string, i ...interface{}
 }
 
 // Println ...
-func (p FallbackUI) Println(i ...interface{}) (int, error) {
+func (ui FallbackUI) Println(i ...interface{}) (int, error) {
+	ui.logger.Tracef("")
 	return fmt.Println(i...)
 }
 
 // Printf ...
-func (p FallbackUI) Printf(format string, a ...interface{}) (int, error) {
+func (ui FallbackUI) Printf(format string, a ...interface{}) (int, error) {
+	ui.logger.Tracef("")
 	return fmt.Printf(format, a...)
 }
 
 // YesNoQuestion ...
-func (p FallbackUI) YesNoQuestion(question string, i ...interface{}) bool {
+func (ui FallbackUI) YesNoQuestion(question string, i ...interface{}) bool {
+	ui.logger.Tracef("")
 	fmt.Print(question + " [y/n] ")
 	answer := readLine()
 	if strings.Contains(answer, "y") {
@@ -171,7 +234,8 @@ func (p FallbackUI) YesNoQuestion(question string, i ...interface{}) bool {
 }
 
 // YesNoQuestionf ...
-func (p FallbackUI) YesNoQuestionf(question string, i ...interface{}) bool {
+func (ui FallbackUI) YesNoQuestionf(question string, i ...interface{}) bool {
+	ui.logger.Tracef("")
 	fmt.Printf(question+" [y/n] ", i...)
 	answer := readLine()
 	if strings.Contains(answer, "y") {
@@ -181,7 +245,8 @@ func (p FallbackUI) YesNoQuestionf(question string, i ...interface{}) bool {
 }
 
 // Question ...
-func (p FallbackUI) Question(question string, i ...interface{}) error {
+func (ui FallbackUI) Question(question string, i ...interface{}) error {
+	ui.logger.Tracef("")
 	fmt.Print(question)
 	if len(i) > 0 {
 		answer, ok := i[0].(*string)
@@ -193,7 +258,8 @@ func (p FallbackUI) Question(question string, i ...interface{}) error {
 }
 
 // Questionf ...
-func (p FallbackUI) Questionf(question string, i ...interface{}) error {
+func (ui FallbackUI) Questionf(question string, i ...interface{}) error {
+	ui.logger.Tracef("")
 	fmt.Printf(question, i[1:])
 	if len(i) > 0 {
 		answer, ok := i[0].(*string)
@@ -215,7 +281,7 @@ func readLine() string {
 }
 
 // // PrintActiveWorkload ...
-// func (p uisimple) PrintActiveWorkload(c *cli.Context, w I.IWorkload, config I.IConfigObject, line int) {
+// func (ui uisimple) PrintActiveWorkload(c *cli.Context, w I.IWorkload, config I.IConfigObject, line int) {
 // 	shared.Debug(c, "called")
 // 	// ----------------------
 // 	_, _, activeBool := w.GetActive()
@@ -230,13 +296,13 @@ func readLine() string {
 // }
 
 // // PrintSidecars ...
-// func (p uisimple) PrintSidecars(c *cli.Context, s I.IWorkload, config I.IConfigObject) {
+// func (ui uisimple) PrintSidecars(c *cli.Context, s I.IWorkload, config I.IConfigObject) {
 // 	shared.Debug(c, "called")
 // 	// ----------------------
 // }
 
 // // PrintNetworkDetails ...
-// func (p uisimple) PrintNetworkDetails(c *cli.Context, s I.IContainer, indent int) {
+// func (ui uisimple) PrintNetworkDetails(c *cli.Context, s I.IContainer, indent int) {
 // 	shared.Debug(c, "called")
 // 	// ----------------------
 // 	if c.Bool("network") {
@@ -245,19 +311,19 @@ func readLine() string {
 // }
 
 // // PrintVolumeDetails ...
-// func (p uisimple) PrintVolumeDetails(c *cli.Context, w I.IWorkload) {
+// func (ui uisimple) PrintVolumeDetails(c *cli.Context, w I.IWorkload) {
 // 	shared.Debug(c, "called")
 // 	// ----------------------
 // }
 
 // // PrintInactiveWorkload ...
-// func (p uisimple) PrintInactiveWorkload(c *cli.Context, s I.IWorkload) {
+// func (ui uisimple) PrintInactiveWorkload(c *cli.Context, s I.IWorkload) {
 // 	shared.Debug(c, "called")
 // 	// ----------------------
 // }
 
 // // PrintExecutionTime ...
-// func (p uisimple) PrintExecutionTime(d time.Duration) {
+// func (ui uisimple) PrintExecutionTime(d time.Duration) {
 // }
 
 // func sortMapAlphabetically(WorkloadMap map[string]I.IWorkload) []I.IWorkload {
