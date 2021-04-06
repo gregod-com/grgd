@@ -11,14 +11,14 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// ExtractHelper ...
+// GetExtractor ...
 func GetExtractor() interfaces.IExtractor {
 	return &Extractor{}
 }
 
 // Extractor ...
 type Extractor struct {
-	// to net put fields here, since the extractor will never be initialized this way
+	// do not put fields here, since the extractor will never be initialized this way
 }
 
 // GetMetadata ...

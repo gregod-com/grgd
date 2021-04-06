@@ -7,8 +7,11 @@ import (
 )
 
 // ProvideHelper ...
-func ProvideHelper() interfaces.IHelper {
-	return new(Helper)
+func ProvideHelper(logger interfaces.ILogger) interfaces.IHelper {
+	h := new(Helper)
+	logger.Tracef("provide %T", h)
+	h.logger = logger
+	return h
 }
 
 // Helper ...
@@ -18,6 +21,7 @@ type Helper struct {
 
 // CheckUserProfile ...
 func (h *Helper) CheckUserProfile() string {
+	h.logger.Tracef("[pkg/helper/CheckUserProfile]")
 	var profilename string
 	u, ok := os.LookupEnv("USER")
 	if !ok {
@@ -39,6 +43,7 @@ func (h *Helper) CheckUserProfile() string {
 
 // CheckFlagArg ...
 func (h *Helper) CheckFlagArg(flag string) string {
+	h.logger.Tracef("[pkg/helper/CheckFlagArg]")
 	for k, v := range os.Args {
 		if v == "--"+flag && len(os.Args) > k+1 {
 			return os.Args[k+1]
@@ -49,6 +54,7 @@ func (h *Helper) CheckFlagArg(flag string) string {
 
 // CheckFlag ...
 func (h *Helper) CheckFlag(flag string) bool {
+	h.logger.Tracef("[pkg/helper/CheckFlag]")
 	for _, v := range os.Args {
 		if v == "-"+flag {
 			return true
