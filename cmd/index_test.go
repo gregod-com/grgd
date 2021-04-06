@@ -1,14 +1,14 @@
-package clicommands
+package cmd
 
 import (
 	"fmt"
 	"testing"
 
-	"github.com/gregod-com/grgd/controller/config"
-	"github.com/gregod-com/grgd/controller/helper"
 	"github.com/gregod-com/grgd/core"
-	"github.com/gregod-com/grgd/gormdal"
-	"github.com/gregod-com/grgd/logger"
+	"github.com/gregod-com/grgd/pkg/config"
+	"github.com/gregod-com/grgd/pkg/gormdal"
+	"github.com/gregod-com/grgd/pkg/helper"
+	"github.com/gregod-com/grgd/pkg/logger"
 	"github.com/gregod-com/grgd/view"
 	"github.com/tj/assert"
 	"github.com/urfave/cli/v2"
@@ -27,8 +27,6 @@ func TestGetCommands(t *testing.T) {
 		"IDAL":                   gormdal.ProvideDAL,
 		"IDownloader":            helper.ProvideDownloader,
 		"IConfig":                config.ProvideConfig,
-		"IPinger":                helper.ProvidePinger,
-		"string":                 gormdal.ProvideDefaultDBPath,
 	}
 	core := core.RegisterDependecies(dependecies)
 

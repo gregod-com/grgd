@@ -3,9 +3,9 @@ package initialise
 import (
 	"testing"
 
-	"github.com/gregod-com/grgd/controller/config"
 	"github.com/gregod-com/grgd/core"
 	"github.com/gregod-com/grgd/interfaces/mocks"
+	"github.com/gregod-com/grgd/pkg/config"
 
 	"github.com/golang/mock/gomock"
 	"github.com/tj/assert"
@@ -20,12 +20,14 @@ func testHelperDefaultDepenedecyMap(ctrl *gomock.Controller) map[string]interfac
 	mockUI := mocks.NewMockIUIPlugin(ctrl)
 	mockPlLoader := mocks.NewMockIPluginLoader(ctrl)
 	mockFSM := mocks.NewMockIFileSystemManipulator(ctrl)
+	mocksProfile := mocks.NewMockIProfile(ctrl)
 
 	mockLogger.EXPECT().Tracef(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes()
 	mockLogger.EXPECT().Trace(gomock.Any()).AnyTimes()
-	mockPlLoader.EXPECT().LoadPlugins(gomock.Any())
+	mockPlLoader.EXPECT().LoadPlugins(gomock.Any()).AnyTimes()
 	mockFSM.EXPECT().HomeDir(".grgd", "plugins")
-	mockDAL.EXPECT().GetProfile().AnyTimes()
+	mockDAL.EXPECT().Read(gomock.Any())
+	mocksProfile.EXPECT().GetName().AnyTimes()
 
 	deps := map[string]interface{}{
 		"IHelper":                mockHelper,
@@ -35,8 +37,8 @@ func testHelperDefaultDepenedecyMap(ctrl *gomock.Controller) map[string]interfac
 		"IUIPlugin":              mockUI,
 		"IPluginLoader":          mockPlLoader,
 		"IFileSystemManipulator": mockFSM,
+		"IProfile":               mocksProfile,
 	}
-
 	return deps
 }
 
@@ -47,6 +49,7 @@ func TestInit(t *testing.T) {
 	depsMap := testHelperDefaultDepenedecyMap(ctrl)
 	mockUI := mocks.NewMockIUIPlugin(ctrl)
 	mockUI.EXPECT().Println(gomock.Any())
+
 	depsMap["IUIPlugin"] = mockUI
 	depsMap["IConfig"] = config.ProvideConfig
 
