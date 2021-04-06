@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 
@@ -12,12 +13,19 @@ import (
 )
 
 // ProvideDownloader ...
-func ProvideDownloader() interfaces.IDownloader {
-	return new(Downloader)
+func ProvideDownloader(logger interfaces.ILogger) interfaces.IDownloader {
+	dl := new(Downloader)
+	dl.pkg = reflect.TypeOf(Downloader{}).PkgPath()
+	dl.logger = logger
+	dl.logger.Tracef("provide %T", dl)
+	return dl
 }
 
 // Downloader ...
-type Downloader struct{}
+type Downloader struct {
+	logger interfaces.ILogger
+	pkg    string
+}
 
 var downloadSize uint64
 
