@@ -14,15 +14,15 @@ func TestLoadTESTProfile(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	// testBootConfig :=
-	fsm := mocks.NewMockIFileSystemManipulator(ctrl)
+	helper := mocks.NewMockIHelper(ctrl)
 	logger := mocks.NewMockILogger(ctrl)
 
-	fsm.EXPECT().LoadBootConfig().Return(&interfaces.Bootconfig{DatabasePath: "testdatabase"}).AnyTimes()
-	fsm.EXPECT().CheckOrCreateFolder(gomock.Any(), gomock.Any()).AnyTimes()
-	fsm.EXPECT().CheckOrCreateParentFolder(gomock.Any(), gomock.Any()).AnyTimes()
-	fsm.EXPECT().HomeDir(gomock.Any(), gomock.Any()).AnyTimes()
-	dal := setupDatabase(fsm, logger)
-	defer tearDownDatabase(fsm)
+	helper.EXPECT().LoadBootConfig().Return(&interfaces.Bootconfig{DatabasePath: "testdatabase"}).AnyTimes()
+	helper.EXPECT().CheckOrCreateFolder(gomock.Any(), gomock.Any()).AnyTimes()
+	helper.EXPECT().CheckOrCreateParentFolder(gomock.Any(), gomock.Any()).AnyTimes()
+	helper.EXPECT().HomeDir(gomock.Any(), gomock.Any()).AnyTimes()
+	dal := setupDatabase(helper, logger)
+	defer tearDownDatabase(helper)
 
 	// When
 	search := ProfileModel{Name: "TESTProfile"}

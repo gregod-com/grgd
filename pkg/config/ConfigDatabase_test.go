@@ -13,21 +13,16 @@ func testHelperDefaultDepenedecyMap(ctrl *gomock.Controller) map[string]interfac
 	mockLogger := mocks.NewMockILogger(ctrl)
 	mockDAL := mocks.NewMockIDAL(ctrl)
 	mockConfig := mocks.NewMockIConfig(ctrl)
-	mockPlLoader := mocks.NewMockIPluginLoader(ctrl)
-	mockFSM := mocks.NewMockIFileSystemManipulator(ctrl)
 
 	mockLogger.EXPECT().Tracef(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes()
 	mockLogger.EXPECT().Trace(gomock.Any()).AnyTimes()
-	mockPlLoader.EXPECT().LoadPlugins(gomock.Any())
-	mockFSM.EXPECT().HomeDir(".grgd", "plugins")
+	mockHelper.EXPECT().HomeDir(".grgd", "plugins")
 
 	deps := map[string]interface{}{
-		"IHelper":                mockHelper,
-		"IDAL":                   mockDAL,
-		"ILogger":                mockLogger,
-		"IConfig":          mockConfig,
-		"IPluginLoader":          mockPlLoader,
-		"IFileSystemManipulator": mockFSM,
+		"IHelper": mockHelper,
+		"IDAL":    mockDAL,
+		"ILogger": mockLogger,
+		"IConfig": mockConfig,
 	}
 	return deps
 }

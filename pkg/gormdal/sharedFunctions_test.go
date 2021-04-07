@@ -7,10 +7,10 @@ import (
 	"github.com/gregod-com/grgd/interfaces"
 )
 
-func setupDatabase(fsm interfaces.IFileSystemManipulator, logger interfaces.ILogger) interfaces.IDAL {
-	os.Remove(fsm.LoadBootConfig().DatabasePath)
+func setupDatabase(helper interfaces.IHelper, logger interfaces.ILogger) interfaces.IDAL {
+	os.Remove(helper.LoadBootConfig().DatabasePath)
 
-	dal := ProvideDAL(fsm, logger)
+	dal := ProvideDAL(helper, logger)
 	dal.Create(&ProfileModel{
 		Name:    "TESTProfile",
 		HomeDir: "./test-me-dir/"})
@@ -24,8 +24,8 @@ func setupDatabase(fsm interfaces.IFileSystemManipulator, logger interfaces.ILog
 	return dal
 }
 
-func tearDownDatabase(fsm interfaces.IFileSystemManipulator) {
-	err := os.Remove(fsm.LoadBootConfig().DatabasePath)
+func tearDownDatabase(helper interfaces.IHelper) {
+	err := os.Remove(helper.LoadBootConfig().DatabasePath)
 	if err != nil {
 		log.Fatal(err)
 	}

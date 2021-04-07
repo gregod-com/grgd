@@ -18,26 +18,21 @@ func testHelperDefaultDepenedecyMap(ctrl *gomock.Controller) map[string]interfac
 	mockDAL := mocks.NewMockIDAL(ctrl)
 	mockConfig := mocks.NewMockIConfig(ctrl)
 	mockUI := mocks.NewMockIUIPlugin(ctrl)
-	mockPlLoader := mocks.NewMockIPluginLoader(ctrl)
-	mockFSM := mocks.NewMockIFileSystemManipulator(ctrl)
 	mocksProfile := mocks.NewMockIProfile(ctrl)
 
 	mockLogger.EXPECT().Tracef(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes()
 	mockLogger.EXPECT().Trace(gomock.Any()).AnyTimes()
-	mockPlLoader.EXPECT().LoadPlugins(gomock.Any()).AnyTimes()
-	mockFSM.EXPECT().HomeDir(".grgd", "plugins")
+	mockHelper.EXPECT().HomeDir(".grgd", "plugins")
 	mockDAL.EXPECT().Read(gomock.Any())
 	mocksProfile.EXPECT().GetName().AnyTimes()
 
 	deps := map[string]interface{}{
-		"IHelper":                mockHelper,
-		"IDAL":                   mockDAL,
-		"ILogger":                mockLogger,
-		"IConfig":                mockConfig,
-		"IUIPlugin":              mockUI,
-		"IPluginLoader":          mockPlLoader,
-		"IFileSystemManipulator": mockFSM,
-		"IProfile":               mocksProfile,
+		"IHelper":   mockHelper,
+		"IDAL":      mockDAL,
+		"ILogger":   mockLogger,
+		"IConfig":   mockConfig,
+		"IUIPlugin": mockUI,
+		"IProfile":  mocksProfile,
 	}
 	return deps
 }

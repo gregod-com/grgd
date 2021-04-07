@@ -19,14 +19,11 @@ func TestGetCommands(t *testing.T) {
 	app := cli.NewApp()
 	cli.NewContext(app, nil, nil)
 	dependecies := map[string]interface{}{
-		"IHelper":                helper.ProvideHelper,
-		"IUIPlugin":              view.ProvideFallbackUI,
-		"ILogger":                logger.ProvideLogrusLogger,
-		"IFileSystemManipulator": helper.ProvideFSManipulator,
-		"IUpdater":               helper.ProvideUpdater,
-		"IDAL":                   gormdal.ProvideDAL,
-		"IDownloader":            helper.ProvideDownloader,
-		"IConfig":                config.ProvideConfig,
+		"IHelper":   helper.ProvideHelper,
+		"IUIPlugin": view.ProvideFallbackUI,
+		"ILogger":   logger.ProvideLogrusLogger,
+		"IDAL":      gormdal.ProvideDAL,
+		"IConfig":   config.ProvideConfig,
 	}
 	core := core.RegisterDependecies(dependecies)
 
