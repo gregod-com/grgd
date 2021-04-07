@@ -7,32 +7,29 @@ import (
 	"sort"
 	"time"
 
-	"github.com/gregod-com/grgd/clicommands"
-	"github.com/gregod-com/grgd/clicommands/flags"
-	"github.com/gregod-com/grgd/controller/config"
-	"github.com/gregod-com/grgd/controller/helper"
+	"github.com/gregod-com/grgd/cmd"
+	"github.com/gregod-com/grgd/cmd/flags"
 	"github.com/gregod-com/grgd/core"
-	"github.com/gregod-com/grgd/gormdal"
 	"github.com/gregod-com/grgd/interfaces"
-	"github.com/gregod-com/grgd/logger"
+	"github.com/gregod-com/grgd/pkg/config"
+	"github.com/gregod-com/grgd/pkg/gormdal"
+	"github.com/gregod-com/grgd/pkg/helper"
+	"github.com/gregod-com/grgd/pkg/logger"
+	"github.com/gregod-com/grgd/pkg/profile"
 	"github.com/gregod-com/grgd/view"
-	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/urfave/cli/v2"
 )
 
 func main() {
 	dependecies := map[string]interface{}{
-		"IHelper":                helper.ProvideHelper,
-		"IUIPlugin":              view.ProvideFallbackUI,
-		"ILogger":                logger.ProvideLogrusLogger,
-		"IFileSystemManipulator": helper.ProvideFSManipulator,
-		"IUpdater":               helper.ProvideUpdater,
-		"IDAL":                   gormdal.ProvideDAL,
-		"IDownloader":            helper.ProvideDownloader,
-		"IConfig":                config.ProvideConfig,
-		"IPinger":                helper.ProvidePinger,
-		"string":                 gormdal.ProvideDefaultDBPath,
+		"IHelper":    helper.ProvideHelper,
+		"IUIPlugin":  view.ProvideFallbackUI,
+		"ILogger":    logger.ProvideLogrusLogger,
+		"INetworker": helper.ProvideNetworker,
+		"IDAL":       gormdal.ProvideDAL,
+		"IConfig":    config.ProvideConfig,
+		"IProfile":   profile.ProvideProfile,
 	}
 
 	core := core.RegisterDependecies(dependecies)
@@ -41,14 +38,9 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "grgd"
 	app.Usage = "grgd cli"
-	app.Version = "0.12.14"
-	clientCfg, err := clientcmd.NewDefaultClientConfigLoadingRules().Load()
-	if err != nil {
-		logger.Warn("Could not read kube config")
-	}
+	app.Version = "0.14.1"
 	app.Metadata = make(map[string]interface{})
 	app.Metadata["core"] = core
-	app.Metadata["kubeContext"] = clientCfg.CurrentContext
 	app.Flags = append(app.Flags, flags.GetFlags()...)
 	app.CustomAppHelpTemplate = view.GetHelpTemplate()
 	app.HideHelpCommand = true
@@ -57,8 +49,8 @@ func main() {
 	app.Before = func(c *cli.Context) error {
 		core := helper.GetExtractor().GetCore(c)
 		UI := core.GetUI()
-		var pinger interfaces.IPinger
-		helper.GetExtractor().GetCore(c).Get(&pinger)
+		var networker interfaces.INetworker
+		helper.GetExtractor().GetCore(c).Get(&networker)
 
 		connections := map[string]interface{}{
 			"first": &helper.Connection{
@@ -68,7 +60,7 @@ func main() {
 			},
 		}
 
-		pinger.CheckConnections(connections)
+		networker.CheckConnections(connections)
 		for _, v := range connections {
 			logger.Info(v)
 		}
@@ -79,7 +71,7 @@ func main() {
 	}
 
 	// define native commands available also without plugins
-	app.Commands = append(app.Commands, clicommands.GetCommands(app, core)...)
+	app.Commands = append(app.Commands, cmd.GetCommands(app, core)...)
 
 	// append native commands with commands found in loaded plugins
 	for _, plug := range core.GetCMDPlugins() {
