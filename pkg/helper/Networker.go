@@ -2,13 +2,17 @@ package helper
 
 import (
 	"bytes"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"os/exec"
 	"path"
 	"runtime"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -17,27 +21,58 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// ProvideUpdater ...
-func ProvideUpdater(logger interfaces.ILogger) interfaces.IUpdater {
-	up := new(Updater)
-	up.logger = logger
-	logger.Tracef("provide %T", up)
-	return up
+// ProvideNetworker ...
+func ProvideNetworker(logger interfaces.ILogger) interfaces.INetworker {
+	networker := new(Networker)
+	networker.logger = logger
+	logger.Tracef("provide %T", networker)
+	return networker
 }
 
-// Updater ...
-type Updater struct {
+// IndexObject ...
+type IndexObject struct {
+	Releases map[string]Category `yaml:"category"`
+}
+
+// Category ...
+type Category struct {
+	Targets map[string]Target `yaml:"target"`
+}
+
+type Target struct {
+	Versions map[string]DownloadMetadata `yaml:"version"`
+}
+
+// Version ...
+// type Version struct {
+// 	DownloadMetadata map[string]DownloadMetadata
+// }
+
+// DownloadMetadata ...
+type DownloadMetadata struct {
+	Author       string
+	Description  string
+	Md5          string
+	Released     time.Time
+	Size         int
+	URL          string
+	ReleaseNotes string
+}
+
+// Connection ...
+type Connection struct {
+	Endpoint string
+	TimeOut  int
+	Success  bool
+}
+
+// Networker ...
+type Networker struct {
 	logger interfaces.ILogger
 }
 
 // CheckUpdate ...
-func (h *Updater) CheckUpdate(version string, core interfaces.ICore) error {
-	// UI := core.GetUI()
-	var downloader interfaces.IDownloader
-	err := core.Get(&downloader)
-	if err != nil {
-		return err
-	}
+func (n *Networker) CheckUpdate(version string, core interfaces.ICore) error {
 	cnfg := core.GetConfig()
 	UI := core.GetUI()
 
@@ -63,7 +98,7 @@ func (h *Updater) CheckUpdate(version string, core interfaces.ICore) error {
 		versionMap[cName] = cVersion
 	}
 
-	err = downloader.Load(indexpath, cnfg.GetActiveProfile().GetUpdateURL())
+	err = n.Load(indexpath, cnfg.GetActiveProfile().GetUpdateURL())
 	if err != nil {
 		return err
 	}
@@ -104,7 +139,7 @@ func (h *Updater) CheckUpdate(version string, core interfaces.ICore) error {
 				versionMap[scriptname],
 				semversion) {
 				UI.Println("DOWNLOADING!!!!")
-				err = downloader.Load(path.Join(hackFolder, scriptname+"-partial"), script.Versions[semversion].URL)
+				err = n.Load(path.Join(hackFolder, scriptname+"-partial"), script.Versions[semversion].URL)
 				if err != nil {
 					return err
 				}
@@ -155,7 +190,7 @@ func (h *Updater) CheckUpdate(version string, core interfaces.ICore) error {
 	sort.Strings(newerVersions)
 	if len(newerVersions) > 0 && UI.YesNoQuestionf("Do you want to update to version %v now?", newerVersions[0]) {
 		url := indexObject.Releases["grgd-cli"].Targets[runtime.GOOS+"-"+runtime.GOARCH].Versions[newerVersions[0]].URL
-		err = downloader.Load("/usr/local/bin/grgd-partial", url)
+		err = n.Load("/usr/local/bin/grgd-partial", url)
 		if err != nil {
 			return err
 		}
@@ -190,32 +225,68 @@ func sortSemverSlice(semverSlice []string) error {
 	return nil
 }
 
-// IndexObject ...
-type IndexObject struct {
-	Releases map[string]Category `yaml:"category"`
+var downloadSize uint64
+
+// Load ...
+func (n *Networker) Load(filepath string, url string) error {
+
+	// Get the data
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	// Create the file
+	out, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	size, _ := strconv.Atoi(resp.Header.Get("Content-Length"))
+	downloadSize = uint64(size)
+
+	counter := &WriteCounter{}
+	// Write the body to file
+	_, err = io.Copy(out, io.TeeReader(resp.Body, counter))
+	fmt.Println()
+	return err
 }
 
-// Category ...
-type Category struct {
-	Targets map[string]Target `yaml:"target"`
+// WriteCounter ...
+type WriteCounter struct {
+	Total uint64
 }
 
-type Target struct {
-	Versions map[string]DownloadMetadata `yaml:"version"`
+func (wc *WriteCounter) Write(p []byte) (int, error) {
+	n := len(p)
+	wc.Total += uint64(n)
+	wc.PrintProgress()
+	return n, nil
 }
 
-// Version ...
-// type Version struct {
-// 	DownloadMetadata map[string]DownloadMetadata
-// }
+// PrintProgress ...
+func (wc WriteCounter) PrintProgress() {
+	// Clear the line by using a character return to go back to the start and remove
+	// the remaining characters by filling it with spaces
+	fmt.Printf("\r%s", strings.Repeat(" ", 35))
 
-// DownloadMetadata ...
-type DownloadMetadata struct {
-	Author       string
-	Description  string
-	Md5          string
-	Released     time.Time
-	Size         int
-	URL          string
-	ReleaseNotes string
+	// Return again and print current status of download
+	// We use the humanize package to print the bytes in a meaningful way (e.g. 10 MB)
+	fmt.Printf("\rDownloading... %d (%d MB) (%d%%) ", wc.Total/1024/1024, downloadSize/1024/1024, (wc.Total * 100 / downloadSize))
+}
+
+// CheckConnections ...
+func (n *Networker) CheckConnections(conns map[string]interface{}) {
+	for k := range conns {
+		if conn, ok := conns[k].(Connection); ok {
+			_, err := http.Get(conn.Endpoint)
+			if err != nil {
+				log.Fatal(err)
+			}
+			conn.Success = true
+		}
+	}
+	return
 }
