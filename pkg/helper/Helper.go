@@ -1,9 +1,12 @@
 package helper
 
 import (
+	"io/ioutil"
 	"os"
+	"path"
 
 	"github.com/gregod-com/grgd/interfaces"
+	"gopkg.in/yaml.v2"
 )
 
 // ProvideHelper ...
@@ -11,12 +14,17 @@ func ProvideHelper(logger interfaces.ILogger) interfaces.IHelper {
 	h := new(Helper)
 	logger.Tracef("provide %T", h)
 	h.logger = logger
+	h.basedir = h.HomeDir(".grgd")
+	h.bootconfigname = "bootconfig.yaml"
+	h.CheckOrCreateFolder(h.basedir, os.FileMode(uint32(0760)))
 	return h
 }
 
 // Helper ...
 type Helper struct {
-	logger interfaces.ILogger
+	logger         interfaces.ILogger
+	basedir        string
+	bootconfigname string
 }
 
 // CheckUserProfile ...
@@ -64,4 +72,72 @@ func (h *Helper) CheckFlag(flag string) bool {
 		}
 	}
 	return false
+}
+
+// HomeDir ...
+func (h *Helper) HomeDir(i ...string) string {
+	h.logger.Tracef("")
+	dir, errHomeDir := os.UserHomeDir()
+	if errHomeDir != nil {
+		h.logger.Fatal(errHomeDir)
+	}
+	for _, v := range i {
+		dir = path.Join(dir, v)
+	}
+	return dir
+}
+
+// CheckOrCreateFolder ...
+func (h *Helper) CheckOrCreateFolder(pathToCheck string, permissions os.FileMode) {
+	h.logger.Tracef("")
+	if !h.PathExists(pathToCheck) {
+		os.MkdirAll(pathToCheck, permissions)
+	}
+}
+
+// CheckOrCreateParentFolder ...
+func (h *Helper) CheckOrCreateParentFolder(pathToCheck string, permissions os.FileMode) {
+	h.logger.Tracef("")
+	dir, _ := path.Split(pathToCheck)
+	h.CheckOrCreateFolder(dir, permissions)
+}
+
+// PathExists ...
+func (h *Helper) PathExists(path string) bool {
+	h.logger.Tracef("")
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return false
+	}
+	return true
+}
+
+// LoadBootConfig ...
+func (h *Helper) LoadBootConfig() *interfaces.Bootconfig {
+	h.logger.Tracef("")
+	bootconfigpath := path.Join(h.basedir, h.bootconfigname)
+	bootconfig := &interfaces.Bootconfig{}
+	if !h.PathExists(bootconfigpath) {
+		h.createDefaultConfig(bootconfigpath)
+	}
+	dat, err := ioutil.ReadFile(bootconfigpath)
+	if err != nil {
+		h.logger.Fatal("Error reading bootconfig yaml")
+	}
+
+	if err := yaml.Unmarshal(dat, bootconfig); err != nil {
+		h.logger.Fatal("Error unmarshalling bootconfig yaml")
+	}
+	return bootconfig
+}
+
+func (h *Helper) createDefaultConfig(bootconfigpath string) {
+	h.logger.Tracef("")
+	newbootconfig := &interfaces.Bootconfig{
+		DatabasePath: path.Join(h.basedir, "grgd.db"),
+	}
+	dat, err := yaml.Marshal(newbootconfig)
+	if err != nil {
+		h.logger.Fatal("Error writing bootconfig yaml")
+	}
+	ioutil.WriteFile(bootconfigpath, dat, os.FileMode(0760))
 }
