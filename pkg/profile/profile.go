@@ -36,13 +36,13 @@ func InitNewProfile(
 	name string,
 	logger interfaces.ILogger,
 	UI interfaces.IUIPlugin,
-	fsm interfaces.IFileSystemManipulator) *Profile {
+	helper interfaces.IHelper) *Profile {
 
 	var profile Profile
 	// defaults for new profile
 	profile.name = name
 	profile.metadata = make(map[string]string)
-	profile.metadata["homeDir"] = fsm.HomeDir(".grgd")
+	profile.metadata["homeDir"] = helper.HomeDir(".grgd")
 	profile.metadata["hackDir"] = path.Join(profile.metadata["homeDir"], "hack")
 	profile.metadata["pluginDir"] = path.Join(profile.metadata["homeDir"], "pluginsv2")
 	profile.metadata["updateURL"] = updateurl
@@ -54,9 +54,9 @@ func InitNewProfile(
 
 	// Scripts
 	UI.Questionf("Base scripts directory [%s]: ", profile.metadata["pluginDir"], profile.metadata["pluginDir"])
-	for !fsm.PathExists(profile.metadata["pluginDir"]) {
+	for !helper.PathExists(profile.metadata["pluginDir"]) {
 		answer := profile.metadata["pluginDir"]
-		profile.metadata["pluginDir"] = fsm.HomeDir(".grgd", "hack")
+		profile.metadata["pluginDir"] = helper.HomeDir(".grgd", "hack")
 		UI.Questionf("The path `%s` does not exists. Try again or use default [%s]: ", answer, profile.metadata["pluginDir"], profile.metadata["pluginDir"])
 	}
 

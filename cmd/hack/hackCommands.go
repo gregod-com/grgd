@@ -19,11 +19,10 @@ func checkErr(err error) {
 
 // GetCLICommands ...
 func GetCLICommands(app *cli.App, core interfaces.ICore) []*cli.Command {
-	var fsm interfaces.IFileSystemManipulator
-	core.Get(&fsm)
+	helper := core.GetHelper()
 
-	hackFolder := fsm.HomeDir(".grgd", "hack")
-	fsm.CheckOrCreateFolder(hackFolder, 0774)
+	hackFolder := helper.HomeDir(".grgd", "hack")
+	helper.CheckOrCreateFolder(hackFolder, 0774)
 
 	fileinfo, err := ioutil.ReadDir(hackFolder)
 	checkErr(err)

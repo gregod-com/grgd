@@ -12,12 +12,12 @@ import (
 )
 
 // ProvideDAL ...
-func ProvideDAL(fsmanipulator interfaces.IFileSystemManipulator, logger interfaces.ILogger) interfaces.IDAL {
+func ProvideDAL(helper interfaces.IHelper, logger interfaces.ILogger) interfaces.IDAL {
 	dal := new(GormDAL)
 	dal.logger = logger
 	dal.logger.Tracef("provide %T", dal)
-	dal.databasePath = fsmanipulator.LoadBootConfig().DatabasePath
-	fsmanipulator.CheckOrCreateParentFolder(dal.databasePath, os.FileMode(uint32(0760)))
+	dal.databasePath = helper.LoadBootConfig().DatabasePath
+	helper.CheckOrCreateParentFolder(dal.databasePath, os.FileMode(uint32(0760)))
 	dal.connect()
 	dal.db.AutoMigrate(&ProfileModel{})
 	dal.db.AutoMigrate(&ProjectModel{})

@@ -15,9 +15,9 @@ import (
 func ProvideProject(
 	logger GI.ILogger,
 	ui GI.IUIPlugin,
-	fsm GI.IFileSystemManipulator,
+	helper GI.IHelper,
 	services map[string]GI.IService) GI.IProject {
-	return &Project{logger: logger, ui: ui, fsm: fsm, services: services}
+	return &Project{logger: logger, ui: ui, helper: helper, services: services}
 }
 
 // Project ...
@@ -30,7 +30,7 @@ type Project struct {
 	services    map[string]GI.IService
 	logger      GI.ILogger
 	ui          GI.IUIPlugin
-	fsm         GI.IFileSystemManipulator
+	helper      GI.IHelper
 }
 
 // Init ...
@@ -42,9 +42,9 @@ func (p *Project) Init() error {
 	// TODO: replace static with actual question
 	p.ui.Question("Where is the base path of your project? ", &basepath)
 
-	for !p.fsm.PathExists(basepath) {
+	for !p.helper.PathExists(basepath) {
 		if p.ui.YesNoQuestion("The path " + basepath + " does not seem to exists. Should we create the path now?") {
-			p.fsm.CheckOrCreateFolder(basepath, os.FileMode(uint32(0760)))
+			p.helper.CheckOrCreateFolder(basepath, os.FileMode(uint32(0760)))
 			continue
 		}
 		p.ui.Question("Where is the base path of your project? ", &basepath)

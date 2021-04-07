@@ -10,12 +10,12 @@ import (
 )
 
 // ProvideConfig ...
-func ProvideConfig(dal I.IDAL, ui I.IUIPlugin, logger I.ILogger, fsm I.IFileSystemManipulator, prof I.IProfile) I.IConfig {
+func ProvideConfig(dal I.IDAL, ui I.IUIPlugin, logger I.ILogger, helper I.IHelper, prof I.IProfile) I.IConfig {
 	config := &ConfigDatabase{
 		dal:    dal,
 		ui:     ui,
 		logger: logger,
-		fsm:    fsm,
+		helper: helper,
 	}
 	mp, err := dal.ReadAll(prof)
 	if err != nil {
@@ -34,7 +34,7 @@ type ConfigDatabase struct {
 	dal           I.IDAL
 	logger        I.ILogger
 	ui            I.IUIPlugin
-	fsm           I.IFileSystemManipulator
+	helper        I.IHelper
 	profiles      map[string]I.IProfile
 	activeProfile string `yaml:"activeProfile"`
 }
@@ -60,7 +60,7 @@ func (coDB *ConfigDatabase) GetAllProfiles() (map[string]I.IProfile, error) {
 // InitNewProfile ...
 func (coDB *ConfigDatabase) InitNewProfile(name string) error {
 	coDB.logger.Tracef("Profile %s not set! Starting init process...", name)
-	p := profile.InitNewProfile(name, coDB.logger, coDB.ui, coDB.fsm)
+	p := profile.InitNewProfile(name, coDB.logger, coDB.ui, coDB.helper)
 	return coDB.AddProfile(p)
 }
 
