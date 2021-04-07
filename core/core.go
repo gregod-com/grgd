@@ -205,3 +205,13 @@ func (c *Core) GetCMDPlugins() []interfaces.ICMDPlugin {
 	}
 	return nil
 }
+
+// GetHelper ...
+func (c *Core) GetNetworker() interfaces.INetworker {
+	a, ok := c.implementations["INetworker"].(interfaces.INetworker)
+	if !ok {
+		a = helper.ProvideNetworker(logger.ProvideLogrusLogger())
+		c.implementations["INetworker"] = a
+	}
+	return a
+}
