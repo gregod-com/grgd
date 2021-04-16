@@ -1,8 +1,6 @@
 package project
 
 import (
-	"errors"
-
 	"github.com/gregod-com/grgd/pkg/helper"
 	"github.com/urfave/cli/v2"
 )
@@ -22,10 +20,10 @@ func AListProject(c *cli.Context) error {
 // ASwitchProject ...
 func ASwitchProject(c *cli.Context) error {
 	core := helper.GetExtractor().GetCore(c)
-	profile := core.GetConfig().GetActiveProfile()
+	prof := core.GetConfig().GetActiveProfile()
 
-	if p, ok := profile.GetProjects()[c.Args().First()]; ok {
-		profile.SetCurrentProject(p)
+	if p, ok := prof.GetProjects()[c.Args().First()]; ok {
+		prof.SetCurrentProjectID(p.GetID())
 	}
 
 	AListProject(c)
@@ -35,16 +33,22 @@ func ASwitchProject(c *cli.Context) error {
 // ADeleteProject ...
 func ADeleteProject(c *cli.Context) error {
 	core := helper.GetExtractor().GetCore(c)
-	cnfg := core.GetConfig()
+	conf := core.GetConfig()
+	ui := core.GetUI()
+	prof := core.GetConfig().GetActiveProfile()
 
-	ps, err := cnfg.GetProjects()
-	if err != nil {
+	ps := prof.GetProjects()
+	AListProject(c)
+	name := c.Args().First()
+	for name == "" {
+		ui.Question("What project do you want to delete? ", &name)
+	}
+	if _, ok := ps[name]; !ok {
+		ui.Printf("The project `%s` does not exists, skipping delete.\n", name)
 		return nil
 	}
-	if p, ok := ps[c.Args().First()]; ok {
-		cnfg.RemoveProject(p)
-	}
-
+	conf.Remove(ps[name])
+	prof.RemoveProject(ps[name])
 	AListProject(c)
 	return nil
 }
@@ -52,28 +56,48 @@ func ADeleteProject(c *cli.Context) error {
 // AAddProject ...
 func AAddProject(c *cli.Context) error {
 	core := helper.GetExtractor().GetCore(c)
-	cnfg := core.GetConfig()
-
-	arg := c.Args().First()
-	ps, err := cnfg.GetProjects()
-	if err != nil {
-		return errors.New("bla")
-	}
-	if _, ok := ps[arg]; !ok && arg != "" {
-		cnfg.AddProject(arg)
-	}
+	ui := core.GetUI()
+	prof := core.GetConfig().GetActiveProfile()
+	ps := prof.GetProjects()
 
 	AListProject(c)
+
+	name := c.Args().First()
+	for name == "" {
+		ui.Question("What's the name of the new project? ", &name)
+	}
+	if _, ok := ps[name]; ok {
+		ui.Printf("The project `%s` already exists, please use unique name.\n", name)
+		return nil
+	}
+	prof.AddProjectByName(name)
+	AListProject(c)
+	if ui.YesNoQuestionf("Init project `%s` now?", name) {
+		if err := prof.GetProjects()[name].Init(core); err != nil {
+			return err
+		}
+		AListProject(c)
+	}
 	return nil
 }
 
 // AEditProject ...
 func AEditProject(c *cli.Context) error {
 	core := helper.GetExtractor().GetCore(c)
-	profile := core.GetConfig().GetActiveProfile()
-	UI := core.GetUI()
+	ui := core.GetUI()
+	prof := core.GetConfig().GetActiveProfile()
+	ps := prof.GetProjects()
+	AListProject(c)
 
-	UI.Println(profile)
-
-	return nil
+	name := c.Args().First()
+	for name == "" {
+		ui.Question("What's the name of the new project? ", &name)
+	}
+	if _, ok := ps[name]; !ok {
+		ui.Printf("The project `%s` does not exists. If you want to add a project use the `add` command.\n", name)
+		return nil
+	}
+	err := ps[name].Init(core)
+	AListProject(c)
+	return err
 }

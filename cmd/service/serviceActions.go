@@ -2,30 +2,59 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"sort"
 	"strconv"
 	"strings"
 
 	"github.com/gregod-com/grgd/interfaces"
 	"github.com/gregod-com/grgd/pkg/helper"
+	"github.com/gregod-com/grgd/pkg/project"
 	"github.com/urfave/cli/v2"
 )
 
 // AListService ...
 func AListService(c *cli.Context) error {
 	core := helper.GetExtractor().GetCore(c)
-	logger := core.GetLogger()
-	logger.Trace("This is the list service command")
+	log := core.GetLogger()
+	ui := core.GetUI()
+	h := core.GetHelper()
 
-	// var profile *persistence.Profile
-	// helpers.ExtractMetadataFatal(c.App.Metadata, "profile", &profile)
-	// current := getProjectByID(profile.Projects, profile.CurrentProjectID)
+	proj := core.GetConfig().GetActiveProfile().GetCurrentProject()
+	if proj == nil {
+		log.Warn("Current project is not set")
+		return nil
+	}
 
-	// head := []string{"Name", "Path", "Description"}
-	// rows := sortServiceMetadataSlice(current.Services)
-	// logger.Trace(profile.Projects)
+	obj, err := proj.ReadSettingsObject(h)
+	if err != nil {
+		return err
+	}
 
-	// UI.PrintTable(c, head, rows)
+	pm, ok := obj.(*project.ProjectMetadata)
+	if !ok {
+		return fmt.Errorf("Project Metadata not supported %T", obj)
+	}
+
+	for k, v := range pm.Services {
+		mp, ok := v.(map[interface{}]interface{})
+		if !ok {
+			ui.Printf("Service %v is %T\n", k, v)
+			continue
+		}
+
+		ui.Printf("%-20v\n", k)
+		// service := proj.GetServiceByName(k)
+		for key, value := range mp {
+			if key == "active" {
+				ui.Printf("%-4v%v: %v \n", "", key, value)
+			}
+
+			if key == "path" {
+				yaml.Unmarshall
+			}
+		}
+	}
 
 	return nil
 }
