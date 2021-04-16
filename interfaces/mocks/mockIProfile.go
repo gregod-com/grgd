@@ -131,18 +131,32 @@ func (mr *MockIProfileMockRecorder) GetCurrentProject() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCurrentProject", reflect.TypeOf((*MockIProfile)(nil).GetCurrentProject))
 }
 
-// SetCurrentProject mocks base method
-func (m *MockIProfile) SetCurrentProject(p interfaces.IProject) error {
+// GetCurrentProjectID mocks base method
+func (m *MockIProfile) GetCurrentProjectID() uint {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetCurrentProject", p)
+	ret := m.ctrl.Call(m, "GetCurrentProjectID")
+	ret0, _ := ret[0].(uint)
+	return ret0
+}
+
+// GetCurrentProjectID indicates an expected call of GetCurrentProjectID
+func (mr *MockIProfileMockRecorder) GetCurrentProjectID() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCurrentProjectID", reflect.TypeOf((*MockIProfile)(nil).GetCurrentProjectID))
+}
+
+// SetCurrentProjectID mocks base method
+func (m *MockIProfile) SetCurrentProjectID(id uint) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetCurrentProjectID", id)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// SetCurrentProject indicates an expected call of SetCurrentProject
-func (mr *MockIProfileMockRecorder) SetCurrentProject(p interface{}) *gomock.Call {
+// SetCurrentProjectID indicates an expected call of SetCurrentProjectID
+func (mr *MockIProfileMockRecorder) SetCurrentProjectID(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetCurrentProject", reflect.TypeOf((*MockIProfile)(nil).SetCurrentProject), p)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetCurrentProjectID", reflect.TypeOf((*MockIProfile)(nil).SetCurrentProjectID), id)
 }
 
 // GetMetaData mocks base method
@@ -214,17 +228,45 @@ func (mr *MockIProfileMockRecorder) GetProjects() *gomock.Call {
 }
 
 // AddProject mocks base method
-func (m *MockIProfile) AddProject(p string) error {
+func (m *MockIProfile) AddProject() error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddProject", p)
+	ret := m.ctrl.Call(m, "AddProject")
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // AddProject indicates an expected call of AddProject
-func (mr *MockIProfileMockRecorder) AddProject(p interface{}) *gomock.Call {
+func (mr *MockIProfileMockRecorder) AddProject() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddProject", reflect.TypeOf((*MockIProfile)(nil).AddProject), p)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddProject", reflect.TypeOf((*MockIProfile)(nil).AddProject))
+}
+
+// AddProjectByName mocks base method
+func (m *MockIProfile) AddProjectByName(name string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddProjectByName", name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddProjectByName indicates an expected call of AddProjectByName
+func (mr *MockIProfileMockRecorder) AddProjectByName(name interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddProjectByName", reflect.TypeOf((*MockIProfile)(nil).AddProjectByName), name)
+}
+
+// AddProjectDirect mocks base method
+func (m *MockIProfile) AddProjectDirect(p interfaces.IProject) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddProjectDirect", p)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddProjectDirect indicates an expected call of AddProjectDirect
+func (mr *MockIProfileMockRecorder) AddProjectDirect(p interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddProjectDirect", reflect.TypeOf((*MockIProfile)(nil).AddProjectDirect), p)
 }
 
 // RemoveProject mocks base method
@@ -242,17 +284,17 @@ func (mr *MockIProfileMockRecorder) RemoveProject(p interface{}) *gomock.Call {
 }
 
 // RemoveProjectByName mocks base method
-func (m *MockIProfile) RemoveProjectByName(p string) error {
+func (m *MockIProfile) RemoveProjectByName(name string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RemoveProjectByName", p)
+	ret := m.ctrl.Call(m, "RemoveProjectByName", name)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // RemoveProjectByName indicates an expected call of RemoveProjectByName
-func (mr *MockIProfileMockRecorder) RemoveProjectByName(p interface{}) *gomock.Call {
+func (mr *MockIProfileMockRecorder) RemoveProjectByName(name interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveProjectByName", reflect.TypeOf((*MockIProfile)(nil).RemoveProjectByName), p)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveProjectByName", reflect.TypeOf((*MockIProfile)(nil).RemoveProjectByName), name)
 }
 
 // GetValues mocks base method

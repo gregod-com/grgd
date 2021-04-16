@@ -33,18 +33,18 @@ func (m *MockIProject) EXPECT() *MockIProjectMockRecorder {
 	return m.recorder
 }
 
-// GetName mocks base method
-func (m *MockIProject) GetName() string {
+// Init mocks base method
+func (m *MockIProject) Init(core interfaces.ICore) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetName")
-	ret0, _ := ret[0].(string)
+	ret := m.ctrl.Call(m, "Init", core)
+	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// GetName indicates an expected call of GetName
-func (mr *MockIProjectMockRecorder) GetName() *gomock.Call {
+// Init indicates an expected call of Init
+func (mr *MockIProjectMockRecorder) Init(core interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetName", reflect.TypeOf((*MockIProject)(nil).GetName))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Init", reflect.TypeOf((*MockIProject)(nil).Init), core)
 }
 
 // GetID mocks base method
@@ -65,22 +65,88 @@ func (mr *MockIProjectMockRecorder) GetID(i ...interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetID", reflect.TypeOf((*MockIProject)(nil).GetID), i...)
 }
 
-// GetPath mocks base method
-func (m *MockIProject) GetPath(i ...interface{}) string {
+// SetID mocks base method
+func (m *MockIProject) SetID(id uint) error {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
-	for _, a := range i {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetPath", varargs...)
+	ret := m.ctrl.Call(m, "SetID", id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetID indicates an expected call of SetID
+func (mr *MockIProjectMockRecorder) SetID(id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetID", reflect.TypeOf((*MockIProject)(nil).SetID), id)
+}
+
+// IsInitialized mocks base method
+func (m *MockIProject) IsInitialized() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsInitialized")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// IsInitialized indicates an expected call of IsInitialized
+func (mr *MockIProjectMockRecorder) IsInitialized() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsInitialized", reflect.TypeOf((*MockIProject)(nil).IsInitialized))
+}
+
+// SetInitialized mocks base method
+func (m *MockIProject) SetInitialized(init bool) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetInitialized", init)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetInitialized indicates an expected call of SetInitialized
+func (mr *MockIProjectMockRecorder) SetInitialized(init interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetInitialized", reflect.TypeOf((*MockIProject)(nil).SetInitialized), init)
+}
+
+// GetName mocks base method
+func (m *MockIProject) GetName() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetName")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetName indicates an expected call of GetName
+func (mr *MockIProjectMockRecorder) GetName() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetName", reflect.TypeOf((*MockIProject)(nil).GetName))
+}
+
+// SetName mocks base method
+func (m *MockIProject) SetName(n string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetName", n)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetName indicates an expected call of SetName
+func (mr *MockIProjectMockRecorder) SetName(n interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetName", reflect.TypeOf((*MockIProject)(nil).SetName), n)
+}
+
+// GetPath mocks base method
+func (m *MockIProject) GetPath() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPath")
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
 // GetPath indicates an expected call of GetPath
-func (mr *MockIProjectMockRecorder) GetPath(i ...interface{}) *gomock.Call {
+func (mr *MockIProjectMockRecorder) GetPath() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPath", reflect.TypeOf((*MockIProject)(nil).GetPath), i...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPath", reflect.TypeOf((*MockIProject)(nil).GetPath))
 }
 
 // SetPath mocks base method
@@ -155,4 +221,80 @@ func (m *MockIProject) GetValues(i ...interface{}) []string {
 func (mr *MockIProjectMockRecorder) GetValues(i ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetValues", reflect.TypeOf((*MockIProject)(nil).GetValues), i...)
+}
+
+// SetSettingsYamlPath mocks base method
+func (m *MockIProject) SetSettingsYamlPath(path string, i ...interface{}) error {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{path}
+	for _, a := range i {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SetSettingsYamlPath", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetSettingsYamlPath indicates an expected call of SetSettingsYamlPath
+func (mr *MockIProjectMockRecorder) SetSettingsYamlPath(path interface{}, i ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{path}, i...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetSettingsYamlPath", reflect.TypeOf((*MockIProject)(nil).SetSettingsYamlPath), varargs...)
+}
+
+// GetSettingsYamlPath mocks base method
+func (m *MockIProject) GetSettingsYamlPath(i ...interface{}) string {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{}
+	for _, a := range i {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetSettingsYamlPath", varargs...)
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetSettingsYamlPath indicates an expected call of GetSettingsYamlPath
+func (mr *MockIProjectMockRecorder) GetSettingsYamlPath(i ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSettingsYamlPath", reflect.TypeOf((*MockIProject)(nil).GetSettingsYamlPath), i...)
+}
+
+// WriteSettingsObject mocks base method
+func (m *MockIProject) WriteSettingsObject(h interfaces.IHelper, i ...interface{}) error {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{h}
+	for _, a := range i {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "WriteSettingsObject", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WriteSettingsObject indicates an expected call of WriteSettingsObject
+func (mr *MockIProjectMockRecorder) WriteSettingsObject(h interface{}, i ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{h}, i...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteSettingsObject", reflect.TypeOf((*MockIProject)(nil).WriteSettingsObject), varargs...)
+}
+
+// ReadSettingsObject mocks base method
+func (m *MockIProject) ReadSettingsObject(h interfaces.IHelper, i ...interface{}) (interface{}, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{h}
+	for _, a := range i {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ReadSettingsObject", varargs...)
+	ret0, _ := ret[0].(interface{})
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ReadSettingsObject indicates an expected call of ReadSettingsObject
+func (mr *MockIProjectMockRecorder) ReadSettingsObject(h interface{}, i ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{h}, i...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadSettingsObject", reflect.TypeOf((*MockIProject)(nil).ReadSettingsObject), varargs...)
 }

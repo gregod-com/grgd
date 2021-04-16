@@ -104,6 +104,20 @@ func (mr *MockICoreMockRecorder) GetHelper() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetHelper", reflect.TypeOf((*MockICore)(nil).GetHelper))
 }
 
+// GetNetworker mocks base method
+func (m *MockICore) GetNetworker() interfaces.INetworker {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetNetworker")
+	ret0, _ := ret[0].(interfaces.INetworker)
+	return ret0
+}
+
+// GetNetworker indicates an expected call of GetNetworker
+func (mr *MockICoreMockRecorder) GetNetworker() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNetworker", reflect.TypeOf((*MockICore)(nil).GetNetworker))
+}
+
 // GetCMDPlugins mocks base method
 func (m *MockICore) GetCMDPlugins() []interfaces.ICMDPlugin {
 	m.ctrl.T.Helper()

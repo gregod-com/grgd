@@ -12,7 +12,9 @@ type IProfile interface {
 	SetName(n string) error
 
 	GetCurrentProject() IProject
-	SetCurrentProject(p IProject) error
+
+	GetCurrentProjectID() uint
+	SetCurrentProjectID(id uint) error
 
 	GetMetaData(key string) string
 	SetMetaData(key string, value string)
@@ -20,9 +22,13 @@ type IProfile interface {
 	GetBasePath() string
 	GetUpdateURL() string
 	GetProjects() map[string]IProject
-	AddProject(p string) error
+
+	AddProject() error
+	AddProjectByName(name string) error
+	AddProjectDirect(p IProject) error
+
 	RemoveProject(p IProject) error
-	RemoveProjectByName(p string) error
+	RemoveProjectByName(name string) error
 
 	GetValues(i ...interface{}) []string
 	GetValuesAsMap(i ...interface{}) map[string]string

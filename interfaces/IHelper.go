@@ -10,6 +10,9 @@ type IHelper interface {
 	// HomeDir ...
 	HomeDir(i ...string) string
 
+	// HomeDir ...
+	CurrentWorkdir(i ...string) string
+
 	// CheckOrCreateFolder ...
 	CheckOrCreateFolder(path string, permissions os.FileMode)
 
@@ -19,6 +22,10 @@ type IHelper interface {
 	PathExists(path string) bool
 
 	LoadBootConfig() *Bootconfig
+
+	ReadFile(path string) ([]byte, error)
+
+	UpdateOrWriteFile(path string, content []byte, permissions os.FileMode) error
 }
 
 // Bootconfig ...
