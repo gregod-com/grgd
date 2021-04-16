@@ -55,7 +55,7 @@ func RegisterDependecies(implsTemp map[string]interface{}) interfaces.ICore {
 				solvedCurrent++
 			}
 		}
-		tempLogger.Debugf("resolved %v / %v dependecies", solvedCurrent, len(implsTemp))
+		tempLogger.Tracef("resolved %v / %v dependecies", solvedCurrent, len(implsTemp))
 		if solvedCurrent >= len(implsTemp) {
 			break
 		}
@@ -104,10 +104,10 @@ func addDependecyFromProviderFunction(elem interface{}, impls map[string]interfa
 			key := retArg.Elem().Name()
 			key = "[]" + key + "s"
 			if _, ok := impls[key]; !ok {
-				tempLogger.Debugf("assigned %s to key %s ", reflect.ValueOf(elem).Call(injection)[0].Interface(), key)
+				tempLogger.Tracef("assigned %s to key %s ", reflect.ValueOf(elem).Call(injection)[0].Interface(), key)
 				impls[key] = reflect.ValueOf(elem).Call(injection)[0].Interface()
 			} else {
-				tempLogger.Debugf("assigned %s to key %s ", reflect.ValueOf(elem).Call(injection)[0].Interface(), key)
+				tempLogger.Tracef("assigned %s to key %s ", reflect.ValueOf(elem).Call(injection)[0].Interface(), key)
 				if slc, ok := impls[key].([]interfaces.ICMDPlugin); ok {
 					if slc2, ok := reflect.ValueOf(elem).Call(injection)[0].Interface().([]interfaces.ICMDPlugin); ok {
 						impls[key] = append(slc, slc2...)
