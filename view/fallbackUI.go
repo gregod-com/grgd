@@ -142,17 +142,32 @@ func (ui FallbackUI) PrintBanner(i ...interface{}) interface{} {
 	longestMetaKey++
 	longestMetaValue++
 
+	valueSpace := 30
 	meta := []string{}
+	currentProjName := "---"
+	if p := core.GetConfig().GetActiveProfile().GetCurrentProject(); p != nil {
+		currentProjName = p.GetName()
+	}
 	for key, value := range map[string]string{
 		"version": c.App.Version,
 		"profile": core.GetConfig().GetActiveProfile().GetName(),
+		"project": currentProjName,
 	} {
-		meta = append(meta, fmt.Sprintf("%-*s \u001b[33m %-*s\u001b[0m", longestMetaKey, key, longestMetaValue, value))
+		meta = append(meta, fmt.Sprintf("%-*s \u001b[33m %-*s\u001b[0m", longestMetaKey, key, valueSpace, value))
 	}
 
 	sort.Strings(unsorted)
 	for _, key := range unsorted {
-		meta = append(meta, fmt.Sprintf("%-*s \u001b[33m %-*s\u001b[0m", longestMetaKey, key, longestMetaValue, core.GetConfig().GetActiveProfile().GetMetaData(key)))
+		val := core.GetConfig().GetActiveProfile().GetMetaData(key)
+		if len(val) > valueSpace {
+			val = val[:valueSpace-3]
+			val += "..."
+		}
+		if val == "" {
+			val = "--"
+		}
+
+		meta = append(meta, fmt.Sprintf("%-*s \u001b[33m %-*s\u001b[0m", longestMetaKey, key, valueSpace, val))
 	}
 
 	// fmt.Srintf("version: \u001b[33m %s\u001b[0m", c.App.Version),
