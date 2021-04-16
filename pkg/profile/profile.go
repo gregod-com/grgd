@@ -8,12 +8,14 @@ import (
 	"sort"
 
 	"github.com/gregod-com/grgd/interfaces"
+	"github.com/gregod-com/grgd/pkg/project"
 )
 
 // ProvideProfile ...
-func ProvideProfile(logger interfaces.ILogger) interfaces.IProfile {
+func ProvideProfile(logger interfaces.ILogger, ui interfaces.IUIPlugin) interfaces.IProfile {
 	p := &Profile{}
 	p.logger = logger
+	p.ui = ui
 	logger.Tracef("provide %T", p)
 	return p
 }
@@ -21,6 +23,7 @@ func ProvideProfile(logger interfaces.ILogger) interfaces.IProfile {
 // Profile ...
 type Profile struct {
 	logger           interfaces.ILogger
+	ui               interfaces.IUIPlugin
 	id               uint
 	name             string
 	initialized      bool
@@ -30,13 +33,10 @@ type Profile struct {
 }
 
 var updateurl = "https://s3.iamstudent.dev/public/grgd/index.yaml"
+var awsregion = "eu-central-1"
 
 // InitNewProfile ...
-func InitNewProfile(
-	name string,
-	logger interfaces.ILogger,
-	UI interfaces.IUIPlugin,
-	helper interfaces.IHelper) *Profile {
+func InitNewProfile(name string, ui interfaces.IUIPlugin, log interfaces.ILogger, helper interfaces.IHelper, i ...interface{}) interfaces.IProfile {
 
 	var profile Profile
 	// defaults for new profile
@@ -46,27 +46,29 @@ func InitNewProfile(
 	profile.metadata["hackDir"] = path.Join(profile.metadata["homeDir"], "hack")
 	profile.metadata["pluginDir"] = path.Join(profile.metadata["homeDir"], "pluginsv2")
 	profile.metadata["updateURL"] = updateurl
-	profile.metadata["awsRegion"] = "eu-central-1"
+	profile.metadata["awsRegion"] = awsregion
 
-	UI.ClearScreen()
+	ui.ClearScreen()
 
-	UI.Printf("Hey %v, let's init your profile\n\n", profile.name)
+	ui.Printf("Hey %v, let's init your profile\n\n", profile.name)
 
 	// Scripts
-	UI.Questionf("Base scripts directory [%s]: ", profile.metadata["pluginDir"], profile.metadata["pluginDir"])
+	ui.Questionf("Base scripts directory [%s]: ", profile.metadata["pluginDir"], profile.metadata["pluginDir"])
 	for !helper.PathExists(profile.metadata["pluginDir"]) {
 		answer := profile.metadata["pluginDir"]
 		profile.metadata["pluginDir"] = helper.HomeDir(".grgd", "hack")
-		UI.Questionf("The path `%s` does not exists. Try again or use default [%s]: ", answer, profile.metadata["pluginDir"], profile.metadata["pluginDir"])
+		ui.Questionf("The path `%s` does not exists. Try again or use default [%s]: ", answer, profile.metadata["pluginDir"], profile.metadata["pluginDir"])
 	}
 
-	UI.Questionf("URL to fetch updates from: [%s]: ", profile.metadata["updateURL"], profile.metadata["updateURL"])
+	ui.Questionf("URL to fetch updates from: [%s]: ", profile.metadata["updateURL"], profile.metadata["updateURL"])
 
 	for !ping(profile.metadata["updateURL"]) {
 		answer := profile.metadata["updateURL"]
 		profile.metadata["updateURL"] = updateurl
-		UI.Questionf("The url `%s` it not reachable. Use anyways or use default [%s]: ", answer, profile.metadata["updateURL"], profile.metadata["updateURL"])
+		ui.Questionf("The url `%s` it not reachable. Use anyways or use default [%s]: ", answer, profile.metadata["updateURL"], profile.metadata["updateURL"])
 	}
+
+	profile.projects = make(map[string]interfaces.IProject)
 
 	profile.initialized = true
 	return &profile
@@ -189,11 +191,28 @@ func (p *Profile) GetProjectsTable() [][]string {
 	return rows
 }
 
+func (p *Profile) AddProject() error {
+	return nil
+}
+
+func (p *Profile) AddProjectByName(name string) error {
+	if p.projects == nil {
+		p.projects = make(map[string]interfaces.IProject)
+	}
+	if _, ok := p.projects[name]; !ok {
+		newP := &project.Project{}
+		newP.SetName(name)
+		p.projects[name] = newP
+	}
+	return nil
+}
+
 // AddProject ...
-func (p *Profile) AddProject(proj string) error {
-	// newProj := &persistence.GRGDProject{Name: proj}
-	// p.projects[proj] = CreateProjectWrapper(newProj)
-	// p.model.Projects = append(p.model.Projects, newProj)
+func (p *Profile) AddProjectDirect(proj interfaces.IProject) error {
+	if p.projects == nil {
+		p.projects = make(map[string]interfaces.IProject)
+	}
+	p.projects[proj.GetName()] = proj
 	return nil
 }
 
@@ -210,18 +229,30 @@ func (p *Profile) RemoveProjectByName(proj string) error {
 }
 
 // GetCurrentProject ...
+func (p *Profile) GetCurrentProjectID() uint {
+	return p.currentProjectID
+}
+
+// GetCurrentProject ...
+func (p *Profile) SetCurrentProjectID(id uint) error {
+	p.currentProjectID = id
+	return nil
+
+}
+
+// GetCurrentProject ...
 func (p *Profile) GetCurrentProject() interfaces.IProject {
-	// for _, v := range p.projects {
-	// 	if v.GetID() == p.model.CurrentProjectID {
-	// 		return p.projects[v.GetName()]
-	// 	}
-	// }
+	for _, v := range p.projects {
+		if v.GetID() == p.currentProjectID {
+			return p.projects[v.GetName()]
+		}
+	}
 	return nil
 }
 
 // SetCurrentProject ...
 func (p *Profile) SetCurrentProject(newProject interfaces.IProject) error {
-	// p.model.GetCurrentProjectID() = newProject.GetID()
+	p.currentProjectID = newProject.GetID()
 	return nil
 }
 

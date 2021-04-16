@@ -1,7 +1,6 @@
 package helper
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 
@@ -29,7 +28,7 @@ type Helper struct {
 
 // CheckUserProfile ...
 func (h *Helper) CheckUserProfile() string {
-	h.logger.Tracef("[pkg/helper/CheckUserProfile]")
+	h.logger.Tracef("")
 	var profilename string
 	u, ok := os.LookupEnv("USER")
 	if !ok {
@@ -51,7 +50,7 @@ func (h *Helper) CheckUserProfile() string {
 
 // CheckFlagArg ...
 func (h *Helper) CheckFlagArg(flag string) string {
-	h.logger.Tracef("[pkg/helper/CheckFlagArg]")
+	h.logger.Tracef("")
 	for k, v := range os.Args {
 		if v == "--"+flag && len(os.Args) > k+1 {
 			return os.Args[k+1]
@@ -62,7 +61,7 @@ func (h *Helper) CheckFlagArg(flag string) string {
 
 // CheckFlag ...
 func (h *Helper) CheckFlag(flag string) bool {
-	h.logger.Tracef("[pkg/helper/CheckFlag]")
+	h.logger.Tracef("")
 	for _, v := range os.Args {
 		if v == "-"+flag {
 			return true
@@ -77,9 +76,22 @@ func (h *Helper) CheckFlag(flag string) bool {
 // HomeDir ...
 func (h *Helper) HomeDir(i ...string) string {
 	h.logger.Tracef("")
-	dir, errHomeDir := os.UserHomeDir()
-	if errHomeDir != nil {
-		h.logger.Fatal(errHomeDir)
+	dir, err := os.UserHomeDir()
+	if err != nil {
+		h.logger.Fatal(err)
+	}
+	for _, v := range i {
+		dir = path.Join(dir, v)
+	}
+	return dir
+}
+
+// CurrentWorkdir ...
+func (h *Helper) CurrentWorkdir(i ...string) string {
+	h.logger.Tracef("")
+	dir, err := os.Getwd()
+	if err != nil {
+		h.logger.Fatal(err)
 	}
 	for _, v := range i {
 		dir = path.Join(dir, v)
@@ -111,6 +123,14 @@ func (h *Helper) PathExists(path string) bool {
 	return true
 }
 
+func (h *Helper) ReadFile(path string) ([]byte, error) {
+	return os.ReadFile(path)
+}
+
+func (h *Helper) UpdateOrWriteFile(path string, content []byte, permissions os.FileMode) error {
+	return os.WriteFile(path, content, permissions)
+}
+
 // LoadBootConfig ...
 func (h *Helper) LoadBootConfig() *interfaces.Bootconfig {
 	h.logger.Tracef("")
@@ -119,7 +139,7 @@ func (h *Helper) LoadBootConfig() *interfaces.Bootconfig {
 	if !h.PathExists(bootconfigpath) {
 		h.createDefaultConfig(bootconfigpath)
 	}
-	dat, err := ioutil.ReadFile(bootconfigpath)
+	dat, err := h.ReadFile(bootconfigpath)
 	if err != nil {
 		h.logger.Fatal("Error reading bootconfig yaml")
 	}
@@ -139,5 +159,5 @@ func (h *Helper) createDefaultConfig(bootconfigpath string) {
 	if err != nil {
 		h.logger.Fatal("Error writing bootconfig yaml")
 	}
-	ioutil.WriteFile(bootconfigpath, dat, os.FileMode(0760))
+	h.UpdateOrWriteFile(bootconfigpath, dat, os.FileMode(0760))
 }
