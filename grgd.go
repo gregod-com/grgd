@@ -18,7 +18,7 @@ func NewApp(core interfaces.ICore, name string, version string) {
 
 	app := cli.NewApp()
 	app.Name = name
-	app.Usage = "grgd cli"
+	app.Usage = "custom grgd cli"
 	app.Version = version
 	app.Metadata = make(map[string]interface{})
 	app.Metadata["core"] = core
@@ -26,6 +26,7 @@ func NewApp(core interfaces.ICore, name string, version string) {
 	// app.CustomAppHelpTemplate = view.GetHelpTemplate()
 	app.HideHelpCommand = true
 	app.HideHelp = true
+	app.HideVersion = true
 
 	// define behavior before every command execution
 	app.Before = func(c *cli.Context) error {
