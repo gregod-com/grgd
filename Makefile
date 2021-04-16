@@ -61,7 +61,8 @@ tdd:
 mocks:
 	@for f in interfaces/*.go; do \
 		echo generate $${f}; \
-		mockgen --source=$${f} -destination interfaces/mocks/mock`basename $${f}` -package mocks; \
+		mockgen -imports interfaces/IConfig.go=github.com/gregod-com/grgd/interfaces,interfaces/ICore.go=github.com/gregod-com/grgd/interfaces,interfaces/IExtractor.go=github.com/gregod-com/grgd/interfaces,interfaces/IHelper.go=github.com/gregod-com/grgd/interfaces,interfaces/INetworker.go=github.com/gregod-com/grgd/interfaces,interfaces/IProfile.go=github.com/gregod-com/grgd/interfaces,interfaces/IProject.go=github.com/gregod-com/grgd/interfaces  \
+		--source=$${f} -destination interfaces/mocks/mock`basename $${f}` -package mocks; \
 	done
 
 proto:
