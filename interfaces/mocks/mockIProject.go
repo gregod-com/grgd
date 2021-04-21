@@ -280,14 +280,14 @@ func (mr *MockIProjectMockRecorder) WriteSettingsObject(h interface{}, i ...inte
 }
 
 // ReadSettingsObject mocks base method
-func (m *MockIProject) ReadSettingsObject(h interfaces.IHelper, i ...interface{}) (interface{}, error) {
+func (m *MockIProject) ReadSettingsObject(h interfaces.IHelper, i ...interface{}) (*interfaces.ProjectMetadata, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{h}
 	for _, a := range i {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ReadSettingsObject", varargs...)
-	ret0, _ := ret[0].(interface{})
+	ret0, _ := ret[0].(*interfaces.ProjectMetadata)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

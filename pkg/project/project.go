@@ -66,15 +66,6 @@ func (p *Project) Init(core interfaces.ICore) error {
 	return err
 }
 
-type ProjectMetadata struct {
-	Name    string
-	Version string
-	// only service-name and ref to service.yaml
-	Services map[string]interface{}
-	// optional
-	Meta map[string]interface{}
-}
-
 type ServiceMetadata struct {
 	Name    string
 	Version string
@@ -144,8 +135,8 @@ func (p *Project) autoSetupServices(core interfaces.ICore) error {
 	return nil
 }
 
-func (p *Project) readSettings(h interfaces.IHelper) (*ProjectMetadata, error) {
-	projMeta := &ProjectMetadata{Name: p.name}
+func (p *Project) readSettings(h interfaces.IHelper) (*interfaces.ProjectMetadata, error) {
+	projMeta := &interfaces.ProjectMetadata{Name: p.name}
 
 	dat, err := h.ReadFile(p.settingsyamlpath)
 	if err != nil {
@@ -161,7 +152,7 @@ func (p *Project) readSettings(h interfaces.IHelper) (*ProjectMetadata, error) {
 	return projMeta, yaml.Unmarshal(dat, projMeta)
 }
 
-func (p *Project) writeSettings(projMeta *ProjectMetadata, h interfaces.IHelper) error {
+func (p *Project) writeSettings(projMeta *interfaces.ProjectMetadata, h interfaces.IHelper) error {
 	dat, err := yaml.Marshal(projMeta)
 	if err != nil {
 		return err
@@ -263,7 +254,7 @@ func (project *Project) GetSettingsYamlPath(i ...interface{}) string {
 
 // SetSettingsObject ...
 func (project *Project) WriteSettingsObject(h interfaces.IHelper, i ...interface{}) error {
-	ps, ok := i[0].(*ProjectMetadata)
+	ps, ok := i[0].(*interfaces.ProjectMetadata)
 	if !ok {
 		return fmt.Errorf("unsupported settings object")
 	}
@@ -272,6 +263,6 @@ func (project *Project) WriteSettingsObject(h interfaces.IHelper, i ...interface
 }
 
 // GetSettingsObject ...
-func (project *Project) ReadSettingsObject(h interfaces.IHelper, i ...interface{}) (interface{}, error) {
+func (project *Project) ReadSettingsObject(h interfaces.IHelper, i ...interface{}) (*interfaces.ProjectMetadata, error) {
 	return project.readSettings(h)
 }

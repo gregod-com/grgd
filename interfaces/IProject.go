@@ -22,5 +22,14 @@ type IProject interface {
 	GetSettingsYamlPath(i ...interface{}) string
 
 	WriteSettingsObject(h IHelper, i ...interface{}) error
-	ReadSettingsObject(h IHelper, i ...interface{}) (interface{}, error)
+	ReadSettingsObject(h IHelper, i ...interface{}) (*ProjectMetadata, error)
+}
+
+type ProjectMetadata struct {
+	Name    string
+	Version string
+	// only service-name and ref to service.yaml
+	Services map[string]interface{}
+	// optional
+	Meta map[string]interface{}
 }
