@@ -74,15 +74,14 @@ func up(ctx *cli.Context) error {
 	core := helper.GetExtractor().GetCore(ctx)
 	log := core.GetLogger()
 
-	tempctx := context.Background()
 	startClusterOpts := types.ClusterStartOpts{}
-	clusters, err := client.ClusterList(tempctx, runtimes.SelectedRuntime)
+	clusters, err := client.ClusterList(ctx.Context, runtimes.SelectedRuntime)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for _, c := range clusters {
-		if err := client.ClusterStart(tempctx, runtimes.SelectedRuntime, c, startClusterOpts); err != nil {
+		if err := client.ClusterStart(ctx.Context, runtimes.SelectedRuntime, c, startClusterOpts); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -93,14 +92,13 @@ func down(ctx *cli.Context) error {
 	core := helper.GetExtractor().GetCore(ctx)
 	log := core.GetLogger()
 
-	tempctx := context.Background()
 	clusters, err := client.ClusterList(ctx.Context, runtimes.SelectedRuntime)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for _, c := range clusters {
-		if err := client.ClusterStop(tempctx, runtimes.SelectedRuntime, c); err != nil {
+		if err := client.ClusterStop(ctx.Context, runtimes.SelectedRuntime, c); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -108,11 +106,10 @@ func down(ctx *cli.Context) error {
 }
 
 func list(ctx *cli.Context) error {
-	tempctx := context.Background()
 	core := helper.GetExtractor().GetCore(ctx)
 	ui := core.GetUI()
 	log := core.GetLogger()
-	clusters, err := client.ClusterList(tempctx, runtimes.SelectedRuntime)
+	clusters, err := client.ClusterList(ctx.Context, runtimes.SelectedRuntime)
 	if err != nil {
 		log.Fatal(err)
 	}
