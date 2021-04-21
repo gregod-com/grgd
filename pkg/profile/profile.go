@@ -32,9 +32,6 @@ type Profile struct {
 	metadata         map[string]string
 }
 
-var updateurl = "https://s3.iamstudent.dev/public/grgd/index.yaml"
-var awsregion = "eu-central-1"
-
 // InitNewProfile ...
 func InitNewProfile(name string, ui interfaces.IUIPlugin, log interfaces.ILogger, helper interfaces.IHelper, i ...interface{}) interfaces.IProfile {
 
