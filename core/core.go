@@ -2,25 +2,31 @@ package core
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"time"
 
 	"github.com/gregod-com/grgd/interfaces"
-	"github.com/gregod-com/grgd/view"
-
-	"github.com/gregod-com/grgd/pkg/helper"
-	"github.com/gregod-com/grgd/pkg/logger"
 )
 
 var tempLogger interfaces.ILogger
 
 // RegisterDependecies ...
-func RegisterDependecies(implsTemp map[string]interface{}) interfaces.ICore {
+func RegisterDependecies(implsTemp map[string]interface{}) (interfaces.ICore, error) {
 	impls := make(map[string]interface{})
 	impls["start"] = time.Now()
 	solvedlast, solvedCurrent := 0, 0
-	// create tempLogger just for this function
-	tempLogger = logger.ProvideLogrusLogger()
+	foundProvider, foundLogger := false, false
+
+	// logger has to be provided
+	tempLoggerProvider, foundProvider := implsTemp["ILogger"].(func() interfaces.ILogger)
+	tempLogger, foundLogger = implsTemp["ILogger"].(interfaces.ILogger)
+	if !foundProvider && !foundLogger {
+		return nil, fmt.Errorf("The implementation for ILogger was not provided. Can not start application without logger (found %T )", implsTemp["ILogger"])
+	}
+	if foundProvider {
+		tempLogger = tempLoggerProvider()
+	}
 
 	for {
 		for target, elem := range implsTemp {
@@ -60,7 +66,7 @@ func RegisterDependecies(implsTemp map[string]interface{}) interfaces.ICore {
 			break
 		}
 		if solvedlast == solvedCurrent {
-			tempLogger.Fatal("There seems to be a circular dependency...")
+			return nil, fmt.Errorf("There seems to be a circular dependency...")
 		}
 		solvedlast = solvedCurrent
 	}
@@ -70,7 +76,7 @@ func RegisterDependecies(implsTemp map[string]interface{}) interfaces.ICore {
 	for k, v := range impls {
 		core.GetLogger().Tracef("%-25v ->\t%T", k, v)
 	}
-	return core
+	return core, nil
 }
 
 func addDependecyFromProviderFunction(elem interface{}, impls map[string]interface{}) bool {
@@ -162,8 +168,7 @@ func (c *Core) Get(i interface{}) error {
 func (c *Core) GetLogger() interfaces.ILogger {
 	a, ok := c.implementations["ILogger"].(interfaces.ILogger)
 	if !ok {
-		a = logger.ProvideLogrusLogger()
-		c.implementations["ILogger"] = a
+		return nil
 	}
 	return a
 }
@@ -172,8 +177,7 @@ func (c *Core) GetLogger() interfaces.ILogger {
 func (c *Core) GetUI() interfaces.IUIPlugin {
 	a, ok := c.implementations["IUIPlugin"].(interfaces.IUIPlugin)
 	if !ok {
-		a = view.ProvideFallbackUI(logger.ProvideLogrusLogger())
-		c.implementations["IUIPlugin"] = a
+		return nil
 	}
 	return a
 }
@@ -191,8 +195,9 @@ func (c *Core) GetConfig() interfaces.IConfig {
 func (c *Core) GetHelper() interfaces.IHelper {
 	a, ok := c.implementations["IHelper"].(interfaces.IHelper)
 	if !ok {
-		a = helper.ProvideHelper(logger.ProvideLogrusLogger())
-		c.implementations["IHelper"] = a
+		return nil
+		// a = helper.ProvideHelper(logger.ProvideLogrusLogger())
+		// c.implementations["IHelper"] = a
 	}
 	return a
 }
@@ -210,8 +215,18 @@ func (c *Core) GetCMDPlugins() []interfaces.ICMDPlugin {
 func (c *Core) GetNetworker() interfaces.INetworker {
 	a, ok := c.implementations["INetworker"].(interfaces.INetworker)
 	if !ok {
-		a = helper.ProvideNetworker(logger.ProvideLogrusLogger())
-		c.implementations["INetworker"] = a
+		return nil
+		// a = helper.ProvideNetworker(logger.ProvideLogrusLogger())
+		// c.implementations["INetworker"] = a
+	}
+	return a
+}
+
+// GetUpdater ...
+func (c *Core) GetUpdater() interfaces.IUpdater {
+	a, ok := c.implementations["IUpdater"].(interfaces.IUpdater)
+	if !ok {
+		return nil
 	}
 	return a
 }

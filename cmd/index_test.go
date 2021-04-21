@@ -25,12 +25,13 @@ func TestGetCommands(t *testing.T) {
 		"IDAL":      gormdal.ProvideDAL,
 		"IConfig":   config.ProvideConfig,
 	}
-	core := core.RegisterDependecies(dependecies)
+	core, err := core.RegisterDependecies(dependecies)
 
 	// When
 	cmds := GetCommands(app, core)
 
 	// Then
+	assert.NoError(t, err)
 	assert.Nil(t, nil, "here in nil")
 	if len(cmds) == 0 {
 		t.Error("no good")

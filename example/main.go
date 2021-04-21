@@ -15,8 +15,9 @@ import (
 )
 
 func main() {
+	log := logger.ProvideLogrusLogger()
 	dependecies := map[string]interface{}{
-		"ILogger":     logger.ProvideLogrusLogger,
+		"ILogger":     log,
 		"IConfig":     config.ProvideConfig,
 		"IHelper":     helper.ProvideHelper,
 		"INetworker":  helper.ProvideNetworker,
@@ -25,7 +26,10 @@ func main() {
 		"IUIPlugin":   view.ProvideFallbackUI,
 		"my-commands": ProvideCommands,
 	}
-	core := core.RegisterDependecies(dependecies)
+	core, err := core.RegisterDependecies(dependecies)
+	if err != nil {
+		log.Fatalf("Error with register dependencies: %s", err.Error())
+	}
 	grgd.NewApp(core, "example", "0.0.1")
 }
 

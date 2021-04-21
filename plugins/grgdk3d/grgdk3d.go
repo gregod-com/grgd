@@ -95,7 +95,7 @@ func down(ctx *cli.Context) error {
 	log := core.GetLogger()
 
 	tempctx := context.Background()
-	clusters, err := client.ClusterList(tempctx, runtimes.SelectedRuntime)
+	clusters, err := client.ClusterList(ctx.Context, runtimes.SelectedRuntime)
 	if err != nil {
 		log.Fatal(err)
 	}

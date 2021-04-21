@@ -12,6 +12,7 @@ type ICore interface {
 	GetConfig() IConfig
 	GetHelper() IHelper
 	GetNetworker() INetworker
+	GetUpdater() IUpdater
 	GetCMDPlugins() []ICMDPlugin
 	Get(i interface{}) error
 }
