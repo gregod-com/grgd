@@ -9,9 +9,9 @@ import (
 func AUpdate(c *cli.Context) error {
 	core := helper.GetExtractor().GetCore(c)
 	logger := core.GetLogger()
-	networker := core.GetNetworker()
+	updater := core.GetUpdater()
 
-	err := networker.CheckUpdate(c.App.Version, core)
+	err := updater.CheckUpdate(c.App.Version, core)
 	if err != nil {
 		logger.Fatal(err)
 	}

@@ -6,7 +6,6 @@ package mocks
 
 import (
 	gomock "github.com/golang/mock/gomock"
-	interfaces "github.com/gregod-com/grgd/interfaces"
 	reflect "reflect"
 )
 
@@ -31,20 +30,6 @@ func NewMockINetworker(ctrl *gomock.Controller) *MockINetworker {
 // EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockINetworker) EXPECT() *MockINetworkerMockRecorder {
 	return m.recorder
-}
-
-// CheckUpdate mocks base method
-func (m *MockINetworker) CheckUpdate(version string, core interfaces.ICore) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CheckUpdate", version, core)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// CheckUpdate indicates an expected call of CheckUpdate
-func (mr *MockINetworkerMockRecorder) CheckUpdate(version, core interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUpdate", reflect.TypeOf((*MockINetworker)(nil).CheckUpdate), version, core)
 }
 
 // CheckConnections mocks base method
