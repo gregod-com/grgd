@@ -13,8 +13,7 @@ PLATFORM=amd64
 
 all: test build-native stats index
 
-test:
-	cd interfaces && ./makeMocks.sh
+test: mocks
 	$(GOTEST) ./...
 
 build-native:
@@ -55,8 +54,8 @@ docker-build:
 	docker build -t registry.gitlab.com/iamdevelopment/iamk3d:latest .
 	docker push registry.gitlab.com/iamdevelopment/iamk3d:latest
 
-tdd:
-	fswatch -o ../* | xargs -n1 -I{} bash -c 'clear && go test ./...'
+tdd: mocks
+	fswatch -o ../* | xargs -n1 -I{} bash -c 'clear && $(GOTEST) ./...'
 
 mocks:
 	@for f in interfaces/*.go; do \
