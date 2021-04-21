@@ -41,9 +41,8 @@ func InitNewProfile(name string, ui interfaces.IUIPlugin, log interfaces.ILogger
 	profile.metadata = make(map[string]string)
 	profile.metadata["homeDir"] = helper.HomeDir(".grgd")
 	profile.metadata["hackDir"] = path.Join(profile.metadata["homeDir"], "hack")
-	profile.metadata["pluginDir"] = path.Join(profile.metadata["homeDir"], "pluginsv2")
-	profile.metadata["updateURL"] = updateurl
-	profile.metadata["awsRegion"] = awsregion
+	// profile.metadata["pluginDir"] = path.Join(profile.metadata["homeDir"], "pluginsv2")
+	// profile.metadata["awsRegion"] = awsregion
 
 	ui.ClearScreen()
 
