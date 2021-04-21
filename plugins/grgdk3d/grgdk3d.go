@@ -1,14 +1,27 @@
 package grgdk3d
 
 import (
-	"context"
+	"bytes"
 	"fmt"
+	"io"
+	"math/rand"
+	"os"
+	"os/exec"
+	"path"
+	"strconv"
+	"strings"
+	"time"
 
+	"github.com/gregod-com/grgd/interfaces"
 	"github.com/gregod-com/grgd/pkg/helper"
+	"gopkg.in/yaml.v2"
 
 	"github.com/rancher/k3d/v4/pkg/client"
+	"github.com/rancher/k3d/v4/pkg/config"
+	"github.com/rancher/k3d/v4/pkg/config/v1alpha2"
 	"github.com/rancher/k3d/v4/pkg/runtimes"
 	"github.com/rancher/k3d/v4/pkg/types"
+	"github.com/rancher/k3d/v4/pkg/util"
 
 	cli "github.com/urfave/cli/v2"
 )
@@ -136,79 +149,254 @@ func bootstrap(ctx *cli.Context) error {
 	core := helper.GetExtractor().GetCore(ctx)
 	ui := core.GetUI()
 	log := core.GetLogger()
+	h := core.GetHelper()
 	currentProj := core.GetConfig().GetActiveProfile().GetCurrentProject()
 	if currentProj == nil {
-		core.GetConfig().GetActiveProfile().AddProjectByName("testa")
+		return fmt.Errorf("Current project not defined")
 	}
-	currentProj = core.GetConfig().GetActiveProfile().GetCurrentProject()
-	if currentProj == nil {
-		log.Fatal("here1")
+	obj, err := currentProj.ReadSettingsObject(h)
+	if err != nil {
+		return err
 	}
 
-	ui.Printf("So here we are proj %s\n", currentProj.GetName())
+	k3dMeta, ok := obj.Meta["k3d"].(map[interface{}]interface{})
+	if !ok {
+		return fmt.Errorf("k3dMeta not defined in project settings. (%T) ", obj.Meta["k3d"])
+	}
 
-	// FILE=iamk3d.yaml
+	k3dyaml := k3dMeta["yaml"].(string)
+	manifests := k3dMeta["manifestsdir"].(string)
 
-	// if k3d node ls | grep -q ' running';
-	// then
-	// 	echo "\nThere is already a k3d cluster running. Exiting script now.\n\n"
-	// 	exit 1
-	// fi
+	if !h.PathExists(fmt.Sprint(k3dyaml)) {
+		return fmt.Errorf("k3d yaml was defined but could not be found at path %s", k3dyaml)
+	}
 
-	// if test -f "$FILE"; then
-	//   echo "Using $FILE as config for new cluster."
-	// else
-	//   echo "$FILE does not exist in current path. Move to iamk3d project or create $FILE"
-	//   exit 1
-	// fi
+	clusters, err := client.ClusterList(ctx.Context, runtimes.SelectedRuntime)
+	if err != nil {
+		return err
+	}
 
-	// if [ -z "$3" ]
-	// then
-	//   CLUSTERNAME=$USER
-	// else
-	//   CLUSTERNAME=$3
-	// fi
+	for _, c := range clusters {
+		totalA, runningA := c.AgentCountRunning()
+		totalS, runningS := c.ServerCountRunning()
+		running := runningA + runningS
+		total := totalA + totalS
+		ui.Printf("%v of %v nodes are running for cluster %s\n", running, total, c.Name)
+		if running > 0 {
+			return fmt.Errorf("Cluster %s is running, please stop before booting a new cluster", c.Name)
+		}
+	}
 
-	// if [ -z "$4" ]
-	// then
-	// 	k3sversion=latest
-	// else
-	// 	k3sversion=$4
-	// fi
+	var conf v1alpha2.SimpleConfig
 
-	// if docker pull rancher/k3s:$k3sversion;
-	// then
-	//   echo "\n\nAll good, starting k3d cluster now...\n\n"
-	// else
-	//   echo "\n\nInvalid k3s version. Check releases for valid tags: https://hub.docker.com/r/rancher/k3s/tags\n\n"
-	//   exit 1
-	// fi
+	out, err := h.ReadFile(k3dyaml)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	err = yaml.Unmarshal(out, &conf)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
 
-	// k3d cluster create $CLUSTERNAME -c $FILE \
-	// 	--image rancher/k3s:$k3sversion \
-	// 	--volume $(PWD)/iammanifests/:/var/lib/rancher/k3s/server/manifests/iammanifests@all \
-	// 	--volume $(PWD)/registries.yaml:/etc/rancher/k3s/registries.yaml@all
+	conf.Name = h.CheckUserProfile()
+	if ctx.NArg() > 0 {
+		conf.Name = ctx.Args().First()
+	}
 
-	// if k3d node ls | grep -q ' running';
-	// then
-	// 	resetRancherContext
-	// 	echo "\n\nImporting your k3d cluster into your rancher instance...\n\n"
-	// 	rancher cluster create --import k3d-$CLUSTERNAME
-	// 	clusterID=$(rancher cluster ls --format json | jq -cr --arg CN "k3d-$CLUSTERNAME" '. | select( .Name == $CN ) | .ID' )
-	// 	rancher cluster import -q $clusterID | head -n 1 | sh -
-	// else
-	// 	echo "\n\n hmmm cluster not running... skipping import to rancher\n\n"
-	// fi
+	vol1 := v1alpha2.VolumeWithNodeFilters{
+		Volume:      manifests + ":/var/lib/rancher/k3s/server/manifests/mountedManifests",
+		NodeFilters: []string{"server[*]", "agent[*]"},
+	}
+	conf.Volumes = []v1alpha2.VolumeWithNodeFilters{vol1}
+
+	conf.ExposeAPI.Host = "localhost"
+	conf.ExposeAPI.HostIP = "127.0.0.1"
+	conf.ExposeAPI.HostPort = strconv.Itoa(6444 + rand.Intn(100))
+
+	clusterConfig, err := config.TransformSimpleToClusterConfig(ctx.Context, runtimes.SelectedRuntime, conf)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+
+	clusterConfig, err = config.ProcessClusterConfig(*clusterConfig)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	if err := config.ValidateClusterConfig(ctx.Context, runtimes.SelectedRuntime, *clusterConfig); err != nil {
+		log.Error(err)
+		return err
+	}
+
+	// check if a cluster with that name exists already
+	if _, err := client.ClusterGet(ctx.Context, runtimes.SelectedRuntime, &clusterConfig.Cluster); err == nil {
+		return fmt.Errorf("Failed to create cluster '%s' because a cluster with that name already exists", clusterConfig.Cluster.Name)
+	}
+
+	if clusterConfig.KubeconfigOpts.UpdateDefaultKubeconfig {
+		log.Debug("'--kubeconfig-update-default set: enabling wait-for-server")
+		clusterConfig.ClusterCreateOpts.WaitForServer = true
+	}
+
+	// create cluster
+	if err := client.ClusterRun(ctx.Context, runtimes.SelectedRuntime, clusterConfig); err != nil {
+		log.Error(err)
+		return err
+	}
+	log.Infof("Cluster '%s' created successfully!", clusterConfig.Cluster.Name)
+
+	/**************
+	* Kubeconfig *
+	**************/
+
+	if !clusterConfig.KubeconfigOpts.UpdateDefaultKubeconfig && clusterConfig.KubeconfigOpts.SwitchCurrentContext {
+		log.Info("--kubeconfig-update-default=false --> sets --kubeconfig-switch-context=false")
+		clusterConfig.KubeconfigOpts.SwitchCurrentContext = false
+	}
+
+	if clusterConfig.KubeconfigOpts.UpdateDefaultKubeconfig {
+		log.Debugf("Updating default kubeconfig with a new context for cluster %s", clusterConfig.Cluster.Name)
+		if _, err := client.KubeconfigGetWrite(ctx.Context, runtimes.SelectedRuntime, &clusterConfig.Cluster, "", &client.WriteKubeConfigOptions{UpdateExisting: true, OverwriteExisting: false, UpdateCurrentContext: conf.Options.KubeconfigOptions.SwitchCurrentContext}); err != nil {
+			log.Warn(err)
+		}
+	}
+
+	for tot, run := clusterConfig.Cluster.AgentCountRunning(); run < tot; tot, run = clusterConfig.Cluster.AgentCountRunning() {
+		time.Sleep(time.Duration(time.Second * 2))
+		log.Info("Waiting for nodes to be ready...")
+	}
+
+	importToRancher(clusterConfig.Cluster.Name, log)
 
 	return nil
 }
 
 func delete(ctx *cli.Context) error {
 	core := helper.GetExtractor().GetCore(ctx)
-	ui := core.GetUI()
+	// ui := core.GetUI()
 	log := core.GetLogger()
-	ui.Println("tba - please use k3d cli as before")
-	log.Fatal("here")
+
+	clusters := []*types.Cluster{}
+	clusternames := []string{}
+	if ctx.NArg() != 0 {
+		clusternames = ctx.Args().Slice()
+	}
+
+	for _, name := range clusternames {
+		c, err := client.ClusterGet(ctx.Context, runtimes.SelectedRuntime, &types.Cluster{Name: name})
+		if err != nil {
+			if err == client.ClusterGetNoNodesFoundError {
+				continue
+			}
+			return err
+		}
+		clusters = append(clusters, c)
+	}
+
+	if len(clusters) == 0 {
+		return fmt.Errorf("No clusters found")
+	}
+
+	log.Infof("Checking for clusters on Rancher...")
+
+	clustermap, err := getClusterIDMap()
+	if err != nil {
+		return err
+	}
+
+	for _, c := range clusters {
+		if c.Name == "local" || strings.Contains(c.Name, "prod") {
+			log.Fatal("You really should not try to delete those clusters...")
+		}
+		if clusterID, ok := clustermap[c.Name]; !ok {
+			log.Warnf("Could not find cluster %s on Rancher. Cannot delete automatically.", c.Name)
+		} else {
+			log.Infof("Removing cluster %s from Rancher...", c.Name)
+			outDeleteCommand, err := catchOutput(true, "rancher", "cluster", "delete", clusterID)
+			if err != nil {
+				return err
+			}
+			log.Infof("%s", outDeleteCommand)
+		}
+
+		if err := client.ClusterDelete(ctx.Context, runtimes.SelectedRuntime, c, types.ClusterDeleteOpts{SkipRegistryCheck: false}); err != nil {
+			log.Fatal(err)
+		}
+		log.Info("Removing cluster details from default kubeconfig...")
+		if err := client.KubeconfigRemoveClusterFromDefaultConfig(ctx.Context, c); err != nil {
+			log.Warn("Failed to remove cluster details from default kubeconfig")
+			return err
+		}
+		log.Info("Removing standalone kubeconfig file (if there is one)...")
+		configDir, err := util.GetConfigDirOrCreate()
+		if err != nil {
+			log.Warnf("Failed to delete kubeconfig file: %+v", err)
+			return err
+		} else {
+			kubeconfigfile := path.Join(configDir, fmt.Sprintf("kubeconfig-%s.yaml", c.Name))
+			if err := os.Remove(kubeconfigfile); err != nil {
+				if !os.IsNotExist(err) {
+					log.Warnf("Failed to delete kubeconfig file '%s'", kubeconfigfile)
+					return err
+				}
+			}
+		}
+
+		log.Infof("Successfully deleted cluster %s!", c.Name)
+	}
 
 	return nil
+}
+
+func importToRancher(clustername string, log interfaces.ILogger) error {
+	log.Info("Importing your k3d cluster into your rancher instance...")
+	outCreate, err := catchOutput(true, "rancher", "cluster", "create", "--import", clustername)
+	if err != nil {
+		return err
+	}
+	log.Warnf("%s", outCreate)
+	clustermap, err := getClusterIDMap()
+	if err != nil {
+		return err
+	}
+	clusterID := clustermap[clustername]
+
+	outImportCommand, err := catchOutput(true, "rancher", "cluster", "import", "-q", clusterID)
+	if err != nil {
+		return err
+	}
+	commands := strings.Split(outImportCommand, "\n")
+
+	cmdAndArgs := strings.Split(commands[0], " ")
+	_, err = catchOutput(true, cmdAndArgs[0], cmdAndArgs[1:]...)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func getClusterIDMap() (map[string]string, error) {
+	var clustermap map[string]string
+	outList, err := catchOutput(true, "rancher", "cluster", "ls", "--format", "{{.Cluster.Name}}: {{.Cluster.ID}}")
+	if err != nil {
+		return nil, err
+	}
+	yaml.Unmarshal([]byte(outList), &clustermap)
+	return clustermap, nil
+}
+
+func catchOutput(silent bool, script string, args ...string) (string, error) {
+	cmd := exec.Command(script, args...)
+	var out, errout bytes.Buffer
+	cmd.Stdout = io.MultiWriter(os.Stdout, &out)
+	cmd.Stderr = io.MultiWriter(os.Stderr, &errout)
+	if silent {
+		cmd.Stdout = &out
+		cmd.Stderr = &errout
+	}
+	err := cmd.Run()
+	return out.String() + errout.String(), err
 }
