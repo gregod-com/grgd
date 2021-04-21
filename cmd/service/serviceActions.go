@@ -2,14 +2,12 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"sort"
 	"strconv"
 	"strings"
 
 	"github.com/gregod-com/grgd/interfaces"
 	"github.com/gregod-com/grgd/pkg/helper"
-	"github.com/gregod-com/grgd/pkg/project"
 	"github.com/urfave/cli/v2"
 )
 
@@ -26,14 +24,9 @@ func AListService(c *cli.Context) error {
 		return nil
 	}
 
-	obj, err := proj.ReadSettingsObject(h)
+	pm, err := proj.ReadSettingsObject(h)
 	if err != nil {
 		return err
-	}
-
-	pm, ok := obj.(*project.ProjectMetadata)
-	if !ok {
-		return fmt.Errorf("Project Metadata not supported %T", obj)
 	}
 
 	for k, v := range pm.Services {
@@ -51,7 +44,7 @@ func AListService(c *cli.Context) error {
 			}
 
 			if key == "path" {
-				yaml.Unmarshall
+				// yaml.Unmarshall
 			}
 		}
 	}
