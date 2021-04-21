@@ -33,16 +33,15 @@ func (cmd *CMD) GetCommands(i interface{}) interface{} {
 				{
 					Name:    "up",
 					Usage:   "start default cluster",
-					Aliases: []string{"u"},
+					Aliases: []string{"u", "start"},
 					Flags:   app.Flags,
 					Action:  up,
 				},
 				{
 					Name:    "down",
 					Usage:   "stop the default cluster",
-					Aliases: []string{"d"},
+					Aliases: []string{"d", "stop"},
 					Flags:   app.Flags,
-					Before:  app.Before,
 					Action:  down,
 				},
 				{
