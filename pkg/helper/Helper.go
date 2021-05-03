@@ -1,7 +1,10 @@
 package helper
 
 import (
+	"bytes"
+	"io"
 	"os"
+	"os/exec"
 	"path"
 
 	"github.com/gregod-com/grgd/interfaces"
@@ -148,6 +151,19 @@ func (h *Helper) LoadBootConfig() *interfaces.Bootconfig {
 		h.logger.Fatal("Error unmarshalling bootconfig yaml")
 	}
 	return bootconfig
+}
+
+func (h *Helper) CatchOutput(script string, silent bool, args ...string) (string, error) {
+	cmd := exec.Command(script, args...)
+	var out, errout bytes.Buffer
+	cmd.Stdout = io.MultiWriter(os.Stdout, &out)
+	cmd.Stderr = io.MultiWriter(os.Stderr, &errout)
+	if silent {
+		cmd.Stdout = &out
+		cmd.Stderr = &errout
+	}
+	err := cmd.Run()
+	return out.String() + errout.String(), err
 }
 
 func (h *Helper) createDefaultConfig(bootconfigpath string) {
