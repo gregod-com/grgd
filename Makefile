@@ -11,7 +11,7 @@ BINARYNAME=grgd
 OS=darwin
 PLATFORM=amd64
 
-all: test build-native stats index
+all: test build-native stats
 
 test: mocks
 	$(GOTEST) ./...
@@ -24,12 +24,6 @@ run:
 
 stats:
 	du -sh $(BINPATH)$(BINARYNAME)-$(OS)-$(PLATFORM)
-
-index:
-	./idxer $(BINARYNAME) $(OS) $(PLATFORM)
-
-upload:
-	mc mirror --remove --overwrite bin/ minio/public/grgd/
 
 cover:
 	$(GOTEST) -coverprofile=coverage.out -cover ./...
@@ -49,10 +43,6 @@ docker-build-bin:
 		golang:latest 						\
 		$(GOBUILD) -ldflags="-w -s"			\
 		-o ./$(BINPATH)$(BINARYNAME)-linux
-
-docker-build:
-	docker build -t registry.gitlab.com/iamdevelopment/iamk3d:latest .
-	docker push registry.gitlab.com/iamdevelopment/iamk3d:latest
 
 tdd: mocks
 	fswatch -o ../* | xargs -n1 -I{} bash -c 'clear && $(GOTEST) ./...'
