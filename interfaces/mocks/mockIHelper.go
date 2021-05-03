@@ -192,3 +192,23 @@ func (mr *MockIHelperMockRecorder) UpdateOrWriteFile(path, content, permissions 
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateOrWriteFile", reflect.TypeOf((*MockIHelper)(nil).UpdateOrWriteFile), path, content, permissions)
 }
+
+// CatchOutput mocks base method
+func (m *MockIHelper) CatchOutput(script string, silent bool, args ...string) (string, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{script, silent}
+	for _, a := range args {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CatchOutput", varargs...)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CatchOutput indicates an expected call of CatchOutput
+func (mr *MockIHelperMockRecorder) CatchOutput(script, silent interface{}, args ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{script, silent}, args...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CatchOutput", reflect.TypeOf((*MockIHelper)(nil).CatchOutput), varargs...)
+}

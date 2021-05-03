@@ -46,3 +46,17 @@ func (mr *MockIUpdaterMockRecorder) CheckUpdate(version, core interface{}) *gomo
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUpdate", reflect.TypeOf((*MockIUpdater)(nil).CheckUpdate), version, core)
 }
+
+// CheckSinceLastUpdate mocks base method
+func (m *MockIUpdater) CheckSinceLastUpdate(version string, core interfaces.ICore) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckSinceLastUpdate", version, core)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CheckSinceLastUpdate indicates an expected call of CheckSinceLastUpdate
+func (mr *MockIUpdaterMockRecorder) CheckSinceLastUpdate(version, core interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckSinceLastUpdate", reflect.TypeOf((*MockIUpdater)(nil).CheckSinceLastUpdate), version, core)
+}

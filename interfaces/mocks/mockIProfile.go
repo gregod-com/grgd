@@ -199,20 +199,6 @@ func (mr *MockIProfileMockRecorder) GetBasePath() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBasePath", reflect.TypeOf((*MockIProfile)(nil).GetBasePath))
 }
 
-// GetUpdateURL mocks base method
-func (m *MockIProfile) GetUpdateURL() string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUpdateURL")
-	ret0, _ := ret[0].(string)
-	return ret0
-}
-
-// GetUpdateURL indicates an expected call of GetUpdateURL
-func (mr *MockIProfileMockRecorder) GetUpdateURL() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUpdateURL", reflect.TypeOf((*MockIProfile)(nil).GetUpdateURL))
-}
-
 // GetProjects mocks base method
 func (m *MockIProfile) GetProjects() map[string]interfaces.IProject {
 	m.ctrl.T.Helper()

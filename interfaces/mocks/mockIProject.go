@@ -169,14 +169,14 @@ func (mr *MockIProjectMockRecorder) SetPath(path interface{}, i ...interface{}) 
 }
 
 // GetServices mocks base method
-func (m *MockIProject) GetServices(i ...interface{}) map[string]interfaces.IService {
+func (m *MockIProject) GetServices(i ...interface{}) map[string]interfaces.ServiceMetadata {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range i {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetServices", varargs...)
-	ret0, _ := ret[0].(map[string]interfaces.IService)
+	ret0, _ := ret[0].(map[string]interfaces.ServiceMetadata)
 	return ret0
 }
 
@@ -187,14 +187,14 @@ func (mr *MockIProjectMockRecorder) GetServices(i ...interface{}) *gomock.Call {
 }
 
 // GetServiceByName mocks base method
-func (m *MockIProject) GetServiceByName(serviceName string, i ...interface{}) interfaces.IService {
+func (m *MockIProject) GetServiceByName(serviceName string, i ...interface{}) interfaces.ServiceMetadata {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{serviceName}
 	for _, a := range i {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetServiceByName", varargs...)
-	ret0, _ := ret[0].(interfaces.IService)
+	ret0, _ := ret[0].(interfaces.ServiceMetadata)
 	return ret0
 }
 

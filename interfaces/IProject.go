@@ -14,8 +14,8 @@ type IProject interface {
 
 	GetPath() string
 	SetPath(path string, i ...interface{}) error
-	GetServices(i ...interface{}) map[string]IService
-	GetServiceByName(serviceName string, i ...interface{}) IService
+	GetServices(i ...interface{}) map[string]ServiceMetadata
+	GetServiceByName(serviceName string, i ...interface{}) ServiceMetadata
 	GetValues(i ...interface{}) []string
 
 	SetSettingsYamlPath(path string, i ...interface{}) error
@@ -29,7 +29,13 @@ type ProjectMetadata struct {
 	Name    string
 	Version string
 	// only service-name and ref to service.yaml
-	Services map[string]interface{}
+	Services      map[string]ServiceLocator
+	IgnoreFolders []string
 	// optional
 	Meta map[string]interface{}
+}
+
+type ServiceLocator struct {
+	Active bool
+	Path   string
 }

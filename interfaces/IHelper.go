@@ -26,6 +26,8 @@ type IHelper interface {
 	ReadFile(path string) ([]byte, error)
 
 	UpdateOrWriteFile(path string, content []byte, permissions os.FileMode) error
+
+	CatchOutput(script string, silent bool, args ...string) (string, error)
 }
 
 // Bootconfig ...

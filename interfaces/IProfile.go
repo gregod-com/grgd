@@ -20,7 +20,6 @@ type IProfile interface {
 	SetMetaData(key string, value string)
 
 	GetBasePath() string
-	GetUpdateURL() string
 	GetProjects() map[string]IProject
 
 	AddProject() error
