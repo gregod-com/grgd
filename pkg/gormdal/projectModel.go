@@ -26,7 +26,7 @@ func iprojectToProjectModel(in interfaces.IProject, out *ProjectModel) error {
 // ProjectModel ...
 type ProjectModel struct {
 	gorm.Model
-	Name             string `gorm:"unique;not null;default:null"`
+	Name             string `gorm:"not null;default:null"`
 	Path             string
 	SettingsYamlPath string
 	Initialized      bool
