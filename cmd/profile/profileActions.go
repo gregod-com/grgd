@@ -52,5 +52,6 @@ func ADeleteProfile(c *cli.Context) error {
 			ui.Printf("No matching profile with name `%s` found.\n", v)
 		}
 	}
+	AListProfiles(c)
 	return nil
 }
