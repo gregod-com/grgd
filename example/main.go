@@ -1,4 +1,3 @@
-// This package implements the cli for the iam-stack. The underlying framework is depnedent upon urfave/cli.
 package main
 
 import (

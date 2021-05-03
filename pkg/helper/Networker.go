@@ -1,13 +1,11 @@
 package helper
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
 	"sort"
 	"strconv"
 	"strings"
@@ -65,17 +63,6 @@ type Connection struct {
 // Networker ...
 type Networker struct {
 	logger interfaces.ILogger
-}
-
-func catchOut(binPath string, args ...string) string {
-	cmd := exec.Command(binPath, args...)
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	err := cmd.Run()
-	if err != nil {
-		log.Fatal("Error executing: " + err.Error())
-	}
-	return strings.TrimSuffix(out.String(), "\n")
 }
 
 func sortSemverSlice(semverSlice []string) error {

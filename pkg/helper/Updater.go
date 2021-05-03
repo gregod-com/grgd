@@ -31,6 +31,7 @@ type Updater struct {
 func (u *Updater) CheckUpdate(version string, core interfaces.ICore) error {
 	cnfg := core.GetConfig()
 	UI := core.GetUI()
+	h := core.GetHelper()
 
 	indexpath := path.Join(cnfg.GetActiveProfile().GetBasePath(), "index.yaml")
 	versionMap := map[string]string{}
@@ -49,15 +50,21 @@ func (u *Updater) CheckUpdate(version string, core interfaces.ICore) error {
 		if strings.HasPrefix(scriptPath, ".") {
 			continue
 		}
-		cName := catchOut(scriptPath, "name")
-		cVersion := catchOut(scriptPath, "version")
+		cName, err := h.CatchOutput(scriptPath, false, "name")
+		if err != nil {
+			return err
+		}
+		cVersion, err := h.CatchOutput(scriptPath, false, "version")
+		if err != nil {
+			return err
+		}
 		versionMap[cName] = cVersion
 	}
 
-	err = u.networker.Load(indexpath, cnfg.GetActiveProfile().GetUpdateURL())
-	if err != nil {
-		return err
-	}
+	// err = u.networker.Load(indexpath, cnfg.GetActiveProfile().GetUpdateURL())
+	// if err != nil {
+	// 	return err
+	// }
 
 	index, err := ioutil.ReadFile(indexpath)
 	if err != nil {
@@ -154,5 +161,9 @@ func (u *Updater) CheckUpdate(version string, core interfaces.ICore) error {
 		os.Chmod("/usr/local/bin/grgd", 0744)
 	}
 
+	return nil
+}
+
+func (u *Updater) CheckSinceLastUpdate(version string, core interfaces.ICore) error {
 	return nil
 }
