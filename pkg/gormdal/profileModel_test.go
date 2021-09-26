@@ -6,6 +6,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/gregod-com/grgd/interfaces"
 	"github.com/gregod-com/grgd/interfaces/mocks"
+	"github.com/gregod-com/grgd/pkg/profile"
 	"github.com/tj/assert"
 )
 
@@ -21,18 +22,22 @@ func TestLoadTESTProfile(t *testing.T) {
 	helper.EXPECT().CheckOrCreateFolder(gomock.Any(), gomock.Any()).AnyTimes()
 	helper.EXPECT().CheckOrCreateParentFolder(gomock.Any(), gomock.Any()).AnyTimes()
 	helper.EXPECT().HomeDir(gomock.Any(), gomock.Any()).AnyTimes()
+	helper.EXPECT().HomeDir(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().Tracef(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().GetLevel().AnyTimes()
+
 	dal := setupDatabase(helper, logger)
 	defer tearDownDatabase(helper)
 
 	// When
-	search := ProfileModel{Name: "TESTProfile"}
-	err := dal.Read(&search)
+	search := &profile.Profile{}
+	search.SetName("TESTProfile")
+	err := dal.Read(search)
 	assert.Nil(t, err)
 
 	// Then
-	assert.Equal(t, "TESTProfile", search.Name)
 	assert.Equal(t, "TESTProfile", search.GetName())
-	assert.Equal(t, "./test-me-dir/", search.HomeDir)
+	assert.Equal(t, "./test-me-dir/", search.GetBasePath())
 }
 
 func TestDeleteTESTProfile(t *testing.T) {
@@ -46,11 +51,15 @@ func TestDeleteTESTProfile(t *testing.T) {
 	helper.EXPECT().CheckOrCreateFolder(gomock.Any(), gomock.Any()).AnyTimes()
 	helper.EXPECT().CheckOrCreateParentFolder(gomock.Any(), gomock.Any()).AnyTimes()
 	helper.EXPECT().HomeDir(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().Tracef(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().GetLevel().AnyTimes()
 	dal := setupDatabase(helper, logger)
 	defer tearDownDatabase(helper)
 
 	// When
-	search := &ProfileModel{Name: "TESTProfile"}
+	// When
+	search := &profile.Profile{}
+	search.SetName("TESTProfile")
 	err := dal.Read(search)
 	assert.Nil(t, err)
 	dal.Delete(search)
@@ -71,14 +80,18 @@ func TestEditTESTProfile(t *testing.T) {
 	helper.EXPECT().CheckOrCreateFolder(gomock.Any(), gomock.Any()).AnyTimes()
 	helper.EXPECT().CheckOrCreateParentFolder(gomock.Any(), gomock.Any()).AnyTimes()
 	helper.EXPECT().HomeDir(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().Tracef(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().GetLevel().AnyTimes()
 	dal := setupDatabase(helper, logger)
 	defer tearDownDatabase(helper)
 
 	// When
-	search := &ProfileModel{Name: "TESTProfile"}
+	// When
+	search := &profile.Profile{}
+	search.SetName("TESTProfile")
 	err := dal.Read(search)
 	assert.Nil(t, err)
-	search.Name = "edited-name"
+	search.SetName("edited-name")
 	dal.Update(search)
 
 	// Then
