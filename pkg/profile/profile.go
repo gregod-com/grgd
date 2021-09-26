@@ -14,16 +14,16 @@ import (
 // ProvideProfile ...
 func ProvideProfile(logger interfaces.ILogger, ui interfaces.IUIPlugin) interfaces.IProfile {
 	p := &Profile{}
-	p.logger = logger
-	p.ui = ui
+	p.Logger = logger
+	p.Ui = ui
 	logger.Tracef("provide %T", p)
 	return p
 }
 
 // Profile ...
 type Profile struct {
-	logger           interfaces.ILogger
-	ui               interfaces.IUIPlugin
+	Logger           interfaces.ILogger
+	Ui               interfaces.IUIPlugin
 	id               uint
 	name             string
 	initialized      bool
@@ -39,33 +39,23 @@ func InitNewProfile(name string, ui interfaces.IUIPlugin, log interfaces.ILogger
 	// defaults for new profile
 	profile.name = name
 	profile.metadata = make(map[string]string)
-	profile.metadata["homeDir"] = helper.HomeDir(".grgd")
-	profile.metadata["hackDir"] = path.Join(profile.metadata["homeDir"], "hack")
-	// profile.metadata["pluginDir"] = path.Join(profile.metadata["homeDir"], "pluginsv2")
-	// profile.metadata["awsRegion"] = awsregion
+	profile.metadata["grgdDir"] = helper.HomeDir(".grgd")
+	profile.metadata["hackDir"] = path.Join(profile.metadata["grgdDir"], "hack")
 
 	ui.ClearScreen()
 
 	ui.Printf("Hey %v, let's init your profile\n\n", profile.name)
 
 	// Scripts
-	ui.Questionf("Base scripts directory [%s]: ", profile.metadata["pluginDir"], profile.metadata["pluginDir"])
-	for !helper.PathExists(profile.metadata["pluginDir"]) {
-		answer := profile.metadata["pluginDir"]
-		profile.metadata["pluginDir"] = helper.HomeDir(".grgd", "hack")
-		ui.Questionf("The path `%s` does not exists. Try again or use default [%s]: ", answer, profile.metadata["pluginDir"], profile.metadata["pluginDir"])
+	answer := profile.metadata["hackDir"]
+	ui.Questionf("Base scripts directory [%s]: ", &answer, answer)
+	for !helper.PathExists(answer) {
+		oldAnswer := answer
+		answer = profile.metadata["hackDir"]
+		ui.Questionf("The path `%s` does not exists. Try again or use default [%s]: ", &answer, oldAnswer, answer)
 	}
-
-	ui.Questionf("URL to fetch updates from: [%s]: ", profile.metadata["updateURL"], profile.metadata["updateURL"])
-
-	for !ping(profile.metadata["updateURL"]) {
-		answer := profile.metadata["updateURL"]
-		profile.metadata["updateURL"] = updateurl
-		ui.Questionf("The url `%s` it not reachable. Use anyways or use default [%s]: ", answer, profile.metadata["updateURL"], profile.metadata["updateURL"])
-	}
-
+	profile.metadata["hackDir"] = answer
 	profile.projects = make(map[string]interfaces.IProject)
-
 	profile.initialized = true
 	return &profile
 }
@@ -106,14 +96,6 @@ func (p *Profile) SetMetaData(key, value string) {
 	}
 }
 
-// GetUpdateURL ...
-func (p *Profile) GetUpdateURL() string {
-	if url, ok := p.metadata["updateURL"]; ok {
-		return url
-	}
-	return ""
-}
-
 // IsInitialized ...
 func (p *Profile) IsInitialized() bool {
 	return p.initialized
@@ -149,7 +131,7 @@ func (p *Profile) SetName(n string) error {
 
 // GetBasePath ...
 func (p *Profile) GetBasePath() string {
-	return p.metadata["homeDir"]
+	return p.metadata["grgdDir"]
 }
 
 // GetPluginsDir ...

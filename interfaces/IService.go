@@ -13,7 +13,7 @@ type IService interface {
 
 type ServiceMetadata struct {
 	Name    string
-	Version string
+	Version string `yaml:"serviceVersion"`
 	// define how service is deployed for dev/staging/live...
 	RunTimes map[string]RunTime
 	//optional
