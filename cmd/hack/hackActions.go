@@ -13,7 +13,9 @@ func AExec(c *cli.Context) error {
 	// UI := core.GetUI()
 	h := core.GetHelper()
 	log := core.GetLogger()
-	script := path.Join(core.GetConfig().GetActiveProfile().GetMetaData("hackDir"), c.Command.FullName())
+	script := path.Join(
+		core.GetConfig().GetActiveProfile().GetMetaData("hackDir"),
+		c.Command.FullName())
 
 	args := c.Args().Slice()
 	prefix := "exec"
