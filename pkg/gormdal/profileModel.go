@@ -11,18 +11,24 @@ func profileModelToIProfile(in *ProfileModel, out interfaces.IProfile) error {
 	out.SetID(in.ID)
 	out.SetName(in.Name)
 
-	out.SetMetaData("homeDir", in.HomeDir)
+	out.SetMetaData("grgdDir", in.HomeDir)
 	out.SetMetaData("hackDir", in.HackDir)
-	out.SetMetaData("pluginDir", in.PluginDir)
-	out.SetMetaData("updateURL", in.UpdateURL)
-	out.SetMetaData("awsRegion", in.AWSRegion)
-	out.SetCurrentProjectID(in.CurrentProjectID)
+	found := false
+	randomID := uint(0)
 	for _, proj := range in.Projects {
 		// todo make implementation agnostic?
+		if in.CurrentProjectID == proj.ID {
+			found = true
+		}
+		randomID = proj.ID
 		iproj := &project.Project{}
 		projectModelToIProject(proj, iproj)
 		out.AddProjectDirect(iproj)
 	}
+	if !found {
+		in.CurrentProjectID = randomID
+	}
+	out.SetCurrentProjectID(in.CurrentProjectID)
 
 	out.SetInitialized(in.Initialized)
 	return nil
@@ -32,11 +38,8 @@ func profileModelToIProfile(in *ProfileModel, out interfaces.IProfile) error {
 func iprofileToProfileModel(in interfaces.IProfile, out *ProfileModel) error {
 	out.ID = in.GetID()
 	out.Name = in.GetName()
-	out.HomeDir = in.GetMetaData("homeDir")
+	out.HomeDir = in.GetMetaData("grgdDir")
 	out.HackDir = in.GetMetaData("hackDir")
-	out.PluginDir = in.GetMetaData("pluginDir")
-	out.UpdateURL = in.GetMetaData("updateURL")
-	out.AWSRegion = in.GetMetaData("awsRegion")
 	out.CurrentProjectID = in.GetCurrentProjectID()
 	for _, proj := range in.GetProjects() {
 		pmdl := &ProjectModel{}
@@ -53,12 +56,9 @@ type ProfileModel struct {
 	Name             string `gorm:"unique;not null;default:null"`
 	HomeDir          string
 	HackDir          string
-	PluginDir        string
 	Projects         []*ProjectModel `gorm:"constraint:OnUpdate:UPDATE,OnDelete:SET NULL;;many2many:profiles_projects;"`
 	CurrentProjectID uint
 	Initialized      bool
-	UpdateURL        string
-	AWSRegion        string
 }
 
 // GetID ...
