@@ -11,7 +11,7 @@ func GetCLICommands(app *cli.App, core interfaces.ICore) []*cli.Command {
 		{
 			Name:            "profile",
 			Category:        "settings",
-			Usage:           "Configuration for profile",
+			Usage:           "Configuration for profiles",
 			HideHelpCommand: true,
 			Flags:           app.Flags,
 			Subcommands: []*cli.Command{

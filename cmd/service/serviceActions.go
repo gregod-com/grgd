@@ -29,24 +29,21 @@ func AListService(c *cli.Context) error {
 		return err
 	}
 
-	for k, v := range pm.Services {
-		mp, ok := v.(map[interface{}]interface{})
-		if !ok {
-			ui.Printf("Service %v is %T\n", k, v)
-			continue
-		}
+	srvs := proj.GetServices(core)
 
-		ui.Printf("%-20v\n", k)
+	for k, v := range srvs {
+		ui.Printf("%-20v%-20v\n", k, v)
+
+	}
+	for serviceName, serviceEntry := range pm.Services {
+		ui.Printf("%-20v\n", serviceName)
 		// service := proj.GetServiceByName(k)
-		for key, value := range mp {
-			if key == "active" {
-				ui.Printf("%-4v%v: %v \n", "", key, value)
-			}
+		ui.Printf("%-4v%v: %v \n", "", "active", serviceEntry.Active)
 
-			if key == "path" {
-				// yaml.Unmarshall
-			}
-		}
+		// }
+		// if propName == "path" {
+		// 	yaml.Unmarshall()
+		// }
 	}
 
 	return nil
