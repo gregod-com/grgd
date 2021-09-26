@@ -6,14 +6,14 @@ replace github.com/gregod-com/grgd/interfaces => ../grgd/interfaces
 
 require (
 	github.com/common-nighthawk/go-figure v0.0.0-20200609044655-c4b36f998cf2
-	github.com/golang/mock v1.4.4
+	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.4.3
 	github.com/rancher/k3d/v4 v4.4.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/tj/assert v0.0.3
 	github.com/urfave/cli/v2 v2.3.0
-	golang.org/x/mod v0.3.0
-	golang.org/x/sys v0.0.0-20210309074719-68d13333faf2
+	golang.org/x/mod v0.4.2
+	golang.org/x/sys v0.0.0-20210510120138-977fb7262007
 	golang.org/x/term v0.0.0-20201210144234-2321bbc49cbf
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/yaml.v2 v2.4.0
@@ -77,7 +77,7 @@ require (
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/crypto v0.0.0-20201002170205-7f63de1d35b0 // indirect
-	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110 // indirect
+	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4 // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/text v0.3.5 // indirect
