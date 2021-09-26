@@ -37,8 +37,11 @@ func NewApp(core interfaces.ICore, name string, version string, hooks map[string
 		UI := core.GetUI()
 		core.GetConfig().SetActiveProfile(c.String("profile"))
 		log := core.GetLogger()
-		if err := core.GetUpdater().CheckSinceLastUpdate(app.Version, core); err != nil {
-			log.Warnf("Error checking for update: %s ", err.Error())
+		u := core.GetUpdater()
+		if u != nil {
+			if err := core.GetUpdater().CheckSinceLastUpdate(app.Version, core); err != nil {
+				log.Warnf("Error checking for update: %s ", err.Error())
+			}
 		}
 		UI.ClearScreen(c)
 		UI.PrintBanner(c)
