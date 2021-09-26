@@ -19,21 +19,25 @@ func ProvideConfig(dal I.IDAL, ui I.IUIPlugin, logger I.ILogger, helper I.IHelpe
 	}
 	// var prof I.IProfile
 	var profiles []I.IProfile
-	mp, err := dal.ReadAll(profiles)
+	allProfiles, err := dal.ReadAll(profiles)
 	if err != nil {
 		config.logger.Warnf("Error loading profiles")
 	}
 
 	// remove element with key ""
-	_, ok := mp[""]
+	_, ok := allProfiles[""]
 	if ok {
-		delete(mp, "")
+		delete(allProfiles, "")
 	}
 
 	config.profiles = make(map[string]I.IProfile)
-	for k, v := range mp {
-		config.profiles[k] = v.(I.IProfile)
-		config.logger.Debugf("Adding profile: %s", k)
+	for name, prof := range allProfiles {
+		p, ok := prof.(I.IProfile)
+		if !ok {
+			continue
+		}
+		config.profiles[name] = p
+		config.logger.Debugf("Adding profile: %s", name)
 	}
 
 	config.profileProvider = profile.InitNewProfile
