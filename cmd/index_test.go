@@ -39,8 +39,6 @@ func TestGetCommands(t *testing.T) {
 	for _, v := range cmds {
 		fmt.Println(v.Name)
 	}
-	// 	assert.Equal(t, "a", "a", "my message")
-	// }
 }
 
 func TestGetUser(t *testing.T) {

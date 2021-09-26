@@ -6,6 +6,8 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/gregod-com/grgd/interfaces"
 	"github.com/gregod-com/grgd/interfaces/mocks"
+	"github.com/gregod-com/grgd/pkg/profile"
+	"github.com/gregod-com/grgd/pkg/project"
 	"github.com/tj/assert"
 )
 
@@ -20,6 +22,9 @@ func TestLoadTESTProject(t *testing.T) {
 	helper.EXPECT().CheckOrCreateFolder(gomock.Any(), gomock.Any()).AnyTimes()
 	helper.EXPECT().CheckOrCreateParentFolder(gomock.Any(), gomock.Any()).AnyTimes()
 	helper.EXPECT().HomeDir(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().Tracef(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().GetLevel().AnyTimes()
+	logger.EXPECT().Warnf(gomock.Any(), gomock.Any()).AnyTimes()
 	dal := setupDatabase(helper, logger)
 	defer tearDownDatabase(helper)
 
@@ -44,6 +49,11 @@ func TestDeleteTESTProject(t *testing.T) {
 	helper.EXPECT().CheckOrCreateFolder(gomock.Any(), gomock.Any()).AnyTimes()
 	helper.EXPECT().CheckOrCreateParentFolder(gomock.Any(), gomock.Any()).AnyTimes()
 	helper.EXPECT().HomeDir(gomock.Any(), gomock.Any()).AnyTimes()
+
+	logger.EXPECT().Tracef(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().GetLevel().AnyTimes()
+	logger.EXPECT().Warnf(gomock.Any(), gomock.Any()).AnyTimes()
+
 	dal := setupDatabase(helper, logger)
 	defer tearDownDatabase(helper)
 
@@ -69,14 +79,20 @@ func TestEditTESTProject(t *testing.T) {
 	helper.EXPECT().CheckOrCreateFolder(gomock.Any(), gomock.Any()).AnyTimes()
 	helper.EXPECT().CheckOrCreateParentFolder(gomock.Any(), gomock.Any()).AnyTimes()
 	helper.EXPECT().HomeDir(gomock.Any(), gomock.Any()).AnyTimes()
+
+	logger.EXPECT().Tracef(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().GetLevel().AnyTimes()
+	logger.EXPECT().Warnf(gomock.Any(), gomock.Any()).AnyTimes()
+
 	dal := setupDatabase(helper, logger)
 	defer tearDownDatabase(helper)
 
 	// When
-	search := &ProfileModel{Name: "TESTProject"}
+	search := &project.Project{}
+	search.SetName("TESTProject")
 	err := dal.Read(search)
 	assert.Nil(t, err)
-	search.Name = "edited-project"
+	search.SetName("edited-project")
 	dal.Update(search)
 
 	// Then
@@ -98,24 +114,31 @@ func TestAddProjectToProfile(t *testing.T) {
 	helper.EXPECT().CheckOrCreateFolder(gomock.Any(), gomock.Any()).AnyTimes()
 	helper.EXPECT().CheckOrCreateParentFolder(gomock.Any(), gomock.Any()).AnyTimes()
 	helper.EXPECT().HomeDir(gomock.Any(), gomock.Any()).AnyTimes()
+
+	logger.EXPECT().Tracef(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().GetLevel().AnyTimes()
+	logger.EXPECT().Warnf(gomock.Any(), gomock.Any()).AnyTimes()
+
 	dal := setupDatabase(helper, logger)
 	defer tearDownDatabase(helper)
 
 	// When
-	searchProfile := &ProfileModel{Name: "TESTProfile"}
+	searchProfile := &profile.Profile{}
+	searchProfile.SetName("TESTProfile")
 	err1 := dal.Read(searchProfile)
 	assert.Nil(t, err1)
-	searchProject := &ProjectModel{Name: "TESTProject"}
+	searchProject := &project.Project{}
+	searchProject.SetName("TESTProject")
 	err2 := dal.Read(searchProject)
 	assert.Nil(t, err2)
 
-	searchProfile.Projects = append(searchProfile.Projects, searchProject)
+	searchProfile.AddProjectDirect(searchProject)
 	dal.Update(searchProfile)
 
 	// Then
 	err3 := dal.Read(searchProfile)
 	assert.Nil(t, err3)
 
-	assert.NotNil(t, searchProfile.Projects)
-	assert.Equal(t, "TESTProject", searchProfile.Projects[0].Name)
+	assert.NotNil(t, searchProfile.GetProjects())
+	assert.Equal(t, "TESTProject", searchProfile.GetProjects()["TESTProject"].GetName())
 }

@@ -188,7 +188,7 @@ func (project *Project) SetID(id uint) error {
 }
 
 // GetID ...
-func (project *Project) GetID(i ...interface{}) uint {
+func (project *Project) GetID() uint {
 	return project.id
 }
 

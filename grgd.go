@@ -29,7 +29,7 @@ func NewApp(core interfaces.ICore, name string, version string, hooks map[string
 	app.CustomAppHelpTemplate = view.GetHelpTemplate()
 	app.HideHelpCommand = true
 	app.HideHelp = true
-	app.UsageText = `iam [global options] command [command options] [arguments...]`
+	app.UsageText = name + ` [global options] command [command options] [arguments...]`
 
 	// define behavior before every command execution
 	app.Before = func(c *cli.Context) error {

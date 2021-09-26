@@ -159,3 +159,31 @@ func (mr *MockICoreMockRecorder) Get(i interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockICore)(nil).Get), i)
 }
+
+// CallPreHook mocks base method
+func (m *MockICore) CallPreHook(i interface{}) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CallPreHook", i)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CallPreHook indicates an expected call of CallPreHook
+func (mr *MockICoreMockRecorder) CallPreHook(i interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CallPreHook", reflect.TypeOf((*MockICore)(nil).CallPreHook), i)
+}
+
+// CallPostHook mocks base method
+func (m *MockICore) CallPostHook(i interface{}) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CallPostHook", i)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CallPostHook indicates an expected call of CallPostHook
+func (mr *MockICoreMockRecorder) CallPostHook(i interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CallPostHook", reflect.TypeOf((*MockICore)(nil).CallPostHook), i)
+}

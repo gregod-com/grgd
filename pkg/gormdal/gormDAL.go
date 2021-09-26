@@ -168,10 +168,9 @@ func (dal *GormDAL) toInterface(dto interface{}, i interface{}) error {
 	case *ProfileModel:
 		p, ok := i.(interfaces.IProfile)
 		if !ok {
-			return fmt.Errorf("missmatch when trying to convert %T to %T", dto, i)
+			return fmt.Errorf("missmatch when trying to convert %T to interfaces.IProfile (got %T), %v", dto, i, i)
 		}
 		dal.logger.Tracef("converting %T to %T", v, p)
-		dal.logger.Debug("here should be some projects loaded %v", v.Projects)
 		return profileModelToIProfile(v, p)
 	case ProjectModel:
 		_, ok := i.(interfaces.IProject)

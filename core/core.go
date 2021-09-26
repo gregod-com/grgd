@@ -197,6 +197,7 @@ func (c *Core) GetHelper() interfaces.IHelper {
 	a, ok := c.implementations["IHelper"].(interfaces.IHelper)
 	if !ok {
 		return nil
+		//  if here is returned a default helper an import cycle is created
 		// a = helper.ProvideHelper(logger.ProvideLogrusLogger())
 		// c.implementations["IHelper"] = a
 	}
