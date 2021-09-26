@@ -95,16 +95,19 @@ func (l *LogrusLogger) Info(i ...interface{}) {
 
 // Warn ...
 func (l *LogrusLogger) Warn(i ...interface{}) {
+	l.logger.SetLevel(logrus.DebugLevel)
 	l.logger.Warn(i...)
 }
 
 // Error ...
 func (l *LogrusLogger) Error(i ...interface{}) {
+	l.logger.SetLevel(logrus.DebugLevel)
 	l.logger.Error(i...)
 }
 
 // Fatal ...
 func (l *LogrusLogger) Fatal(i ...interface{}) {
+	l.logger.SetLevel(logrus.DebugLevel)
 	l.logger.Fatal(i...)
 }
 
@@ -130,15 +133,18 @@ func (l *LogrusLogger) Infof(format string, i ...interface{}) {
 
 // Warnf ...
 func (l *LogrusLogger) Warnf(format string, i ...interface{}) {
+	l.logger.SetLevel(logrus.DebugLevel)
 	l.logger.Warnf(format, i...)
 }
 
 // Errorf ...
 func (l *LogrusLogger) Errorf(format string, i ...interface{}) {
+	l.logger.SetLevel(logrus.DebugLevel)
 	l.logger.Errorf(format, i...)
 }
 
 // Fatalf ...
 func (l *LogrusLogger) Fatalf(format string, i ...interface{}) {
+	l.logger.SetLevel(logrus.DebugLevel)
 	l.logger.Fatalf(format, i...)
 }

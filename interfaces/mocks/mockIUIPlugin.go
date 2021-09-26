@@ -203,9 +203,9 @@ func (mr *MockIUIPluginMockRecorder) Question(question interface{}, i ...interfa
 }
 
 // Questionf mocks base method
-func (m *MockIUIPlugin) Questionf(questionf string, i ...interface{}) error {
+func (m *MockIUIPlugin) Questionf(questionf string, answer *string, i ...interface{}) error {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{questionf}
+	varargs := []interface{}{questionf, answer}
 	for _, a := range i {
 		varargs = append(varargs, a)
 	}
@@ -215,8 +215,8 @@ func (m *MockIUIPlugin) Questionf(questionf string, i ...interface{}) error {
 }
 
 // Questionf indicates an expected call of Questionf
-func (mr *MockIUIPluginMockRecorder) Questionf(questionf interface{}, i ...interface{}) *gomock.Call {
+func (mr *MockIUIPluginMockRecorder) Questionf(questionf, answer interface{}, i ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{questionf}, i...)
+	varargs := append([]interface{}{questionf, answer}, i...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Questionf", reflect.TypeOf((*MockIUIPlugin)(nil).Questionf), varargs...)
 }

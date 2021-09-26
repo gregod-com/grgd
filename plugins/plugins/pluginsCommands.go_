@@ -25,11 +25,10 @@ func failOnError(err error) {
 
 // GetCLICommands ...
 func GetCLICommands(app *cli.App, core interfaces.ICore) []*cli.Command {
-	var fsm interfaces.IFileSystemManipulator
-	core.Get(&fsm)
+	helper := core.GetHelper()
 
 	pluginFolder := core.GetConfig().GetActiveProfile().GetPluginsDir()
-	fsm.CheckOrCreateFolder(pluginFolder, 0774)
+	helper.CheckOrCreateFolder(pluginFolder, 0774)
 
 	fileinfo, err := ioutil.ReadDir(pluginFolder)
 	failOnError(err)

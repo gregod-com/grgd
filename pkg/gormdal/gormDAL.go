@@ -3,21 +3,24 @@ package gormdal
 import (
 	"fmt"
 	"os"
+	"reflect"
 
 	"github.com/gregod-com/grgd/interfaces"
+	"github.com/gregod-com/grgd/pkg/profile"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 	"gorm.io/gorm/logger"
 )
 
 // ProvideDAL ...
-func ProvideDAL(fsmanipulator interfaces.IFileSystemManipulator, logger interfaces.ILogger) interfaces.IDAL {
+func ProvideDAL(helper interfaces.IHelper, logger interfaces.ILogger) interfaces.IDAL {
 	dal := new(GormDAL)
 	dal.logger = logger
 	dal.logger.Tracef("provide %T", dal)
-	dal.databasePath = fsmanipulator.LoadBootConfig().DatabasePath
-	fsmanipulator.CheckOrCreateParentFolder(dal.databasePath, os.FileMode(uint32(0760)))
+	dal.databasePath = helper.LoadBootConfig().DatabasePath
+	helper.CheckOrCreateParentFolder(dal.databasePath, os.FileMode(uint32(0760)))
 	dal.connect()
 	dal.db.AutoMigrate(&ProfileModel{})
 	dal.db.AutoMigrate(&ProjectModel{})
@@ -68,13 +71,7 @@ func (dal *GormDAL) Update(i interface{}) error {
 	if err != nil {
 		return err
 	}
-	_, ok := i.(interfaces.IProfile)
-	if !ok {
-		dal.logger.Fatal("hmmm konisch")
-	}
-	// dal.logger.Fatalf("%v ", p.GetID())
-
-	return dal.db.Save(dto).Error
+	return dal.db.Session(&gorm.Session{FullSaveAssociations: true}).Save(dto).Error
 }
 
 // Delete ...
@@ -84,45 +81,55 @@ func (dal *GormDAL) Delete(i interface{}) error {
 	if err != nil {
 		return err
 	}
-	return dal.db.Delete(dto).Error
+	// no soft delete, but relly remove from db
+	return dal.db.Unscoped().Delete(dto).Error
 }
 
 // ReadAll ...
 func (dal *GormDAL) ReadAll(dataType interface{}) (map[string]interface{}, error) {
 	dal.logger.Tracef("%T", dataType)
-	dto, err := dal.toDTO(dataType)
-	if err != nil {
-		return nil, err
-	}
-	result := dal.db.Find(dto)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	if result.RowsAffected == 0 {
-		return nil, fmt.Errorf("No entries for %T", dataType)
-	}
-	rows, err := result.Rows()
-	defer rows.Close()
-	if err != nil {
-		return nil, err
-	}
-
+	var result *gorm.DB
 	retmap := make(map[string]interface{})
 
-	for rows.Next() {
-		tempDTO, _ := dal.toDTO(dataType)
-		// ScanRows is a method of `gorm.DB`, it can be used to scan a row into a struct
-		dal.db.ScanRows(rows, tempDTO)
-		dal.toInterface(tempDTO, dataType)
-		retmap[tempDTO.GetName()] = dataType
+	switch typ := reflect.ValueOf(dataType).Interface().(type) {
+	case []interfaces.IProfile:
+		profileModels := []ProfileModel{}
+		result = dal.db.Preload(clause.Associations).Find(&profileModels)
+		if result.Error != nil {
+			return nil, result.Error
+		}
+		for k := range profileModels {
+			p := profile.ProvideProfile(dal.logger, nil)
+			dal.toInterface(&profileModels[k], p)
+			retmap[p.GetName()] = p
+		}
+	default:
+		dal.logger.Fatalf("result: %v (%T)", typ, typ)
+
 	}
 	return retmap, result.Error
 }
 
 func (dal *GormDAL) connect() {
+	var lvl logger.LogLevel
+	switch dal.logger.GetLevel() {
+	case "trace":
+		lvl = logger.Info
+	case "debug":
+		lvl = logger.Info
+	case "info":
+		lvl = logger.Warn
+	case "warn":
+		lvl = logger.Warn
+	case "error":
+		lvl = logger.Error
+	default:
+		lvl = logger.Silent
+	}
+
 	dal.logger.Tracef("Connecting to %v", dal.databasePath)
 	db, err := gorm.Open(sqlite.Open(dal.databasePath+"?cache=shared&mode=memory"), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent)})
+		Logger: logger.Default.LogMode(lvl)})
 	if err != nil {
 		dal.logger.Fatal("failed to connect database")
 	}
@@ -134,7 +141,12 @@ func (dal *GormDAL) toDTO(i interface{}) (dto, error) {
 	case interfaces.IProfile:
 		pm := &ProfileModel{}
 		dal.logger.Tracef("converting %T to %T", v, pm)
-		err := profileToIProfileModel(v, pm)
+		err := iprofileToProfileModel(v, pm)
+		return pm, err
+	case interfaces.IProject:
+		pm := &ProjectModel{}
+		dal.logger.Tracef("converting %T to %T", v, pm)
+		err := iprojectToProjectModel(v, pm)
 		return pm, err
 	case *ProfileModel:
 		dal.logger.Tracef("No Conversion needed (%T is aleady dto)", v)
@@ -159,6 +171,7 @@ func (dal *GormDAL) toInterface(dto interface{}, i interface{}) error {
 			return fmt.Errorf("missmatch when trying to convert %T to %T", dto, i)
 		}
 		dal.logger.Tracef("converting %T to %T", v, p)
+		dal.logger.Debug("here should be some projects loaded %v", v.Projects)
 		return profileModelToIProfile(v, p)
 	case ProjectModel:
 		_, ok := i.(interfaces.IProject)
@@ -172,8 +185,7 @@ func (dal *GormDAL) toInterface(dto interface{}, i interface{}) error {
 		}
 
 	default:
-		dal.logger.Tracef("FOUND dto %T", v)
+		dal.logger.Warnf("FOUND dto %T", v)
 	}
-	dal.logger.Tracef("converted %T to %T", dto, i)
 	return nil
 }

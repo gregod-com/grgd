@@ -9,16 +9,26 @@ import (
 func GetCLICommands(app *cli.App, core interfaces.ICore) []*cli.Command {
 	return []*cli.Command{
 		{
-			Name:     "profile",
-			Category: "settings",
-			Usage:    "Configuration for profile",
-			Flags:    app.Flags,
+			Name:            "profile",
+			Category:        "settings",
+			Usage:           "Configuration for profiles",
+			HideHelpCommand: true,
+			Flags:           app.Flags,
 			Subcommands: []*cli.Command{
 				{
-					Name:   "show",
-					Usage:  "Show all profile infos",
+					Name:    "list",
+					Usage:   "Show all profiles",
+					Aliases: []string{"ls"},
+					Before:  nil,
+					Flags:   app.Flags,
+					Action:  AListProfiles,
+				},
+				{
+					Name:   "delete",
+					Usage:  "Delete a single profile",
+					Before: nil,
 					Flags:  app.Flags,
-					Action: AListProfiles,
+					Action: ADeleteProfile,
 				},
 			},
 		},

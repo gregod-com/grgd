@@ -1,45 +1,37 @@
 package helper
 
 import (
-	"bytes"
 	"io/ioutil"
-	"log"
 	"os"
-	"os/exec"
 	"path"
 	"runtime"
 	"sort"
 	"strings"
-	"time"
 
 	"github.com/gregod-com/grgd/interfaces"
 	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v2"
 )
 
-// ProvideUpdater ...
-func ProvideUpdater(logger interfaces.ILogger) interfaces.IUpdater {
-	up := new(Updater)
-	up.logger = logger
-	logger.Tracef("provide %T", up)
-	return up
+// ProvideNetworker ...
+func ProvideUpdater(logger interfaces.ILogger, networker interfaces.INetworker) interfaces.IUpdater {
+	updater := new(Updater)
+	updater.logger = logger
+	updater.networker = networker
+	logger.Tracef("provide %T", updater)
+	return updater
 }
 
-// Updater ...
 type Updater struct {
-	logger interfaces.ILogger
+	logger    interfaces.ILogger
+	networker interfaces.INetworker
 }
 
 // CheckUpdate ...
-func (h *Updater) CheckUpdate(version string, core interfaces.ICore) error {
-	// UI := core.GetUI()
-	var downloader interfaces.IDownloader
-	err := core.Get(&downloader)
-	if err != nil {
-		return err
-	}
+func (u *Updater) CheckUpdate(version string, core interfaces.ICore) error {
 	cnfg := core.GetConfig()
 	UI := core.GetUI()
+	h := core.GetHelper()
 
 	indexpath := path.Join(cnfg.GetActiveProfile().GetBasePath(), "index.yaml")
 	versionMap := map[string]string{}
@@ -58,15 +50,21 @@ func (h *Updater) CheckUpdate(version string, core interfaces.ICore) error {
 		if strings.HasPrefix(scriptPath, ".") {
 			continue
 		}
-		cName := catchOut(scriptPath, "name")
-		cVersion := catchOut(scriptPath, "version")
+		cName, err := h.CatchOutput(scriptPath, false, "name")
+		if err != nil {
+			return err
+		}
+		cVersion, err := h.CatchOutput(scriptPath, false, "version")
+		if err != nil {
+			return err
+		}
 		versionMap[cName] = cVersion
 	}
 
-	err = downloader.Load(indexpath, cnfg.GetActiveProfile().GetUpdateURL())
-	if err != nil {
-		return err
-	}
+	// err = u.networker.Load(indexpath, cnfg.GetActiveProfile().GetUpdateURL())
+	// if err != nil {
+	// 	return err
+	// }
 
 	index, err := ioutil.ReadFile(indexpath)
 	if err != nil {
@@ -104,7 +102,7 @@ func (h *Updater) CheckUpdate(version string, core interfaces.ICore) error {
 				versionMap[scriptname],
 				semversion) {
 				UI.Println("DOWNLOADING!!!!")
-				err = downloader.Load(path.Join(hackFolder, scriptname+"-partial"), script.Versions[semversion].URL)
+				err = u.networker.Load(path.Join(hackFolder, scriptname+"-partial"), script.Versions[semversion].URL)
 				if err != nil {
 					return err
 				}
@@ -155,7 +153,7 @@ func (h *Updater) CheckUpdate(version string, core interfaces.ICore) error {
 	sort.Strings(newerVersions)
 	if len(newerVersions) > 0 && UI.YesNoQuestionf("Do you want to update to version %v now?", newerVersions[0]) {
 		url := indexObject.Releases["grgd-cli"].Targets[runtime.GOOS+"-"+runtime.GOARCH].Versions[newerVersions[0]].URL
-		err = downloader.Load("/usr/local/bin/grgd-partial", url)
+		err = u.networker.Load("/usr/local/bin/grgd-partial", url)
 		if err != nil {
 			return err
 		}
@@ -166,56 +164,6 @@ func (h *Updater) CheckUpdate(version string, core interfaces.ICore) error {
 	return nil
 }
 
-func catchOut(binPath string, args ...string) string {
-	cmd := exec.Command(binPath, args...)
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	err := cmd.Run()
-	if err != nil {
-		log.Fatal("Error executing: " + err.Error())
-	}
-	return strings.TrimSuffix(out.String(), "\n")
-}
-
-func sortSemverSlice(semverSlice []string) error {
-	// sort.Strings(sortedScriptVersions)
-	sort.Slice(semverSlice, func(i, j int) bool {
-		switch semver.Compare(semverSlice[i], semverSlice[j]) {
-		case 1:
-			return true
-		default:
-			return false
-		}
-	})
+func (u *Updater) CheckSinceLastUpdate(version string, core interfaces.ICore) error {
 	return nil
-}
-
-// IndexObject ...
-type IndexObject struct {
-	Releases map[string]Category `yaml:"category"`
-}
-
-// Category ...
-type Category struct {
-	Targets map[string]Target `yaml:"target"`
-}
-
-type Target struct {
-	Versions map[string]DownloadMetadata `yaml:"version"`
-}
-
-// Version ...
-// type Version struct {
-// 	DownloadMetadata map[string]DownloadMetadata
-// }
-
-// DownloadMetadata ...
-type DownloadMetadata struct {
-	Author       string
-	Description  string
-	Md5          string
-	Released     time.Time
-	Size         int
-	URL          string
-	ReleaseNotes string
 }

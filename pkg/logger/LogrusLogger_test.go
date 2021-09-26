@@ -23,13 +23,14 @@ func TestProvideLogrusLogger(t *testing.T) {
 	mockHelper.EXPECT().CheckFlag("d")
 	mockHelper.EXPECT().CheckFlagArg(gomock.Eq("log-level"))
 
-	core := core.RegisterDependecies(
+	core, err := core.RegisterDependecies(
 		map[string]interface{}{
 			"IHelper": mockHelper,
 			"ILogger": ProvideLogrusLogger,
 		})
 
 	// Then
+	assert.NoError(t, err)
 	var loggerInterface interfaces.ILogger
 	assert.Implements(t, &loggerInterface, core.GetLogger())
 }

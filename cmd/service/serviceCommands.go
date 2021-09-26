@@ -9,9 +9,8 @@ import (
 func GetCLICommands(app *cli.App, core interfaces.ICore) []*cli.Command {
 	return []*cli.Command{
 		{
-			Name:     "services",
+			Name:     "service",
 			Category: "settings",
-			Aliases:  []string{"s"},
 			Usage:    "Configuration for services",
 			Flags:    app.Flags,
 			Subcommands: []*cli.Command{
@@ -46,12 +45,6 @@ func GetCLICommands(app *cli.App, core interfaces.ICore) []*cli.Command {
 					Usage:  "Disable service",
 					Flags:  app.Flags,
 					Action: AToggleService,
-				},
-				{
-					Name:   "group",
-					Usage:  "Group services together",
-					Flags:  app.Flags,
-					Action: AGroupService,
 				},
 			},
 		},

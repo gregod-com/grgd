@@ -9,9 +9,8 @@ import (
 func GetCLICommands(app *cli.App, core interfaces.ICore) []*cli.Command {
 	return []*cli.Command{
 		{
-			Name:     "projects",
+			Name:     "project",
 			Category: "settings",
-			Aliases:  []string{"p"},
 			Usage:    "Configuration for projects",
 			Flags:    app.Flags,
 			Subcommands: []*cli.Command{
