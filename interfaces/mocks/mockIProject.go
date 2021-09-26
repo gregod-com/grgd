@@ -48,21 +48,17 @@ func (mr *MockIProjectMockRecorder) Init(core interface{}) *gomock.Call {
 }
 
 // GetID mocks base method
-func (m *MockIProject) GetID(i ...interface{}) uint {
+func (m *MockIProject) GetID() uint {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
-	for _, a := range i {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetID", varargs...)
+	ret := m.ctrl.Call(m, "GetID")
 	ret0, _ := ret[0].(uint)
 	return ret0
 }
 
 // GetID indicates an expected call of GetID
-func (mr *MockIProjectMockRecorder) GetID(i ...interface{}) *gomock.Call {
+func (mr *MockIProjectMockRecorder) GetID() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetID", reflect.TypeOf((*MockIProject)(nil).GetID), i...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetID", reflect.TypeOf((*MockIProject)(nil).GetID))
 }
 
 // SetID mocks base method
