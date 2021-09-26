@@ -15,4 +15,6 @@ type ICore interface {
 	GetUpdater() IUpdater
 	GetCMDPlugins() []ICMDPlugin
 	Get(i interface{}) error
+	CallPreHook(i interface{}) error
+	CallPostHook(i interface{}) error
 }
