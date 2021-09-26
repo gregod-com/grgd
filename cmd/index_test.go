@@ -1,49 +1,35 @@
 package cmd
 
-import (
-	"fmt"
-	"testing"
+// func TestGetCommands(t *testing.T) {
+// 	// Given
+// 	app := cli.NewApp()
+// 	cli.NewContext(app, nil, nil)
+// 	dependecies := map[string]interface{}{
+// 		"IHelper":   helper.ProvideHelper,
+// 		"IUIPlugin": view.ProvideFallbackUI,
+// 		"ILogger":   logger.ProvideLogrusLogger,
+// 		"IDAL":      gormdal.ProvideDAL,
+// 		"IConfig":   config.ProvideConfig,
+// 	}
+// 	core, err := core.RegisterDependecies(dependecies)
 
-	"github.com/gregod-com/grgd/core"
-	"github.com/gregod-com/grgd/pkg/config"
-	"github.com/gregod-com/grgd/pkg/gormdal"
-	"github.com/gregod-com/grgd/pkg/helper"
-	"github.com/gregod-com/grgd/pkg/logger"
-	"github.com/gregod-com/grgd/view"
-	"github.com/tj/assert"
-	"github.com/urfave/cli/v2"
-)
+// 	// When
+// 	cmds := GetCommands(app, core)
 
-func TestGetCommands(t *testing.T) {
-	// Given
-	app := cli.NewApp()
-	cli.NewContext(app, nil, nil)
-	dependecies := map[string]interface{}{
-		"IHelper":   helper.ProvideHelper,
-		"IUIPlugin": view.ProvideFallbackUI,
-		"ILogger":   logger.ProvideLogrusLogger,
-		"IDAL":      gormdal.ProvideDAL,
-		"IConfig":   config.ProvideConfig,
-	}
-	core, err := core.RegisterDependecies(dependecies)
+// 	// Then
+// 	assert.NoError(t, err)
+// 	assert.Nil(t, nil, "here in nil")
+// 	if len(cmds) == 0 {
+// 		t.Error("no good")
+// 	}
+// 	for _, v := range cmds {
+// 		fmt.Println(v.Name)
+// 	}
+// }
 
-	// When
-	cmds := GetCommands(app, core)
-
-	// Then
-	assert.NoError(t, err)
-	assert.Nil(t, nil, "here in nil")
-	if len(cmds) == 0 {
-		t.Error("no good")
-	}
-	for _, v := range cmds {
-		fmt.Println(v.Name)
-	}
-}
-
-func TestGetUser(t *testing.T) {
-	// Given
-	// When
-	// Then
-	assert.True(t, true)
-}
+// func TestGetUser(t *testing.T) {
+// 	// Given
+// 	// When
+// 	// Then
+// 	assert.True(t, true)
+// }
