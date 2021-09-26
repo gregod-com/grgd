@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"strings"
 
 	"github.com/gregod-com/grgd/interfaces"
 	"gopkg.in/yaml.v2"
@@ -163,7 +164,9 @@ func (h *Helper) CatchOutput(script string, silent bool, args ...string) (string
 		cmd.Stderr = &errout
 	}
 	err := cmd.Run()
-	return out.String() + errout.String(), err
+	stdout := strings.Trim(out.String(), "\n")
+	stderr := strings.Trim(errout.String(), "\n")
+	return stdout + stderr, err
 }
 
 func (h *Helper) createDefaultConfig(bootconfigpath string) {
