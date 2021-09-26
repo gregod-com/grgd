@@ -3,7 +3,7 @@ package interfaces
 // IProject ...
 type IProject interface {
 	Init(core ICore) error
-	GetID(i ...interface{}) uint
+	GetID() uint
 	SetID(id uint) error
 
 	IsInitialized() bool
