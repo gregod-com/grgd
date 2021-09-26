@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gregod-com/grgd/interfaces"
+	"github.com/urfave/cli/v2"
 )
 
 var tempLogger interfaces.ILogger
@@ -22,7 +23,7 @@ func RegisterDependecies(implsTemp map[string]interface{}) (interfaces.ICore, er
 	tempLoggerProvider, foundProvider := implsTemp["ILogger"].(func() interfaces.ILogger)
 	tempLogger, foundLogger = implsTemp["ILogger"].(interfaces.ILogger)
 	if !foundProvider && !foundLogger {
-		return nil, fmt.Errorf("The implementation for ILogger was not provided. Can not start application without logger (found %T )", implsTemp["ILogger"])
+		return nil, fmt.Errorf("the implementation for ILogger was not provided. Can not start application without logger (found %T )", implsTemp["ILogger"])
 	}
 	if foundProvider {
 		tempLogger = tempLoggerProvider()
@@ -66,7 +67,7 @@ func RegisterDependecies(implsTemp map[string]interface{}) (interfaces.ICore, er
 			break
 		}
 		if solvedlast == solvedCurrent {
-			return nil, fmt.Errorf("There seems to be a circular dependency...")
+			return nil, fmt.Errorf("there seems to be a circular dependency")
 		}
 		solvedlast = solvedCurrent
 	}
@@ -229,4 +230,48 @@ func (c *Core) GetUpdater() interfaces.IUpdater {
 		return nil
 	}
 	return a
+}
+
+// GetUpdater ...
+func (c *Core) CallPreHook(i interface{}) error {
+	log := c.GetLogger()
+	log.Trace()
+	ctx, ok := i.(*cli.Context)
+	if !ok {
+		return fmt.Errorf("wrong type passed %T", i)
+	}
+
+	hook, ok := ctx.App.Metadata["hooks_pre_"+ctx.Command.Name].(func(*cli.Context) error)
+	if !ok {
+		log.Debugf("no pre hook for command %s found", ctx.Command.Name)
+		return nil
+	}
+	log.Infof("executing pre hook for command %s", ctx.Command.Name)
+	err := hook(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// GetUpdater ...
+func (c *Core) CallPostHook(i interface{}) error {
+	log := c.GetLogger()
+	log.Trace()
+	ctx, ok := i.(*cli.Context)
+	if !ok {
+		return fmt.Errorf("wrong type passed")
+	}
+
+	hook, ok := ctx.App.Metadata["hooks_post_"+ctx.Command.Name].(func(*cli.Context) error)
+	if !ok {
+		log.Debugf("no post hook for command %s found", ctx.Command.Name)
+		return nil
+	}
+	log.Infof("executing post hook for command %s", ctx.Command.Name)
+	err := hook(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
 }
