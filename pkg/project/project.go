@@ -66,35 +66,22 @@ func (p *Project) Init(core interfaces.ICore) error {
 	return err
 }
 
-type ServiceMetadata struct {
-	Name    string
-	Version string
-	// define how service is deployed for dev/staging/live...
-	RunTimes map[string]RunTime
-	//optional
-	Meta map[string]interface{}
-}
-
-type RunTime struct {
-	// define technology type (i.e. kubernetes, vm, serverless....)
-	Technology string
-	// define technology for dev deployment (i.e. skaffold&helm, skaffold & manifests, kubectl, helm-only,...)
-	Helper map[string]interface{}
-}
-
 func defaultPermissions() fs.FileMode {
 	return os.FileMode(uint32(0760))
 }
+
+const metadataFolder = ".grgd"
 
 // AutosetupServices ...
 func (p *Project) autoSetupServices(core interfaces.ICore) error {
 	// log := core.GetLogger()
 	ui := core.GetUI()
 	h := core.GetHelper()
-	p.settingsyamlpath = path.Join(p.path, ".grgd", ".grgdproject.yaml")
+	p.settingsyamlpath = path.Join(p.path, metadataFolder, ".grgdproject.yaml")
 	h.CheckOrCreateParentFolder(p.settingsyamlpath, defaultPermissions())
 	projMeta, err := p.readSettings(h)
 
+	shouldBeIgnored(metadataFolder, &projMeta.IgnoreFolders)
 	files, err := os.ReadDir(p.path)
 	if err != nil {
 		return err
@@ -103,10 +90,10 @@ func (p *Project) autoSetupServices(core interfaces.ICore) error {
 		if !serviceDir.IsDir() {
 			continue
 		}
-		if serviceDir.Name() == ".grgd" {
+		if isIgnored(serviceDir.Name(), projMeta.IgnoreFolders) {
 			continue
 		}
-		servMeta := &ServiceMetadata{Name: serviceDir.Name()}
+		servMeta := &interfaces.ServiceMetadata{Name: serviceDir.Name()}
 
 		servYamlPath := path.Join(p.path, serviceDir.Name(), ".grgdservice.yaml")
 		dat, err := h.ReadFile(servYamlPath)
@@ -116,6 +103,9 @@ func (p *Project) autoSetupServices(core interfaces.ICore) error {
 				return err
 			}
 			if !ui.YesNoQuestion("Is " + serviceDir.Name() + " a folder containing a service you would like to add to the project?") {
+				if ui.YesNoQuestion("Add " + serviceDir.Name() + " to the ignore list? (can be whitelisted again): ") {
+					shouldBeIgnored(serviceDir.Name(), &projMeta.IgnoreFolders)
+				}
 				continue
 			}
 			err = h.UpdateOrWriteFile(servYamlPath, dat, defaultPermissions())
@@ -127,7 +117,7 @@ func (p *Project) autoSetupServices(core interfaces.ICore) error {
 		if err != nil {
 			return err
 		}
-		projMeta.Services[servMeta.Name] = map[string]interface{}{"path": servYamlPath, "active": true}
+		projMeta.Services[servMeta.Name] = interfaces.ServiceLocator{Path: servYamlPath, Active: true}
 	}
 
 	p.writeSettings(projMeta, h)
@@ -165,21 +155,19 @@ func (p *Project) writeSettings(projMeta *interfaces.ProjectMetadata, h interfac
 	return nil
 }
 
-// func walker(path string, info os.FileInfo, err error) error {
-// 	if !info.IsDir() && strings.Contains(info.Name(), "docker-compose") {
-// 		fmt.Println(path)
-// 	}
-
-// 	if !info.IsDir() && strings.Contains(info.Name(), "skaffold.yaml") {
-// 		fmt.Println(path)
-// 	}
-
-// 	if info.IsDir() && strings.Contains(info.Name(), "Chart") {
-// 		fmt.Println(path)
-// 	}
-
-// 	return nil
-// }
+func shouldBeIgnored(val string, arr *[]string) {
+	if !isIgnored(val, *arr) {
+		*arr = append(*arr, val)
+	}
+}
+func isIgnored(val string, arr []string) bool {
+	for _, v := range arr {
+		if val == v {
+			return true
+		}
+	}
+	return false
+}
 
 // GetName ...
 func (project *Project) GetName() string {
@@ -227,13 +215,40 @@ func (project *Project) SetPath(path string, i ...interface{}) error {
 }
 
 // GetServices ...
-func (project *Project) GetServices(i ...interface{}) map[string]interfaces.IService {
-	return nil
+func (project *Project) GetServices(i ...interface{}) map[string]interfaces.ServiceMetadata {
+	services := make(map[string]interfaces.ServiceMetadata)
+	c, ok := i[0].(interfaces.ICore)
+	if !ok {
+		return nil
+	}
+	log := c.GetLogger()
+	h := c.GetHelper()
+	projMeta, err := project.readSettings(h)
+	if err != nil {
+		return nil
+
+	}
+	for _, v := range projMeta.Services {
+		byts, err := os.ReadFile(v.Path)
+		if err != nil {
+			log.Warnf("%s", err.Error())
+			continue
+		}
+		srv := interfaces.ServiceMetadata{}
+		err = yaml.Unmarshal(byts, &srv)
+		if err != nil {
+			log.Warnf("%s", err.Error())
+			continue
+		}
+		services[srv.Name] = srv
+	}
+	return services
 }
 
 // GetServiceByName ...
-func (project *Project) GetServiceByName(serviceName string, i ...interface{}) interfaces.IService {
-	return nil
+func (project *Project) GetServiceByName(serviceName string, i ...interface{}) interfaces.ServiceMetadata {
+
+	return interfaces.ServiceMetadata{}
 }
 
 // GetValues ...
