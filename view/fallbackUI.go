@@ -142,32 +142,47 @@ func (ui FallbackUI) PrintBanner(i ...interface{}) interface{} {
 	longestMetaKey++
 	longestMetaValue++
 
+	valueSpace := 30
 	meta := []string{}
+	currentProjName := "---"
+	if p := core.GetConfig().GetActiveProfile().GetCurrentProject(); p != nil {
+		currentProjName = p.GetName()
+	}
 	for key, value := range map[string]string{
 		"version": c.App.Version,
 		"profile": core.GetConfig().GetActiveProfile().GetName(),
+		"project": currentProjName,
 	} {
-		meta = append(meta, fmt.Sprintf("%-*s \u001b[33m %-*s\u001b[0m", longestMetaKey, key, longestMetaValue, value))
+		meta = append(meta, fmt.Sprintf("%-*s \u001b[33m %-*s\u001b[0m", longestMetaKey, key, valueSpace, value))
 	}
 
 	sort.Strings(unsorted)
 	for _, key := range unsorted {
-		meta = append(meta, fmt.Sprintf("%-*s \u001b[33m %-*s\u001b[0m", longestMetaKey, key, longestMetaValue, core.GetConfig().GetActiveProfile().GetMetaData(key)))
+		val := core.GetConfig().GetActiveProfile().GetMetaData(key)
+		if len(val) > valueSpace {
+			val = val[:valueSpace-3]
+			val += "..."
+		}
+		if val == "" {
+			val = "--"
+		}
+
+		meta = append(meta, fmt.Sprintf("%-*s \u001b[33m %-*s\u001b[0m", longestMetaKey, key, valueSpace, val))
 	}
 
 	// fmt.Srintf("version: \u001b[33m %s\u001b[0m", c.App.Version),
 	// ||| profile: \u001b[33m%s\u001b[0m",
 	// core.GetConfig().GetActiveProfile().GetName(),
 
-	iamASCII := figure.NewFigure(c.App.Name, "standard", true)
+	ASCII := figure.NewFigure(c.App.Name, "standard", true)
 	longestLine := 0
-	nrOfBannerLines := len(iamASCII.Slicify())
-	for _, line := range iamASCII.Slicify() {
+	nrOfBannerLines := len(ASCII.Slicify())
+	for _, line := range ASCII.Slicify() {
 		if len(line) > longestLine {
 			longestLine = len(line)
 		}
 	}
-	for k, line := range iamASCII.Slicify() {
+	for k, line := range ASCII.Slicify() {
 		tag1 := ""
 		tag2 := ""
 		if k <= len(meta)-1 {
@@ -234,6 +249,7 @@ func (ui FallbackUI) YesNoQuestion(question string, i ...interface{}) bool {
 }
 
 // YesNoQuestionf ...
+
 func (ui FallbackUI) YesNoQuestionf(question string, i ...interface{}) bool {
 	ui.logger.Tracef("")
 	fmt.Printf(question+" [y/n] ", i...)
@@ -258,14 +274,11 @@ func (ui FallbackUI) Question(question string, i ...interface{}) error {
 }
 
 // Questionf ...
-func (ui FallbackUI) Questionf(question string, i ...interface{}) error {
+func (ui FallbackUI) Questionf(question string, answer *string, i ...interface{}) error {
 	ui.logger.Tracef("")
-	fmt.Printf(question, i[1:])
-	if len(i) > 0 {
-		answer, ok := i[0].(*string)
-		if input := readLine(); ok && input != "" {
-			*answer = input
-		}
+	fmt.Printf(question, i...)
+	if input := readLine(); input != "" {
+		*answer = input
 	}
 	return nil
 }

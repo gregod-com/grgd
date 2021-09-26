@@ -4,35 +4,32 @@ package view
 // GetHelpTemplate so if i start typing something here
 func GetHelpTemplate() string {
 	return `
-
-
-USAGE:
-	{{- if .UsageText}}
-		{{.UsageText}}
-	{{- else}}
-		{{.HelpName}} 
-		{{- if .VisibleFlags}}	[global options]
-		{{- end}}
-		{{- if .Commands}} command [command options]
-		{{- end}} 
-		{{- if .ArgsUsage}} {{.ArgsUsage}}
-		{{- else}} [arguments...]
-		{{- end}}
-	{{end}}
+{{- if .UsageText}}
+	{{- .UsageText}}
+{{- else}}
+	{{.HelpName}} 
+	{{- if .VisibleFlags}}	[global options]
+	{{- end}}
+	{{- if .Commands}} command [command options]
+	{{- end}} 
+	{{- if .ArgsUsage}} {{.ArgsUsage}}
+	{{- else}} [arguments...]
+	{{- end}}
+{{ end }}
 COMMANDS:
-	{{- if .VisibleCommands}}
+{{- if .VisibleCommands}}
 	{{- range .VisibleCategories}}
-	 	{{- if .Name}}
-	{{ .Name}}
+		{{- if .Name}}
+	/// {{ .Name}} \\\
 		{{- end}}
 		{{- range .VisibleCommands}}
 			{{$names:= join .Names ", " }}
 			{{- printf "%-20v" $names }} {{"->  "}}{{.Usage}}
 		{{- end}}
-		{{end}}
+	{{end}}
 	{{- end}}
-	{{if .VisibleFlags}}
-	GLOBAL OPTIONS:
+	{{- if .VisibleFlags}}
+	Flags:
 		{{- range $index, $option := .VisibleFlags}}
 			{{if $index}}
 		{{- end}}

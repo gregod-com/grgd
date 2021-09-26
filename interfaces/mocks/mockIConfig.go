@@ -137,106 +137,18 @@ func (mr *MockIConfigMockRecorder) RemoveProfile(p interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveProfile", reflect.TypeOf((*MockIConfig)(nil).RemoveProfile), p)
 }
 
-// GetAllProjects mocks base method
-func (m *MockIConfig) GetAllProjects() (map[string][]interfaces.IProject, error) {
+// Remove mocks base method
+func (m *MockIConfig) Remove(i interface{}) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAllProjects")
-	ret0, _ := ret[0].(map[string][]interfaces.IProject)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetAllProjects indicates an expected call of GetAllProjects
-func (mr *MockIConfigMockRecorder) GetAllProjects() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllProjects", reflect.TypeOf((*MockIConfig)(nil).GetAllProjects))
-}
-
-// GetProjects mocks base method
-func (m *MockIConfig) GetProjects() (map[string]interfaces.IProject, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetProjects")
-	ret0, _ := ret[0].(map[string]interfaces.IProject)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetProjects indicates an expected call of GetProjects
-func (mr *MockIConfigMockRecorder) GetProjects() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjects", reflect.TypeOf((*MockIConfig)(nil).GetProjects))
-}
-
-// GetProjectByName mocks base method
-func (m *MockIConfig) GetProjectByName(projectName string) (interfaces.IProject, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetProjectByName", projectName)
-	ret0, _ := ret[0].(interfaces.IProject)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetProjectByName indicates an expected call of GetProjectByName
-func (mr *MockIConfigMockRecorder) GetProjectByName(projectName interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectByName", reflect.TypeOf((*MockIConfig)(nil).GetProjectByName), projectName)
-}
-
-// AddProject mocks base method
-func (m *MockIConfig) AddProject(p string, i ...interface{}) error {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{p}
-	for _, a := range i {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "AddProject", varargs...)
+	ret := m.ctrl.Call(m, "Remove", i)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// AddProject indicates an expected call of AddProject
-func (mr *MockIConfigMockRecorder) AddProject(p interface{}, i ...interface{}) *gomock.Call {
+// Remove indicates an expected call of Remove
+func (mr *MockIConfigMockRecorder) Remove(i interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{p}, i...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddProject", reflect.TypeOf((*MockIConfig)(nil).AddProject), varargs...)
-}
-
-// RemoveProject mocks base method
-func (m *MockIConfig) RemoveProject(p interfaces.IProject, i ...interface{}) error {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{p}
-	for _, a := range i {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "RemoveProject", varargs...)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// RemoveProject indicates an expected call of RemoveProject
-func (mr *MockIConfigMockRecorder) RemoveProject(p interface{}, i ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{p}, i...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveProject", reflect.TypeOf((*MockIConfig)(nil).RemoveProject), varargs...)
-}
-
-// SwitchCurrentProject mocks base method
-func (m *MockIConfig) SwitchCurrentProject(i ...interface{}) (interfaces.IProject, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{}
-	for _, a := range i {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "SwitchCurrentProject", varargs...)
-	ret0, _ := ret[0].(interfaces.IProject)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// SwitchCurrentProject indicates an expected call of SwitchCurrentProject
-func (mr *MockIConfigMockRecorder) SwitchCurrentProject(i ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SwitchCurrentProject", reflect.TypeOf((*MockIConfig)(nil).SwitchCurrentProject), i...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Remove", reflect.TypeOf((*MockIConfig)(nil).Remove), i)
 }
 
 // GetConfigPath mocks base method

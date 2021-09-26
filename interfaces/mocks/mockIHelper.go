@@ -6,6 +6,8 @@ package mocks
 
 import (
 	gomock "github.com/golang/mock/gomock"
+	interfaces "github.com/gregod-com/grgd/interfaces"
+	os "os"
 	reflect "reflect"
 )
 
@@ -72,4 +74,141 @@ func (m *MockIHelper) CheckFlagArg(flag string) string {
 func (mr *MockIHelperMockRecorder) CheckFlagArg(flag interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckFlagArg", reflect.TypeOf((*MockIHelper)(nil).CheckFlagArg), flag)
+}
+
+// HomeDir mocks base method
+func (m *MockIHelper) HomeDir(i ...string) string {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{}
+	for _, a := range i {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HomeDir", varargs...)
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// HomeDir indicates an expected call of HomeDir
+func (mr *MockIHelperMockRecorder) HomeDir(i ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HomeDir", reflect.TypeOf((*MockIHelper)(nil).HomeDir), i...)
+}
+
+// CurrentWorkdir mocks base method
+func (m *MockIHelper) CurrentWorkdir(i ...string) string {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{}
+	for _, a := range i {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CurrentWorkdir", varargs...)
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// CurrentWorkdir indicates an expected call of CurrentWorkdir
+func (mr *MockIHelperMockRecorder) CurrentWorkdir(i ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CurrentWorkdir", reflect.TypeOf((*MockIHelper)(nil).CurrentWorkdir), i...)
+}
+
+// CheckOrCreateFolder mocks base method
+func (m *MockIHelper) CheckOrCreateFolder(path string, permissions os.FileMode) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "CheckOrCreateFolder", path, permissions)
+}
+
+// CheckOrCreateFolder indicates an expected call of CheckOrCreateFolder
+func (mr *MockIHelperMockRecorder) CheckOrCreateFolder(path, permissions interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckOrCreateFolder", reflect.TypeOf((*MockIHelper)(nil).CheckOrCreateFolder), path, permissions)
+}
+
+// CheckOrCreateParentFolder mocks base method
+func (m *MockIHelper) CheckOrCreateParentFolder(path string, permissions os.FileMode) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "CheckOrCreateParentFolder", path, permissions)
+}
+
+// CheckOrCreateParentFolder indicates an expected call of CheckOrCreateParentFolder
+func (mr *MockIHelperMockRecorder) CheckOrCreateParentFolder(path, permissions interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckOrCreateParentFolder", reflect.TypeOf((*MockIHelper)(nil).CheckOrCreateParentFolder), path, permissions)
+}
+
+// PathExists mocks base method
+func (m *MockIHelper) PathExists(path string) bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PathExists", path)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// PathExists indicates an expected call of PathExists
+func (mr *MockIHelperMockRecorder) PathExists(path interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PathExists", reflect.TypeOf((*MockIHelper)(nil).PathExists), path)
+}
+
+// LoadBootConfig mocks base method
+func (m *MockIHelper) LoadBootConfig() *interfaces.Bootconfig {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoadBootConfig")
+	ret0, _ := ret[0].(*interfaces.Bootconfig)
+	return ret0
+}
+
+// LoadBootConfig indicates an expected call of LoadBootConfig
+func (mr *MockIHelperMockRecorder) LoadBootConfig() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadBootConfig", reflect.TypeOf((*MockIHelper)(nil).LoadBootConfig))
+}
+
+// ReadFile mocks base method
+func (m *MockIHelper) ReadFile(path string) ([]byte, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ReadFile", path)
+	ret0, _ := ret[0].([]byte)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ReadFile indicates an expected call of ReadFile
+func (mr *MockIHelperMockRecorder) ReadFile(path interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadFile", reflect.TypeOf((*MockIHelper)(nil).ReadFile), path)
+}
+
+// UpdateOrWriteFile mocks base method
+func (m *MockIHelper) UpdateOrWriteFile(path string, content []byte, permissions os.FileMode) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateOrWriteFile", path, content, permissions)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateOrWriteFile indicates an expected call of UpdateOrWriteFile
+func (mr *MockIHelperMockRecorder) UpdateOrWriteFile(path, content, permissions interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateOrWriteFile", reflect.TypeOf((*MockIHelper)(nil).UpdateOrWriteFile), path, content, permissions)
+}
+
+// CatchOutput mocks base method
+func (m *MockIHelper) CatchOutput(script string, silent bool, args ...string) (string, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{script, silent}
+	for _, a := range args {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CatchOutput", varargs...)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CatchOutput indicates an expected call of CatchOutput
+func (mr *MockIHelperMockRecorder) CatchOutput(script, silent interface{}, args ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{script, silent}, args...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CatchOutput", reflect.TypeOf((*MockIHelper)(nil).CatchOutput), varargs...)
 }

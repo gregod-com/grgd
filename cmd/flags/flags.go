@@ -9,6 +9,7 @@ func GetFlags() []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:    "profile",
+			Aliases: []string{"p"},
 			EnvVars: []string{"USER"},
 		},
 		&cli.StringFlag{

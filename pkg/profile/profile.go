@@ -8,19 +8,22 @@ import (
 	"sort"
 
 	"github.com/gregod-com/grgd/interfaces"
+	"github.com/gregod-com/grgd/pkg/project"
 )
 
 // ProvideProfile ...
-func ProvideProfile(logger interfaces.ILogger) interfaces.IProfile {
+func ProvideProfile(logger interfaces.ILogger, ui interfaces.IUIPlugin) interfaces.IProfile {
 	p := &Profile{}
-	p.logger = logger
+	p.Logger = logger
+	p.Ui = ui
 	logger.Tracef("provide %T", p)
 	return p
 }
 
 // Profile ...
 type Profile struct {
-	logger           interfaces.ILogger
+	Logger           interfaces.ILogger
+	Ui               interfaces.IUIPlugin
 	id               uint
 	name             string
 	initialized      bool
@@ -29,45 +32,30 @@ type Profile struct {
 	metadata         map[string]string
 }
 
-var updateurl = "https://s3.iamstudent.dev/public/grgd/index.yaml"
-
 // InitNewProfile ...
-func InitNewProfile(
-	name string,
-	logger interfaces.ILogger,
-	UI interfaces.IUIPlugin,
-	fsm interfaces.IFileSystemManipulator) *Profile {
+func InitNewProfile(name string, ui interfaces.IUIPlugin, log interfaces.ILogger, helper interfaces.IHelper, i ...interface{}) interfaces.IProfile {
 
 	var profile Profile
 	// defaults for new profile
 	profile.name = name
 	profile.metadata = make(map[string]string)
-	profile.metadata["homeDir"] = fsm.HomeDir(".grgd")
-	profile.metadata["hackDir"] = path.Join(profile.metadata["homeDir"], "hack")
-	profile.metadata["pluginDir"] = path.Join(profile.metadata["homeDir"], "pluginsv2")
-	profile.metadata["updateURL"] = updateurl
-	profile.metadata["awsRegion"] = "eu-central-1"
+	profile.metadata["grgdDir"] = helper.HomeDir(".grgd")
+	profile.metadata["hackDir"] = path.Join(profile.metadata["grgdDir"], "hack")
 
-	UI.ClearScreen()
+	ui.ClearScreen()
 
-	UI.Printf("Hey %v, let's init your profile\n\n", profile.name)
+	ui.Printf("Hey %v, let's init your profile\n\n", profile.name)
 
 	// Scripts
-	UI.Questionf("Base scripts directory [%s]: ", profile.metadata["pluginDir"], profile.metadata["pluginDir"])
-	for !fsm.PathExists(profile.metadata["pluginDir"]) {
-		answer := profile.metadata["pluginDir"]
-		profile.metadata["pluginDir"] = fsm.HomeDir(".grgd", "hack")
-		UI.Questionf("The path `%s` does not exists. Try again or use default [%s]: ", answer, profile.metadata["pluginDir"], profile.metadata["pluginDir"])
+	answer := profile.metadata["hackDir"]
+	ui.Questionf("Base scripts directory [%s]: ", &answer, answer)
+	for !helper.PathExists(answer) {
+		oldAnswer := answer
+		answer = profile.metadata["hackDir"]
+		ui.Questionf("The path `%s` does not exists. Try again or use default [%s]: ", &answer, oldAnswer, answer)
 	}
-
-	UI.Questionf("URL to fetch updates from: [%s]: ", profile.metadata["updateURL"], profile.metadata["updateURL"])
-
-	for !ping(profile.metadata["updateURL"]) {
-		answer := profile.metadata["updateURL"]
-		profile.metadata["updateURL"] = updateurl
-		UI.Questionf("The url `%s` it not reachable. Use anyways or use default [%s]: ", answer, profile.metadata["updateURL"], profile.metadata["updateURL"])
-	}
-
+	profile.metadata["hackDir"] = answer
+	profile.projects = make(map[string]interfaces.IProject)
 	profile.initialized = true
 	return &profile
 }
@@ -108,14 +96,6 @@ func (p *Profile) SetMetaData(key, value string) {
 	}
 }
 
-// GetUpdateURL ...
-func (p *Profile) GetUpdateURL() string {
-	if url, ok := p.metadata["updateURL"]; ok {
-		return url
-	}
-	return ""
-}
-
 // IsInitialized ...
 func (p *Profile) IsInitialized() bool {
 	return p.initialized
@@ -151,7 +131,7 @@ func (p *Profile) SetName(n string) error {
 
 // GetBasePath ...
 func (p *Profile) GetBasePath() string {
-	return p.metadata["homeDir"]
+	return p.metadata["grgdDir"]
 }
 
 // GetPluginsDir ...
@@ -189,11 +169,28 @@ func (p *Profile) GetProjectsTable() [][]string {
 	return rows
 }
 
+func (p *Profile) AddProject() error {
+	return nil
+}
+
+func (p *Profile) AddProjectByName(name string) error {
+	if p.projects == nil {
+		p.projects = make(map[string]interfaces.IProject)
+	}
+	if _, ok := p.projects[name]; !ok {
+		newP := &project.Project{}
+		newP.SetName(name)
+		p.projects[name] = newP
+	}
+	return nil
+}
+
 // AddProject ...
-func (p *Profile) AddProject(proj string) error {
-	// newProj := &persistence.GRGDProject{Name: proj}
-	// p.projects[proj] = CreateProjectWrapper(newProj)
-	// p.model.Projects = append(p.model.Projects, newProj)
+func (p *Profile) AddProjectDirect(proj interfaces.IProject) error {
+	if p.projects == nil {
+		p.projects = make(map[string]interfaces.IProject)
+	}
+	p.projects[proj.GetName()] = proj
 	return nil
 }
 
@@ -210,18 +207,30 @@ func (p *Profile) RemoveProjectByName(proj string) error {
 }
 
 // GetCurrentProject ...
+func (p *Profile) GetCurrentProjectID() uint {
+	return p.currentProjectID
+}
+
+// GetCurrentProject ...
+func (p *Profile) SetCurrentProjectID(id uint) error {
+	p.currentProjectID = id
+	return nil
+
+}
+
+// GetCurrentProject ...
 func (p *Profile) GetCurrentProject() interfaces.IProject {
-	// for _, v := range p.projects {
-	// 	if v.GetID() == p.model.CurrentProjectID {
-	// 		return p.projects[v.GetName()]
-	// 	}
-	// }
+	for _, v := range p.projects {
+		if v.GetID() == p.currentProjectID {
+			return p.projects[v.GetName()]
+		}
+	}
 	return nil
 }
 
 // SetCurrentProject ...
 func (p *Profile) SetCurrentProject(newProject interfaces.IProject) error {
-	// p.model.GetCurrentProjectID() = newProject.GetID()
+	p.currentProjectID = newProject.GetID()
 	return nil
 }
 

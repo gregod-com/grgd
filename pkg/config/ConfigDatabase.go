@@ -10,68 +10,101 @@ import (
 )
 
 // ProvideConfig ...
-func ProvideConfig(dal I.IDAL, ui I.IUIPlugin, logger I.ILogger, fsm I.IFileSystemManipulator, prof I.IProfile) I.IConfig {
+func ProvideConfig(dal I.IDAL, ui I.IUIPlugin, logger I.ILogger, helper I.IHelper) I.IConfig {
 	config := &ConfigDatabase{
 		dal:    dal,
 		ui:     ui,
 		logger: logger,
-		fsm:    fsm,
+		helper: helper,
 	}
-	mp, err := dal.ReadAll(prof)
+	// var prof I.IProfile
+	var profiles []I.IProfile
+	allProfiles, err := dal.ReadAll(profiles)
 	if err != nil {
 		config.logger.Warnf("Error loading profiles")
 	}
-	config.profiles = make(map[string]I.IProfile)
-	for k, v := range mp {
-		config.profiles[k] = v.(I.IProfile)
+
+	// remove element with key ""
+	_, ok := allProfiles[""]
+	if ok {
+		delete(allProfiles, "")
 	}
+
+	config.profiles = make(map[string]I.IProfile)
+	for name, prof := range allProfiles {
+		p, ok := prof.(I.IProfile)
+		if !ok {
+			continue
+		}
+		config.profiles[name] = p
+		config.logger.Debugf("Adding profile: %s", name)
+	}
+
+	config.profileProvider = profile.InitNewProfile
+	config.activeProfile = helper.CheckUserProfile()
 	config.logger.Tracef("provide %T", config)
 	return config
 }
 
 // ConfigDatabase ...
 type ConfigDatabase struct {
-	dal           I.IDAL
-	logger        I.ILogger
-	ui            I.IUIPlugin
-	fsm           I.IFileSystemManipulator
-	profiles      map[string]I.IProfile
-	activeProfile string `yaml:"activeProfile"`
+	dal             I.IDAL
+	logger          I.ILogger
+	ui              I.IUIPlugin
+	helper          I.IHelper
+	profileProvider func(name string, ui I.IUIPlugin, log I.ILogger, helper I.IHelper, i ...interface{}) I.IProfile
+	projectProvider func(i ...interface{}) I.IProject
+	profiles        map[string]I.IProfile
+	activeProfile   string
 }
 
 // Save ...
 func (coDB *ConfigDatabase) Save(i ...interface{}) error {
+	coDB.logger.Trace("")
 	for k := range coDB.profiles {
 		err := coDB.dal.Update(coDB.profiles[k])
 		if err != nil {
 			coDB.logger.Fatal(err)
 		}
+		// for _, proj := range coDB.profiles[k].GetProjects() {
+		// 	err := coDB.dal.Update(proj)
+		// 	if err != nil {
+		// 		coDB.logger.Fatal(err)
+		// 	}
+		// }
 	}
-
 	coDB.logger.Trace("")
 	return nil
 }
 
 // GetAllProfiles ...
 func (coDB *ConfigDatabase) GetAllProfiles() (map[string]I.IProfile, error) {
+	coDB.logger.Trace("")
+
 	return coDB.profiles, nil
 }
 
 // InitNewProfile ...
 func (coDB *ConfigDatabase) InitNewProfile(name string) error {
-	coDB.logger.Tracef("Profile %s not set! Starting init process...", name)
-	p := profile.InitNewProfile(name, coDB.logger, coDB.ui, coDB.fsm)
+	coDB.logger.Trace("")
+	coDB.logger.Debug("Profile %s not set! Starting init process...", name)
+	p := coDB.profileProvider(name, coDB.ui, coDB.logger, coDB.helper)
+	// p := profile.InitNewProfile(name, coDB.logger, coDB.ui, coDB.helper)
 	return coDB.AddProfile(p)
 }
 
 // SetActiveProfile ...
 func (coDB *ConfigDatabase) SetActiveProfile(name string) error {
+	coDB.logger.Trace("")
+
 	coDB.activeProfile = name
 	return nil
 }
 
 // GetActiveProfile ...
 func (coDB *ConfigDatabase) GetActiveProfile() I.IProfile {
+	coDB.logger.Trace("")
+
 	if _, ok := coDB.profiles[coDB.activeProfile]; !ok {
 		if coDB.InitNewProfile(coDB.activeProfile) != nil {
 			coDB.logger.Fatal("Could not create new profile")
@@ -82,6 +115,8 @@ func (coDB *ConfigDatabase) GetActiveProfile() I.IProfile {
 
 // GetActiveProfileByName ...
 func (coDB *ConfigDatabase) GetActiveProfileByName(profilename string) (I.IProfile, error) {
+	coDB.logger.Trace("")
+
 	current, ok := coDB.profiles[profilename]
 	if !ok {
 		coDB.logger.Tracef("Profile %s not set! Starting init process...", profilename)
@@ -103,45 +138,21 @@ func (coDB *ConfigDatabase) AddProfile(p I.IProfile) error {
 
 // RemoveProfile ...
 func (coDB *ConfigDatabase) RemoveProfile(p I.IProfile) error {
+	coDB.logger.Tracef("")
+	coDB.dal.Delete(p)
 	return nil
-}
-
-// GetAllProjects ...
-func (coDB *ConfigDatabase) GetAllProjects() (map[string][]I.IProject, error) {
-	return nil, nil
-
-}
-
-// GetProjects ...
-func (coDB *ConfigDatabase) GetProjects() (map[string]I.IProject, error) {
-	return coDB.GetActiveProfile().GetProjects(), nil
-}
-
-// GetProjectByName ...
-func (coDB *ConfigDatabase) GetProjectByName(projectName string) (I.IProject, error) {
-	p := coDB.GetActiveProfile().GetProjects()[projectName]
-	return p, nil
-}
-
-// AddProject ...
-func (coDB *ConfigDatabase) AddProject(p string, i ...interface{}) error {
-	return coDB.GetActiveProfile().AddProject(p)
 }
 
 // RemoveProject ...
-func (coDB *ConfigDatabase) RemoveProject(p I.IProject, i ...interface{}) error {
-	// db := coDB.dal.Delete(&persistence.GRGDProject{}, &persistence.GRGDProject{Name: p.GetName()})
-	// delete(coDB.GetActiveProfile().GetProjects(), p.GetName())
+func (coDB *ConfigDatabase) Remove(i interface{}) error {
+	coDB.logger.Tracef("")
+	coDB.dal.Delete(i)
 	return nil
-}
-
-// SwitchCurrentProject ...
-func (coDB *ConfigDatabase) SwitchCurrentProject(i ...interface{}) (I.IProject, error) {
-	return nil, nil
 }
 
 // GetConfigPath ...
 func (coDB *ConfigDatabase) GetConfigPath() (string, error) {
+	coDB.logger.Tracef("")
 	return "", nil
 }
 

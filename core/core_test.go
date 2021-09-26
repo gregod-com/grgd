@@ -31,12 +31,13 @@ func TestRegisterDependecies_With_Helper_2(t *testing.T) {
 	// Given
 
 	// When
-	mycore := RegisterDependecies(
+	mycore, err := RegisterDependecies(
 		map[string]interface{}{
 			"interfaces.IHelper": helper.ProvideHelper,
 		})
 
 	// Then
+	assert.NoError(t, err)
 	assert.NotNil(t, mycore.GetHelper(), "core returned nil for helper")
 	hlpr := mycore.GetHelper()
 
@@ -47,12 +48,13 @@ func TestRegisterDependecies_With_Helper_2(t *testing.T) {
 func TestRegisterDependecies_With_Helper_3(t *testing.T) {
 	// Given
 	// When
-	mycore := RegisterDependecies(
+	mycore, err := RegisterDependecies(
 		map[string]interface{}{
 			"hans": nil,
 		})
 
 	// Then
+	assert.NoError(t, err)
 	assert.NotNil(t, mycore.GetHelper(), "core returned nil for helper")
 	hlpr := mycore.GetHelper()
 	var helperint interfaces.IHelper
@@ -63,7 +65,7 @@ func TestRegisterDependecies_With_Helper_3(t *testing.T) {
 func TestRegisterDependecies_With_Helper_4(t *testing.T) {
 	// Given
 	// When
-	mycore := RegisterDependecies(
+	mycore, err := RegisterDependecies(
 		map[string]interface{}{
 			"interfaces.IHelper":  helper.ProvideHelper,
 			"interfaces.IHelper2": helper.ProvideHelper,
@@ -72,6 +74,7 @@ func TestRegisterDependecies_With_Helper_4(t *testing.T) {
 		})
 
 	// Then
+	assert.NoError(t, err)
 	assert.NotNil(t, mycore.GetHelper(), "core returned nil for helper")
 	hlpr := mycore.GetHelper()
 	var helperint interfaces.IHelper
@@ -81,12 +84,13 @@ func TestRegisterDependecies_With_Helper_4(t *testing.T) {
 func TestRegisterDependecies_With_Helper_5(t *testing.T) {
 	// Given
 	// When
-	mycore := RegisterDependecies(
+	mycore, err := RegisterDependecies(
 		map[string]interface{}{
 			"interfaces.IHelper": helper.ProvideHelper,
 		})
 
 	// Then
+	assert.NoError(t, err)
 	assert.NotNil(t, mycore.GetHelper(), "core returned nil for helper")
 	hlpr := mycore.GetHelper()
 	var helperint interfaces.IHelper
@@ -96,12 +100,13 @@ func TestRegisterDependecies_With_Helper_5(t *testing.T) {
 func TestRegisterDependecies_With_Variadric_Provider(t *testing.T) {
 	// Given
 	// When
-	mycore := RegisterDependecies(
+	mycore, err := RegisterDependecies(
 		map[string]interface{}{
 			"fmt.Println": fmt.Println,
 		})
 
 	// Then
+	assert.NoError(t, err)
 	assert.NotNil(t, mycore.GetHelper(), "core returned nil for helper")
 	hlpr := mycore.GetHelper()
 	var helperint interfaces.IHelper
@@ -112,12 +117,13 @@ func TestRegisterDependecies_With_Struct(t *testing.T) {
 	// Given
 	configStruct := config.ConfigDatabase{}
 	// When
-	mycore := RegisterDependecies(
+	mycore, err := RegisterDependecies(
 		map[string]interface{}{
 			"test": configStruct,
 		})
 
 	// Then
+	assert.NoError(t, err)
 	assert.NotNil(t, mycore.GetHelper(), "core returned nil for helper")
 	hlpr := mycore.GetHelper()
 	var helperint interfaces.IHelper

@@ -51,13 +51,13 @@ func (yamlObj *ConfigYAML) initFromFile() error {
 }
 
 func (yamlObj *ConfigYAML) getSourceAsBytes() []byte {
-	iamconf, err := ioutil.ReadFile(yamlObj.path)
+	conf, err := ioutil.ReadFile(yamlObj.path)
 	if err != nil {
 		yamlObj.Update()
 		log.Println("A new config file has been created at " + yamlObj.path)
 		log.Fatal("Run the 'init' command next to configure your stack.")
 	}
-	return iamconf
+	return conf
 }
 
 //                                       _                _

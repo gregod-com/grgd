@@ -1,4 +1,4 @@
-package hack
+package plugins
 
 import (
 	"path"
@@ -10,10 +10,10 @@ import (
 // AExec ...
 func AExec(c *cli.Context) error {
 	core := helper.GetExtractor().GetCore(c)
-	// UI := core.GetUI()
 	h := core.GetHelper()
 	log := core.GetLogger()
-	script := path.Join(core.GetConfig().GetActiveProfile().GetMetaData("hackDir"), c.Command.FullName())
+
+	script := path.Join(core.GetConfig().GetActiveProfile().GetBasePath(), "hack", c.Command.FullName())
 
 	args := c.Args().Slice()
 	prefix := "exec"
@@ -22,6 +22,7 @@ func AExec(c *cli.Context) error {
 	}
 
 	args = append([]string{prefix}, args...)
+
 	log.Debug("Calling plugin with arguments: %v\n", args)
 
 	if _, err2 := h.CatchOutput(script, false, args...); err2 != nil {

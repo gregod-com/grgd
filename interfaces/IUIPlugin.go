@@ -11,5 +11,5 @@ type IUIPlugin interface {
 	YesNoQuestion(question string, i ...interface{}) bool
 	YesNoQuestionf(questionf string, i ...interface{}) bool
 	Question(question string, i ...interface{}) error
-	Questionf(questionf string, i ...interface{}) error
+	Questionf(questionf string, answer *string, i ...interface{}) error
 }

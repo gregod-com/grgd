@@ -14,18 +14,37 @@ import (
 // AListService ...
 func AListService(c *cli.Context) error {
 	core := helper.GetExtractor().GetCore(c)
-	logger := core.GetLogger()
-	logger.Trace("This is the list service command")
+	log := core.GetLogger()
+	ui := core.GetUI()
+	h := core.GetHelper()
 
-	// var profile *persistence.Profile
-	// helpers.ExtractMetadataFatal(c.App.Metadata, "profile", &profile)
-	// current := getProjectByID(profile.Projects, profile.CurrentProjectID)
+	proj := core.GetConfig().GetActiveProfile().GetCurrentProject()
+	if proj == nil {
+		log.Warn("Current project is not set")
+		return nil
+	}
 
-	// head := []string{"Name", "Path", "Description"}
-	// rows := sortServiceMetadataSlice(current.Services)
-	// logger.Trace(profile.Projects)
+	pm, err := proj.ReadSettingsObject(h)
+	if err != nil {
+		return err
+	}
 
-	// UI.PrintTable(c, head, rows)
+	srvs := proj.GetServices(core)
+
+	for k, v := range srvs {
+		ui.Printf("%-20v%-20v\n", k, v)
+
+	}
+	for serviceName, serviceEntry := range pm.Services {
+		ui.Printf("%-20v\n", serviceName)
+		// service := proj.GetServiceByName(k)
+		ui.Printf("%-4v%v: %v \n", "", "active", serviceEntry.Active)
+
+		// }
+		// if propName == "path" {
+		// 	yaml.Unmarshall()
+		// }
+	}
 
 	return nil
 }

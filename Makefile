@@ -11,10 +11,9 @@ BINARYNAME=grgd
 OS=darwin
 PLATFORM=amd64
 
-all: test build-native stats index
+all: test build-native stats
 
-test:
-	cd interfaces && ./makeMocks.sh
+test: mocks
 	$(GOTEST) ./...
 
 build-native:
@@ -25,12 +24,6 @@ run:
 
 stats:
 	du -sh $(BINPATH)$(BINARYNAME)-$(OS)-$(PLATFORM)
-
-index:
-	./idxer $(BINARYNAME) $(OS) $(PLATFORM)
-
-upload:
-	mc mirror --remove --overwrite bin/ minio/public/grgd/
 
 cover:
 	$(GOTEST) -coverprofile=coverage.out -cover ./...
@@ -51,17 +44,14 @@ docker-build-bin:
 		$(GOBUILD) -ldflags="-w -s"			\
 		-o ./$(BINPATH)$(BINARYNAME)-linux
 
-docker-build:
-	docker build -t registry.gitlab.com/iamdevelopment/iamk3d:latest .
-	docker push registry.gitlab.com/iamdevelopment/iamk3d:latest
-
-tdd:
-	fswatch -o ../* | xargs -n1 -I{} bash -c 'clear && go test ./...'
+tdd: mocks
+	fswatch -o ../* | xargs -n1 -I{} bash -c 'clear && $(GOTEST) ./...'
 
 mocks:
 	@for f in interfaces/*.go; do \
 		echo generate $${f}; \
-		mockgen --source=$${f} -destination interfaces/mocks/mock`basename $${f}` -package mocks; \
+		mockgen -imports interfaces/IConfig.go=github.com/gregod-com/grgd/interfaces,interfaces/ICore.go=github.com/gregod-com/grgd/interfaces,interfaces/IExtractor.go=github.com/gregod-com/grgd/interfaces,interfaces/IHelper.go=github.com/gregod-com/grgd/interfaces,interfaces/INetworker.go=github.com/gregod-com/grgd/interfaces,interfaces/IProfile.go=github.com/gregod-com/grgd/interfaces,interfaces/IProject.go=github.com/gregod-com/grgd/interfaces  \
+		--source=$${f} -destination interfaces/mocks/mock`basename $${f}` -package mocks; \
 	done
 
 proto:
