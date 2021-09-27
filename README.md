@@ -1,4 +1,4 @@
-![Logo of the project](https://img.shields.io/aur/license/asd)
+![main pipeline](https://github.com/gregod-com/grgd/actions/workflows/go.yml/badge.svg) [![GitHub go.mod Go version of a Go module](https://img.shields.io/github/go-mod/go-version/gregod-com/grgd.svg)](https://github.com/gregod-com/grgd) [![GoReportCard](https://goreportcard.com/badge/github.com/gregod-com/grgd)](https://goreportcard.com/report/github.com/gregod-com/grgd) [![GitHub license](https://img.shields.io/github/license/gregod-com/grgd)](https://github.com/gregod-com/grgd/blob/master/LICENSE)
 
 # grgd
 
