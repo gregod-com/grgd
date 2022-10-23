@@ -18,3 +18,4 @@ bin/
 
 .vscode/*
 delme*
+.DS_Store
