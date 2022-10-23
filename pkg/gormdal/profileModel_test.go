@@ -7,7 +7,7 @@ import (
 	"github.com/gregod-com/grgd/interfaces"
 	"github.com/gregod-com/grgd/interfaces/mocks"
 	"github.com/gregod-com/grgd/pkg/profile"
-	"github.com/tj/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLoadTESTProfile(t *testing.T) {

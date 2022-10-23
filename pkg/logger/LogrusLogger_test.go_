@@ -8,7 +8,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/gregod-com/grgd/core"
 	"github.com/gregod-com/grgd/interfaces/mocks"
-	"github.com/tj/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestProvideLogrusLogger(t *testing.T) {
