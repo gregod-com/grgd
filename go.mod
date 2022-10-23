@@ -6,7 +6,6 @@ replace github.com/gregod-com/grgd/interfaces => ../grgd/interfaces
 
 require (
 	github.com/golang/mock v1.6.0
-	github.com/sirupsen/logrus v1.9.0
 	github.com/stretchr/testify v1.8.0
 	github.com/urfave/cli/v2 v2.20.3
 	golang.org/x/mod v0.6.0
