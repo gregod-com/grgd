@@ -111,7 +111,7 @@ func (l *Logger) Trace(i ...interface{}) {
 func (l *Logger) Debug(i ...interface{}) {
 	if log_level > 4 {
 		l.logger.SetPrefix("DEBUG: ")
-		l.logger.Println(i)
+		l.logger.Println(i...)
 	}
 }
 
@@ -119,7 +119,7 @@ func (l *Logger) Debug(i ...interface{}) {
 func (l *Logger) Info(i ...interface{}) {
 	if log_level > 3 {
 		l.logger.SetPrefix("INFO: ")
-		l.logger.Println(i)
+		l.logger.Println(i...)
 	}
 }
 
@@ -127,7 +127,7 @@ func (l *Logger) Info(i ...interface{}) {
 func (l *Logger) Warn(i ...interface{}) {
 	if log_level > 2 {
 		l.logger.SetPrefix("WARN: ")
-		l.logger.Println(i)
+		l.logger.Println(i...)
 	}
 }
 
@@ -135,14 +135,14 @@ func (l *Logger) Warn(i ...interface{}) {
 func (l *Logger) Error(i ...interface{}) {
 	if log_level > 1 {
 		l.logger.SetPrefix("ERROR: ")
-		l.logger.Println(i)
+		l.logger.Println(i...)
 	}
 }
 
 // Fatal ...
 func (l *Logger) Fatal(i ...interface{}) {
 	l.logger.SetPrefix("FATAL: ")
-	l.logger.Fatal(i)
+	l.logger.Fatal(i...)
 }
 
 // Tracef ...
