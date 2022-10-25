@@ -10,7 +10,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/common-nighthawk/go-figure"
 	"github.com/gregod-com/grgd/interfaces"
 	cli "github.com/urfave/cli/v2"
 	"golang.org/x/sys/unix"
@@ -174,15 +173,14 @@ func (ui FallbackUI) PrintBanner(i ...interface{}) interface{} {
 	// ||| profile: \u001b[33m%s\u001b[0m",
 	// core.GetConfig().GetActiveProfile().GetName(),
 
-	ASCII := figure.NewFigure(c.App.Name, "standard", true)
 	longestLine := 0
-	nrOfBannerLines := len(ASCII.Slicify())
-	for _, line := range ASCII.Slicify() {
+	nrOfBannerLines := len(convert_to_banner(c.App.Name))
+	for _, line := range convert_to_banner(c.App.Name) {
 		if len(line) > longestLine {
 			longestLine = len(line)
 		}
 	}
-	for k, line := range ASCII.Slicify() {
+	for k, line := range convert_to_banner(c.App.Name) {
 		tag1 := ""
 		tag2 := ""
 		if k <= len(meta)-1 {

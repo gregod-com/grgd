@@ -7,7 +7,7 @@ import (
 
 	"github.com/gregod-com/grgd/pkg/helper"
 	"github.com/gregod-com/grgd/pkg/logger"
-	"github.com/tj/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRegisterDependecies_With_Nil(t *testing.T) {
@@ -22,7 +22,7 @@ func TestRegisterDependecies_With_Helper(t *testing.T) {
 	// When
 	RegisterDependecies(
 		map[string]interface{}{
-			"ILogger": logger.ProvideLogrusLogger,
+			"ILogger": logger.ProvideLogger,
 			"IHelper": helper.ProvideHelper,
 		})
 }
@@ -33,7 +33,7 @@ func TestRegisterDependecies_With_Helper_2(t *testing.T) {
 	// When
 	mycore, err := RegisterDependecies(
 		map[string]interface{}{
-			"ILogger": logger.ProvideLogrusLogger,
+			"ILogger": logger.ProvideLogger,
 			"IHelper": helper.ProvideHelper,
 		})
 
@@ -69,7 +69,7 @@ func TestRegisterDependecies_With_Helper_4(t *testing.T) {
 	// When
 	mycore, err := RegisterDependecies(
 		map[string]interface{}{
-			"ILogger":             logger.ProvideLogrusLogger,
+			"ILogger":             logger.ProvideLogger,
 			"interfaces.IHelper":  helper.ProvideHelper,
 			"interfaces.IHelper2": helper.ProvideHelper,
 			"interfaces.IHelper3": helper.ProvideHelper,
@@ -89,7 +89,7 @@ func TestRegisterDependecies_With_Helper_5(t *testing.T) {
 	// When
 	mycore, err := RegisterDependecies(
 		map[string]interface{}{
-			"ILogger":            logger.ProvideLogrusLogger,
+			"ILogger":            logger.ProvideLogger,
 			"interfaces.IHelper": helper.ProvideHelper,
 		})
 

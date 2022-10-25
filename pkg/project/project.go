@@ -6,7 +6,7 @@ import (
 	"os"
 	"path"
 
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 
 	"github.com/gregod-com/grgd/interfaces"
 )

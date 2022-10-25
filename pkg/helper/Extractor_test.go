@@ -5,7 +5,7 @@ import (
 
 	"github.com/gregod-com/grgd/view"
 
-	"github.com/tj/assert"
+	"github.com/stretchr/testify/assert"
 	"github.com/urfave/cli/v2"
 )
 

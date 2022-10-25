@@ -10,7 +10,7 @@ import (
 
 	"github.com/gregod-com/grgd/interfaces"
 	"golang.org/x/mod/semver"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 // ProvideNetworker ...

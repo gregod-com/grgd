@@ -7,7 +7,7 @@ import (
 
 	I "github.com/gregod-com/grgd/interfaces"
 
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 // CreateConfigYAML ...

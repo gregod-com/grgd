@@ -14,9 +14,9 @@ import (
 )
 
 func main() {
-	log := logger.ProvideLogrusLogger()
+	log := logger.ProvideLogger()
 	dependecies := map[string]interface{}{
-		"ILogger":     logger.ProvideLogrusLogger,
+		"ILogger":     logger.ProvideLogger,
 		"IConfig":     config.ProvideConfig,
 		"IHelper":     helper.ProvideHelper,
 		"INetworker":  helper.ProvideNetworker,

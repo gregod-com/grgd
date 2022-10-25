@@ -9,7 +9,7 @@ import (
 	"github.com/gregod-com/grgd/pkg/profile"
 	"github.com/gregod-com/grgd/pkg/project"
 	"github.com/gregod-com/grgd/pkg/service"
-	"github.com/tj/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLoadTESTService(t *testing.T) {
